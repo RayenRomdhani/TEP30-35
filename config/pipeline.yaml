@@ -1,0 +1,4 @@
+# Settings for our own scenario pipeline (Phase 4 adds the rest).
+
+# Prepared, unsolved Tunisia network from PyPSA-Earth v0.10.0 + config/tn_base.yaml (Task 6).
+base_network: "D:/pypsa-earth/networks/TN/elec_s_2_ec_lcopt_3h.nc"

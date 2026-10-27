@@ -38,4 +38,41 @@ Lesson for the Tunisia run: on-disk size is several times the download size, so 
 
 ## PyPSA-Earth configuration changes
 
-(None yet. Filled in Phase 2.)
+All overrides live in [`config/tn_base.yaml`](../config/tn_base.yaml), passed with `--configfile`. PyPSA-Earth itself is unmodified.
+
+| Key | Default | Ours | Why |
+|---|---|---|---|
+| `tutorial` | `false` (`true` only in `config.tutorial.yaml`) | `false` | Not a change: stated so the run clearly uses the full data bundles |
+| `countries` | `["NG", "BJ"]` | `["TN"]` | Tunisia only (spec D11) |
+| `run.name` | `""` | `"TN"` | Keeps Tunisia files apart from the tutorial run |
+| `scenario.clusters` | `[10]` | `[2]` | Small, fast network (spec D11) |
+| `scenario.opts` | `[Co2L-3h]` | `[3h]` | 3-hour steps; no CO2 cap because Tunisia has none (spec D9) |
+| `electricity.extendable_carriers.Generator` | `[solar, onwind, offwind-ac, offwind-dc, OCGT]` | `[solar, onwind, OCGT, CCGT]` | Candidate technologies of spec D1 |
+| `electricity.extendable_carriers.StorageUnit` | `[]` | `[]` | No pumped hydro or H2 storage units |
+| `electricity.extendable_carriers.Store` | `[battery, H2]` | `[battery]` | Li-ion only; no hydrogen (spec D1) |
+| `electricity.renewable_carriers` | `[solar, onwind, offwind-ac, offwind-dc, hydro]` | `[solar, onwind, hydro]` | Offshore wind is not a candidate, so its profiles are skipped |
+| `solving.solver` | `gurobi`, `gurobi-default` | `highs`, `highs-default` | Open-source solver |
+
+Left at their defaults (checked in `config.default.yaml`): cost year 2030 with technology-data v0.15.0, discount rate 0.071, weather year 2013, load source GEGIS with prediction year 2030.
+
+### Built-in minimum renewable share (plan Task 6, Step 2)
+
+PyPSA-Earth v0.10.0 has an `RES` option in `opts`, but it is not usable here. It forces the renewable share to **equal** the target, measures the share against load rather than domestic generation, and the code marks it as work in progress. Our spec needs **at least** 35% of domestic generation (D12).
+**Answer: none suitable; custom constraint in Task 13.**
+
+### Missing OCGT candidate
+
+PyPSA-Earth adds extendable OCGT only at buses that already have a plant labelled OCGT (`scripts/add_electricity.py`, line 772). The Tunisian plant list has none, so listing OCGT in `extendable_carriers` adds the carrier but no generator. Our own code will add OCGT candidates (see `docs/phase2-base-network.md`).
+
+## Tunisia base network run (Task 6)
+
+Command (from `D:\pypsa-earth`):
+`snakemake -j 1 networks/TN/elec_s_2_ec_lcopt_3h.nc --configfile <repo>/config/tn_base.yaml`
+
+| Item | Value |
+|---|---|
+| Date | 2026-10-27, 17:12 → 23:00 |
+| Result | 21 of 21 steps done, exit 0 |
+| Runtime | 347.6 min, of which about 5.3 h downloads and 17 min modelling |
+| Disk after the run | `data/` 21.4 GB, `cutouts/` 19.5 GB (includes the tutorial data); 41.2 GB free on D: |
+| Output | `networks/TN/elec_s_2_ec_lcopt_3h.nc` (2 buses, 2,920 snapshots × 3 h, 29.88 TWh load) |
