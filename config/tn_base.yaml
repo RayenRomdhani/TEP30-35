@@ -1,0 +1,28 @@
+# PyPSA-Earth v0.10.0 overrides for the Tunisia 2030 study.
+# Only keys that differ from D:\pypsa-earth\config.default.yaml (and configs/solving.default.yaml).
+# Run from D:\pypsa-earth:  snakemake -j 1 <target> --configfile <this file>
+# Every change is also logged, with its reason, in docs/config-changes.md.
+
+tutorial: false            # full data bundles, not the Nigeria/Benin tutorial set
+
+countries: ["TN"]          # Tunisia only (spec D11)
+
+run:
+  name: "TN"               # write TN files to resources/TN, networks/TN, results/TN (kept apart from the tutorial)
+
+scenario:
+  clusters: [2]            # 2 nodes to start; 4 later if runtime allows (spec D11)
+  opts: ["3h"]             # 3-hour steps (spec D11, risk R1). No "Co2L": Tunisia has no CO2 cap; CO2 is reported, not limited (spec D9)
+
+electricity:
+  extendable_carriers:
+    Generator: [solar, onwind, OCGT, CCGT]   # new builds allowed by spec D1 (no offshore wind)
+    StorageUnit: []
+    Store: [battery]                          # Li-ion battery (store + charger/discharger links); no hydrogen (spec D1)
+    Link: []
+  renewable_carriers: [solar, onwind, hydro]  # skip offshore wind profiles: not a candidate technology (spec D1)
+
+solving:
+  solver:
+    name: highs            # open-source solver (default is the commercial gurobi)
+    options: highs-default # preset from configs/solving.default.yaml
