@@ -18,6 +18,24 @@ Every install step and every change to PyPSA-Earth's configuration, with the rea
 
 Key pinned versions: Python 3.11.13, PyPSA 0.30.3, linopy 0.5.5, HiGHS (highspy) 1.11.0, Snakemake 7.32.4.
 
+## Tutorial run (Task 5)
+
+Command (from `D:\pypsa-earth`, PyPSA-Earth unmodified):
+`snakemake -j 1 solve_all_networks --configfile config.tutorial.yaml`
+
+| Item | Value |
+|---|---|
+| Date | 2026-10-27, 16:10 → 17:08 |
+| Result | 27 of 27 steps done, exit 0 |
+| Runtime | 58.1 min on 1 core (i3-1215U, 24 GB RAM) |
+| Downloads | tutorial bundles ≈ 0.75 GB zipped (data 144 MB, cutouts 10 MB, common data 259 MB, hydrobasins 337 MB) + OpenStreetMap data |
+| Disk after unzip | `data/` 4.5 GB, other folders < 0.1 GB |
+| Solved network | `results/networks/elec_s_6_ec_lcopt_Co2L-4H.nc` (Nigeria + Benin, 18 buses, 36 snapshots × 243 h) |
+| Objective | 3,258.9 M EUR/yr |
+| Energy balance | generators 42.95 TWh + hydro storage 8.39 TWh = load 51.33 TWh (gap 0.000 TWh) |
+
+Lesson for the Tunisia run: on-disk size is several times the download size, so plan ≥ 30 GB for the ≈ 16 GB Tunisia download (D: had 78 GB free after the tutorial).
+
 ## PyPSA-Earth configuration changes
 
 (None yet. Filled in Phase 2.)
