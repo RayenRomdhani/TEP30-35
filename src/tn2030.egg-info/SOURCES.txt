@@ -1,7 +1,0 @@
-pyproject.toml
-src/tn2030/__init__.py
-src/tn2030.egg-info/PKG-INFO
-src/tn2030.egg-info/SOURCES.txt
-src/tn2030.egg-info/dependency_links.txt
-src/tn2030.egg-info/top_level.txt
-tests/test_package.py
