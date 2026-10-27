@@ -91,4 +91,30 @@ These feed the constants in Task 13 (renewable share constraint):
 | Runtime | 347.6 min. Downloads took about 5.3 h (data bundle 4 h 51 min, cutout 29 min); modelling steps took about 17 min |
 | Disk on D: after the run | `data/` 21.4 GB, `cutouts/` 19.5 GB, `resources/` 0.1 GB; 41.2 GB free |
 
+## Resolution benchmark (Task 7, risk R1)
+
+The base network solved as-is (PyPSA-Earth `solve_network`, HiGHS, same config) at 3-hour and 1-hour steps. Both solves are optimal. This is a plain least-cost expansion with no renewable-share constraint and default costs, so the results are a timing check, not study results.
+
+Command: `snakemake -j 1 results/TN/networks/elec_s_2_ec_lcopt_{3h,1h}.nc --configfile <repo>/config/tn_base.yaml`
+
+| | 3 h | 1 h | 1 h vs 3 h |
+|---|---|---|---|
+| Snapshots | 2,920 | 8,760 | ×3 |
+| LP size (rows × columns) | 154,779 × 75,934 | 464,299 × 227,774 | ×3 |
+| HiGHS solve time | 49.9 s | 535.8 s | ×10.7 |
+| Whole `solve_network` step | 69.6 s | 582.3 s | ×8.4 |
+| Peak memory (process tree) | 0.72 GiB | 1.26 GiB | ×1.8 |
+| Objective (M EUR/yr, excl. constant 842.5) | 1,369.3 | 1,374.0 | +0.3% |
+| Solar built (MW) | 6,633 | 6,459 | −2.6% |
+| Onshore wind built (MW) | 2,023 | 1,948 | −3.7% |
+| CCGT generation (TWh) | 15.4 | 15.9 | +3.2% |
+| Batteries built | 0 | 0 | |
+| Peak load (MW) | 4,604 | 4,620 | 3-hour averaging smooths the peak |
+
+Solve times are from the HiGHS and Snakemake logs. Snakemake cannot measure memory on Windows ("unable to collect cpu and memory benchmark statistics"), so peak memory comes from a second run of each solve, sampling the memory of the whole process tree every 0.5 s. That second run reproduced both objectives exactly; its HiGHS times were 58.5 s (3 h) and 578.2 s (1 h), so solve times vary by about ±10% between runs. Machine: i3-1215U, 24 GB RAM, 1 Snakemake core.
+
+During solving, PyPSA-Earth adds `load shedding` generators priced at 100 EUR/kWh, i.e. 100,000 EUR/MWh (`configs/solving.default.yaml`). It also adds tiny random "noisy costs" so the solver has a unique optimum. Both runs shed 0 TWh. Our Phase 4 pipeline must decide whether to keep both settings.
+
+## Notes
+
 The `GUROBI error: Unknown parameter '_test'` line at the top of the log is a harmless check by the `pulp` library for an installed commercial solver. Gurobi is not used.
