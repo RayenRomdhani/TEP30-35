@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tn2030"
+version = "0.1.0"
+description = "Value of energy efficiency in Tunisia's 2030 power system (PyPSA-Earth study)"
+authors = [{ name = "Rayen Romdhani" }]
+requires-python = ">=3.11"
+# Dependencies come from the pypsa-earth conda environment (environment.yml).
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

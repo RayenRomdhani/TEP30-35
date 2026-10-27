@@ -1,0 +1,6 @@
+Metadata-Version: 2.4
+Name: tn2030
+Version: 0.1.0
+Summary: Value of energy efficiency in Tunisia's 2030 power system (PyPSA-Earth study)
+Author: Rayen Romdhani
+Requires-Python: >=3.11
