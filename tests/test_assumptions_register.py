@@ -42,6 +42,12 @@ def test_load_register_rejects_sourced_row_without_url(tmp_path):
         load_register(path)
 
 
+def test_load_register_rejects_usable_row_without_value(tmp_path):
+    path = _write_register(tmp_path / "reg.xlsx", [_row("flex_max_hours", None, "assumption", url="")])
+    with pytest.raises(ValueError, match="value"):
+        load_register(path)
+
+
 def test_load_register_rejects_duplicate_ids(tmp_path):
     path = _write_register(tmp_path / "reg.xlsx", [
         _row("re_target_2030", 0.35, "sourced"),

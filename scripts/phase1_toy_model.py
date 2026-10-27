@@ -26,7 +26,7 @@ def summarize(n) -> None:
     w = n.snapshot_weightings.generators
     gen = n.generators_t.p.mul(w, axis=0).sum()
     print("Built capacity (MW):")
-    for name, mw in n.generators.p_nom_opt.clip(lower=0).items():  # solver may return -0.0
+    for name, mw in (n.generators.p_nom_opt.clip(lower=0) + 0.0).items():  # + 0.0 turns solver's -0.0 into 0.0
         print(f"  {LABELS[name]:<14}{mw:8.0f}")
     print(f"  {'Battery':<14}{n.storage_units.p_nom_opt['battery']:8.0f}  "
           f"({n.storage_units.max_hours['battery']:.0f} h)")
@@ -89,7 +89,7 @@ def plot_dispatch(n, path: Path) -> None:
         ax.spines[side].set_color("#c3c2b7")
     ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1), frameon=False, fontsize=9)
     fig.text(0.01, 0.045, "Generation above the load line charges the battery (shown below zero). "
-             "Days 3-4 are a low-wind spell.", color=MUTED, fontsize=8)
+             "Wind availability drops to 20% on 2-3 July (low-wind spell).", color=MUTED, fontsize=8)
     fig.text(0.01, 0.01, "Illustrative load, solar and wind shapes (not measured data). "
              "Costs: PyPSA technology-data v0.15.0 (2030). Solver: HiGHS.",
              color=MUTED, fontsize=8)

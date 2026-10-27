@@ -27,8 +27,8 @@ the cheapest system look like under these assumptions", nothing more.
 | Demand | `Load` with hourly `p_set` | illustrative summer-day shape, peak ~4.1 GW |
 | Gas (CCGT) | `Generator`, `p_nom_extendable=True` | technology-data v0.15.0: 1,109 EUR/kW, 58 % efficiency, gas 28.4 EUR/MWh_th |
 | Solar PV | `Generator` + hourly `p_max_pu` | 482 EUR/kW, illustrative daylight curve |
-| Onshore wind | `Generator` + hourly `p_max_pu` | 1,383 EUR/kW, illustrative curve with a 2-day lull |
-| Battery | `StorageUnit`, `max_hours=4` | inverter 214 EUR/kW + storage 190 EUR/kWh, 96 % each way |
+| Onshore wind | `Generator` + hourly `p_max_pu` | 1,383 EUR/kW, illustrative curve with a lull on 2-3 July |
+| Battery | `StorageUnit`, `max_hours=4` | inverter 214 EUR/kW + storage 190 EUR/kWh; 96 % round trip, so √0.96 ≈ 98 % each way (as PyPSA-Earth does) |
 
 Every number comes from [`data/assumptions_register.xlsx`](../data/assumptions_register.xlsx). Load, solar and
 wind **shapes are illustrative**, not measured; they exist only to show the mechanics.
@@ -67,7 +67,7 @@ $$
 | 3 | **Battery power limit** | $0 \le p^{dis}_{s,t},\, p^{ch}_{s,t} \le P_s$ | `StorageUnit.p_nom` |
 | 4 | **State of charge**: energy carried hour to hour, with losses | $e_{s,t} = e_{s,t-1} + w_t\,(\eta\, p^{ch}_{s,t} - p^{dis}_{s,t}/\eta)$ | `StorageUnit` |
 | 5 | **Energy capacity** | $0 \le e_{s,t} \le h_s\, P_s$ ($h_s$ = 4 h) | `max_hours` |
-| 6 | **Cyclic storage**: end the week with the charge it started with | $e_{s,T} = e_{s,0}$ | `cyclic_state_of_charge=True` |
+| 6 | **Cyclic storage**: the charge before the first hour equals the charge after the last hour | $e_{s,-1} = e_{s,T}$ | `cyclic_state_of_charge=True` |
 | 7 | Non-negative capacities | $G_g, P_s \ge 0$ | `p_nom_extendable` |
 
 Everything is **linear**, so this is a linear program (LP) that HiGHS solves exactly in under a second.
@@ -79,11 +79,11 @@ that hour. That is the **marginal electricity price**, one of the outputs of the
 
 | | Result |
 |---|---|
-| Gas (CCGT) built | 2,212 MW, 43 % of generation |
-| Solar PV built | 6,822 MW, 57 % of generation |
+| Gas (CCGT) built | 2,129 MW, 42 % of generation |
+| Solar PV built | 6,981 MW, 58 % of generation |
 | Onshore wind built | 0 MW |
-| Battery built | 2,154 MW / 8,616 MWh (4 h) |
-| Cost of the week | 28.8 M EUR |
+| Battery built | 2,401 MW / 9,604 MWh (4 h) |
+| Cost of the week | 28.7 M EUR |
 
 **Reading the figure:** solar covers the day and over-produces at noon; the surplus charges the battery
 (purple, below zero), which discharges in the evening peak. Gas runs flat at night.
@@ -95,7 +95,9 @@ inputs, so every input must be sourced** (the rule for the real model).
 
 ## Things people often confuse
 
-- **Capacity (MW) vs energy (MWh).** A 2,154 MW battery with 4 h stores 8,616 MWh. Both are decisions.
+- **Capacity (MW) vs energy (MWh).** A 2,401 MW battery with 4 h stores 9,604 MWh. Both are decisions.
+- **Round-trip vs one-way efficiency.** The source gives 96 % for a full charge-discharge cycle; each
+  direction is therefore √0.96 ≈ 98 %. Applying 96 % twice would silently lose 7.8 % instead of 4 %.
 - **"Cheapest" is not "least gas".** The optimizer has no renewable target yet. The 35 % constraint
   is added in Phase 4.
 - **Generation above the load line** is not wasted: it is the battery charging.

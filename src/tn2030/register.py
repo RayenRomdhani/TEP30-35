@@ -25,8 +25,14 @@ def load_register(path: Path) -> dict[str, float]:
 
     # A "sourced" number without a link is not sourced: refuse it.
     sourced = usable[usable["type"] == "sourced"]
-    missing_url = sourced["id"][sourced["source_url"].fillna("").str.strip() == ""].tolist()
+    # astype(str): an all-empty column is read as float NaN, which has no .str accessor.
+    missing_url = sourced["id"][sourced["source_url"].fillna("").astype(str).str.strip() == ""].tolist()
     if missing_url:
         raise ValueError(f"sourced rows without source_url: {missing_url}")
+
+    # A usable row must carry a number, otherwise NaN would flow silently into the model.
+    no_value = usable["id"][usable["value"].isna()].tolist()
+    if no_value:
+        raise ValueError(f"rows without a value (fill it or mark them pending): {no_value}")
 
     return {row.id: float(row.value) for row in usable.itertuples()}

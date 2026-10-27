@@ -23,15 +23,16 @@ def _illustrative_profiles(snapshots: pd.DatetimeIndex) -> pd.DataFrame:
     """Synthetic daily shapes for load (MW), solar and wind availability (p.u.).
 
     ILLUSTRATIVE ONLY: smooth curves chosen to look like a summer day, not measured data.
-    Load peaks at 15:00 around 4.1 GW, the same order of magnitude as Tunisia's ~4 GW summer peak.
-    Days 3 and 4 are a low-wind spell: real weather has multi-day lulls, which is what backup is for.
+    Load peaks at 15:00 around 4.1 GW.
+    Days 2 and 3 are a low-wind spell: real weather has multi-day lulls, which is what backup is for.
+    Day 2 falls inside the 48 h test fixture, so the fixture also needs gas.
     """
     h = snapshots.hour.to_numpy()
     day = (snapshots.normalize() - snapshots[0].normalize()).days.to_numpy()
     load = 3200 + 900 * np.cos(2 * np.pi * (h - 15) / 24)
     solar = 0.85 * np.clip(np.sin(np.pi * (h - 6) / 12), 0, None)  # daylight 06:00-18:00
     wind = 0.35 + 0.10 * np.cos(2 * np.pi * (h - 3) / 24)  # a bit windier at night
-    wind = np.where(np.isin(day, (2, 3)), wind * 0.2, wind)  # lull: 20% of normal wind
+    wind = np.where(np.isin(day, (1, 2)), wind * 0.2, wind)  # lull on days 2-3: 20% of normal wind
     return pd.DataFrame({"load": load, "solar": solar, "wind": wind}, index=snapshots)
 
 
@@ -44,12 +45,13 @@ def build_toy_network(register: dict[str, float], hours: int = 168, step_hours: 
     """
     r = register
     rate = r["discount_rate"]
-    horizon = hours / HOURS_PER_YEAR
 
     n = pypsa.Network()
     snapshots = pd.date_range("2030-07-01 00:00", periods=hours // step_hours, freq=f"{step_hours}h")
     n.set_snapshots(snapshots)
     n.snapshot_weightings.loc[:, :] = step_hours  # each snapshot stands for step_hours hours
+    # Share of a year actually modelled (from the snapshots, so a leftover partial step is not counted).
+    horizon = n.snapshot_weightings.generators.sum() / HOURS_PER_YEAR
 
     profiles = _illustrative_profiles(snapshots)
 
@@ -81,7 +83,8 @@ def build_toy_network(register: dict[str, float], hours: int = 168, step_hours: 
                                 r["toy_battery_inverter_lifetime"], rate)
     storage = annualised_capex(r["toy_battery_storage_investment"] * 1000, 0.0,
                                r["toy_battery_storage_lifetime"], rate)
-    eff = r["toy_battery_inverter_efficiency"]
+    # The source value is round-trip; split it equally between charging and discharging (as PyPSA-Earth does).
+    eff = r["toy_battery_inverter_efficiency"] ** 0.5
     n.add("StorageUnit", "battery", bus="TN", carrier="battery", p_nom_extendable=True,
           max_hours=max_hours, efficiency_store=eff, efficiency_dispatch=eff,
           cyclic_state_of_charge=True,  # end the period with the same charge it started with

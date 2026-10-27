@@ -1,6 +1,6 @@
 import pytest
 
-from tn2030.toy import build_toy_network
+from tn2030.toy import annualised_capex, build_toy_network
 
 
 def test_toy_solves_optimal(toy_network):
@@ -44,10 +44,30 @@ def test_all_bus_carriers_are_defined(toy_network):
     assert set(toy_network.buses.carrier) <= set(toy_network.carriers.index)
 
 
+def _solar_full_year_capex(reg):
+    return annualised_capex(reg["toy_solar_investment"] * 1000, reg["toy_solar_fom"],
+                            reg["toy_solar_lifetime"], reg["discount_rate"])
+
+
 def test_toy_capital_cost_scaled_to_horizon(reg, toy_network):
     # A 48 h model must carry 48/8760 of the yearly capital cost, or it would overvalue capex.
-    from tn2030.toy import annualised_capex
+    assert toy_network.generators.at["solar", "capital_cost"] == pytest.approx(_solar_full_year_capex(reg) * 48 / 8760)
 
-    full_year = annualised_capex(reg["toy_solar_investment"] * 1000, reg["toy_solar_fom"],
-                                 reg["toy_solar_lifetime"], reg["discount_rate"])
-    assert toy_network.generators.at["solar", "capital_cost"] == pytest.approx(full_year * 48 / 8760)
+
+def test_capital_cost_follows_modelled_hours_when_step_does_not_divide(reg):
+    # 50 h at 3 h steps gives 16 snapshots = 48 modelled hours; capex must match those 48 h.
+    n = build_toy_network(reg, hours=50, step_hours=3)
+    assert n.snapshot_weightings.generators.sum() == 48
+    assert n.generators.at["solar", "capital_cost"] == pytest.approx(_solar_full_year_capex(reg) * 48 / 8760)
+
+
+def test_battery_round_trip_matches_register(reg, toy_network):
+    # technology-data gives the inverter efficiency as round trip; each direction is its square root.
+    su = toy_network.storage_units.loc["battery"]
+    assert su.efficiency_store * su.efficiency_dispatch == pytest.approx(reg["toy_battery_inverter_efficiency"])
+
+
+def test_fixture_builds_gas(toy_network):
+    # Later gas/CO2 tests use this fixture; with no gas built they would pass trivially.
+    toy_network.optimize(solver_name="highs")
+    assert toy_network.generators.p_nom_opt["CCGT"] > 0
