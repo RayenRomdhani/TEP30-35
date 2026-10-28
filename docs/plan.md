@@ -490,7 +490,7 @@ def test_pipeline_end_to_end_on_toy(tmp_path):
 - [x] **Step 4:** Run `pytest -v`. Expected: all pass. Then `snakemake -n` lists 11 build + 11 solve + 1 summarize jobs.
 - [x] **Step 5:** Run `snakemake -j 1` on the real base network. Expected: `results/summary.csv` (11 rows), `results/avoided.csv` (8 rows: every scenario except the three self-referenced ones), no sanity-check failure. Failures → `superpowers:systematic-debugging` + `operations-planning-mitigation`.
 - [x] **Step 6:** `docs/phase4-scenarios.md`: how efficiency and flexibility are represented (spec §5.2–5.3 in plain words), runtimes, all warnings.
-- [ ] **Step 7:** Commit, then **Phase gate**. Evidence: Snakemake log, both CSVs, pytest output.
+- [x] **Step 7:** Commit, then **Phase gate**. Evidence: Snakemake log, both CSVs, pytest output.
 
 ---
 
@@ -505,7 +505,7 @@ def test_pipeline_end_to_end_on_toy(tmp_path):
 
 Use the `dataviz` skill before writing any chart code.
 
-- [ ] **Step 1: Write the failing test:**
+- [x] **Step 1: Write the failing test:**
 ```python
 def test_finish_figure_adds_source_footer():
     fig, ax = plt.subplots(); finish_figure(fig, ax, "T", "GW", "Source: X")
@@ -513,10 +513,10 @@ def test_finish_figure_adds_source_footer():
 def test_palette_covers_all_carriers(solved_toy):
     assert set(solved_toy.generators.carrier) <= set(PALETTE)
 ```
-- [ ] **Step 2:** Run. Expected: FAIL. **Step 3:** Implement. **Step 4:** Run. Expected: pass.
-- [ ] **Step 5:** `scripts/make_figures.py` writes: capacity mix, generation mix, gas use, system cost, CO2, price duration curves, S0 vs S2-300 summer-week dispatch (7 days centred on the annual peak hour), avoided-per-MWh bar chart (headline), uniform vs cooling comparison.
+- [x] **Step 2:** Run. Expected: FAIL. **Step 3:** Implement. **Step 4:** Run. Expected: pass.
+- [x] **Step 5:** `scripts/make_figures.py` writes: capacity mix, generation mix, gas use, system cost, CO2, price duration curves, S0 vs S2-300 summer-week dispatch (7 days centred on the annual peak hour), avoided-per-MWh bar chart (headline), uniform vs cooling comparison.
 Verify: 9 PNGs exist; inspect each visually.
-- [ ] **Step 6:** Commit: `git commit -m "feat: add result figures"`
+- [x] **Step 6:** Commit: `git commit -m "feat: add result figures"`
 
 ### Task 18: README, environment, report, deck
 
