@@ -122,8 +122,8 @@ These are differences against S1-15, which has the same annual saving. They are 
 | vs S1-15 | System cost (M EUR/yr) | Gas (TWh_th) | CO2 (Mt) | New capacity (MW) |
 |---|---|---|---|---|
 | S1-15C: 39% of the saving on cooling | −11.5 | −0.74 | −0.15 | +13 |
-| S2-300: + 300 MW shiftable load | −22.1 | −1.20 | −0.24 | +440 (solar) |
-| S2-600: + 600 MW shiftable load | −39.2 | −1.94 | −0.38 | +791 (solar) |
+| S2-300: + 300 MW shiftable load | −22.1 | −1.20 | −0.24 | +440 (525 more solar, 85 less wind) |
+| S2-600: + 600 MW shiftable load | −39.2 | −1.94 | −0.38 | +791 (1,020 more solar, 229 less wind) |
 
 300 MW of shifting is worth about 74,000 EUR per MW per year (22.1 M EUR / 300 MW). 600 MW gives about 65,000 EUR per MW, so each extra MW is worth a little less.
 
@@ -154,7 +154,7 @@ These are differences against S1-15, which has the same annual saving. They are 
    - That is enough to avoid 20% more gas and CO2 per MWh than a fully uniform cut, and 11.5 M EUR/yr more.
    - The air-conditioning hours are when gas runs.
 5. **Flexibility adds a lot on top of efficiency.** 300 MW of load moved by at most 3 hours saves another 22 M EUR/yr and 0.24 Mt CO2.
-   - It moves morning and evening load into midday solar hours, so the model builds about 440 MW more solar and burns less gas.
+   - It moves morning and evening load into midday solar hours, so the model builds about 525 MW more solar (and 85 MW less wind) and burns less gas.
    - This value is all energy: under the reserve rule, flexibility gets no credit for lowering the peak. No batteries are built at the base gas price, so shifting is not competing with them here.
 6. **The gas price changes the story more than any efficiency choice does.**
    - With cheap gas, efficiency mainly avoids gas: 0.28 t CO2 per MWh.

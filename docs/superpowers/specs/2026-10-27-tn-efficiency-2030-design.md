@@ -32,7 +32,7 @@ system. If a sourced ANME programme cost is found, it is compared against this v
 | D2 | 2030 demand | **2024 actual demand × (1 + g)^6.** 2024 demand from ONEM (22.51 TWh; Ember kept as a cross-check). Growth rate g = 3.2%/yr, STEG's base-case forecast (JICA 2022), chosen 2026-10-28 over REGlobal's unsourced 3.7%. Hourly shape from PyPSA-Earth, **reshaped** to the official load factor and minimum/peak ratio (Phase 3, `docs/phase3-validation.md`), then scaled to the annual total. Resulting peak checked against STEG's 6,000 MW 2030 forecast (warning, not a hard fail). |
 | D3 | Imports | **Fixed at the cited 2024 import volume**, flat hourly profile, subtracted from demand. Identical in all scenarios, so efficiency only reduces domestic generation. |
 | D4 | Efficiency | **Main runs: uniform cut** of every hour by 10 / 15 / 20%. **Sensitivity at -15%: cooling-weighted** (same annual MWh saved, concentrated on the cooling component, see §5.2). |
-| D5 | Flexibility | **Shiftable load** capped at 300 MW, shift up to 3 h, energy-neutral each day. Sensitivity at 600 MW. Batteries are extendable in **all** scenarios, so scenario 3 isolates the extra value of demand shifting. |
+| D5 | Flexibility | **Shiftable load** capped at 300 MW, shift up to 3 h **earlier or later** (every MWh back within 3 h; author, 2026-10-28), energy-neutral each day. Sensitivity at 600 MW. Batteries are extendable in **all** scenarios, so scenario 3 isolates the extra value of demand shifting. |
 | D6 | Existing fleet | **ONEM 2024 thermal fleet by type** (2,527 MW combined cycle; 2,457 MW gas turbines + 660 MW steam), replacing PyPSA-Earth's labels after the Phase 3 validation, with one fitted efficiency factor for existing gas units; PyPSA-Earth's renewables and hydro **+ committed projects** (under construction or signed contract, each with a cited source). Announced-only projects are excluded. Steam units are kept in 2030 (author, 2026-10-28). |
 | D7 | Technology costs | PyPSA `technology-data`, 2030 values, version shipped with the pinned PyPSA-Earth. Every value copied into the register. |
 | D8 | Gas price | **Economic (opportunity) cost**, not STEG's subsidised tariff. Base value from technology-data; **±50% sensitivity** (labelled assumption). |
@@ -41,6 +41,7 @@ system. If a sourced ANME programme cost is found, it is compared against this v
 | D11 | Resolution | Tunisia only; **2 clusters** (4 if runtime allows); **1-hour** time steps (decided 2026-10-28 after the risk R1 benchmark; first planned at 3 h); HiGHS. |
 | D12 | RE constraint | One annual constraint: (solar + wind + hydro generation) ≥ 35% × total **domestic** generation. Storage discharge and imports excluded from both sides. Use a built-in PyPSA-Earth option if one exists (checked in Phase 2), else a custom `extra_functionality`. |
 | D13 | ELMED (Italy link) | **Optional scenario 4**, decided after Phase 4 depending on time. |
+| D14 | Reserve margin | Added 2026-10-28 (author): firm capacity (gas + hydro) ≥ 1.10 × each scenario's peak, the lower end of STEG's 10–15% planning target (JICA 2022, p.5-33). Without it the model has no reason to build firm capacity, and "avoided capacity" would miss avoided gas plants. |
 
 ## 4. Scenario matrix
 
@@ -75,7 +76,7 @@ Core: 11 solves. Each scenario is one small YAML file in `config/scenarios/`.
 5. Load never goes below zero (tested).
 
 ### 5.3 Shiftable load
-Modelled as virtual storage at the demand bus: power ≤ cap (300 or 600 MW), energy ≤ cap × 3 h, round-trip efficiency 1, no investment cost, state of charge forced to zero at the start of each day (energy-neutral daily).
+Modelled as virtual storage at the demand bus: power ≤ cap (300 or 600 MW), round-trip efficiency 1, no investment cost. It starts each day half full (room for cap × 3 h earlier or later) and returns to half full at the end of each day (energy-neutral daily). Energy owed at any hour ≤ energy moved in the last 3 hours (each MWh comes back within 3 h), and load shifted up + down in one hour ≤ cap. Implementation: `src/tn2030/flexibility.py`.
 
 ### 5.4 Output metrics
 | Output | Definition |

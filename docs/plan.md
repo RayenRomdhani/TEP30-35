@@ -427,7 +427,7 @@ def test_sanity_check_fails_on_missing_committed(solved_toy):
   - `apply_committed(n: pypsa.Network, committed: pd.DataFrame) -> None`: raises `p_nom_min` (and `p_nom` floor) of the extendable component with the same `carrier` and `bus` by `p_nom_mw`; `ValueError` if none exists
   - `scale_gas_cost(n: pypsa.Network, factor: float, gas_price_eur_per_mwh_th: float) -> None`: for carriers `CCGT`, `OCGT`, `marginal_cost += (factor − 1) × price / efficiency`
   - `build_scenario(n_base: pypsa.Network, scenario: dict, register: dict[str, float], committed: pd.DataFrame, calibrate: bool = True) -> pypsa.Network` (returns a copy). Order fixed by spec §5.1: `calibrate_base` (if `calibrate`) → reshape total load with `demand.reshape_profile` (load factor = `demand_2024_twh` / 8,784 h / `peak_2024_mw`, `min_to_peak_2030`) → scale to `annual_demand_2030` split by base bus shares → efficiency cut → subtract imports split by the same shares → `apply_committed` (all rows of `data/committed_projects.csv`, including `operating_since_*`) → `scale_gas_cost` (existing and new CCGT/OCGT) → `add_shiftable_load` if `p_max_mw > 0`.
-  - Sensitivity to decide with the author in Phase 4: the fitted efficiency factor also absorbs outages, and the marginal gas unit drives the headline metric (see `docs/phase3-validation.md`, gap 2).
+  - Decided 2026-10-28 (author): the efficiency-factor issue (it also absorbs outages; see `docs/phase3-validation.md`, gap 2) is recorded as a limitation, no sensitivity run. Added instead: STEG's 10% reserve margin in all runs (spec D14) and a two-way 3 h shift limit (spec D5).
 
 Scenario files (`reference` is the scenario it is compared against):
 
