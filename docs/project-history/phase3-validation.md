@@ -4,8 +4,8 @@
 
 **Method:** compare it with the official 2024 statistics, explain every gap above 10%, and calibrate what matters. Calibrations go into code with tests (`src/tn2030/fleet.py`, `src/tn2030/demand.py`) and into the assumptions register, never as hand edits to the network.
 
-**Script:** [`scripts/validate_baseline.py`](../scripts/validate_baseline.py) (about 40 s, three HiGHS solves).
-**Output:** [`results/validation.csv`](../results/validation.csv).
+**Script:** [`scripts/validate_baseline.py`](../../scripts/validate_baseline.py) (about 40 s, three HiGHS solves).
+**Output:** [`results/validation.csv`](../../results/validation.csv).
 **References:**
 - ONEM *Memento du secteur de l'énergie, Chiffres de 2024* for 2024 capacity, generation, peak and fuel.
 - STEG's forecast in the JICA 2022 survey for the minimum/peak ratio.

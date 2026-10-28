@@ -37,7 +37,7 @@ def _value(x, register: dict[str, float]) -> float:
 
 
 def calibrate_base(n_base: pypsa.Network, register: dict[str, float]) -> pypsa.Network:
-    """Apply the Phase 3 calibrations (docs/phase3-validation.md) to a copy of the base network."""
+    """Apply the Phase 3 calibrations (docs/project-history/phase3-validation.md) to a copy of the base network."""
     r = register
     n = rebuild_thermal_fleet(
         n_base, ccgt_mw=r["cap_2024_ccgt_mw"], ocgt_mw=r["cap_2024_ocgt_mw"] + r["cap_2024_steam_mw"],

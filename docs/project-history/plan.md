@@ -8,7 +8,7 @@
 
 **Tech Stack:** Python (version from the PyPSA-Earth env), PyPSA, linopy, HiGHS, Snakemake, pandas, pytest, openpyxl, matplotlib.
 
-**Spec:** `docs/superpowers/specs/2026-10-27-tn-efficiency-2030-design.md` (read it with this plan).
+**Spec:** `docs/project-history/specs/2026-10-27-tn-efficiency-2030-design.md` (read it with this plan).
 
 ## Global Constraints
 
@@ -20,7 +20,7 @@
 - All commands run from the repo root in the activated `pypsa-earth` conda env.
 - Deliverables in English. Comments and docstrings short and plain.
 - Git: one branch per phase (`phase-1-toy`, `phase-2-pypsa-earth`, `phase-3-validation`, `phase-4-scenarios`, `phase-5-deliverables`), commit after each task. **Commit messages have no co-author or tool-attribution lines. Nothing is pushed without approval.**
-- Every phase ends with: `superpowers:requesting-code-review` → `superpowers:verification-before-completion` → 5-line summary + evidence → wait for "go" → `superpowers:finishing-a-development-branch`.
+- Every phase ends with: code review → fresh verification → 5-line summary + evidence → wait for "go" → merge the branch.
 
 ## Review Focus
 
@@ -57,12 +57,12 @@
 
 ### Task 1: Environment and package skeleton
 
-**Files:** Create `pyproject.toml`, `src/tn2030/__init__.py`, `tests/test_smoke.py`, `docs/config-changes.md`
+**Files:** Create `pyproject.toml`, `src/tn2030/__init__.py`, `tests/test_smoke.py`, `docs/project-history/config-changes.md`
 
 **Interfaces:** Produces the importable package `tn2030` and the `pypsa-earth` conda env used by every later task.
 
 - [x] **Step 1:** Ask the author for permission to download the Miniforge Windows installer (state the URL from github.com/conda-forge/miniforge and its size). Install to `D:\miniforge3` (just me, no PATH change).
-- [x] **Step 2:** Find the latest PyPSA-Earth release tag on GitHub; `git clone --branch <tag> --depth 1 https://github.com/pypsa-meets-earth/pypsa-earth D:\pypsa-earth`. Record the tag in `docs/config-changes.md`.
+- [x] **Step 2:** Find the latest PyPSA-Earth release tag on GitHub; `git clone --branch <tag> --depth 1 https://github.com/pypsa-meets-earth/pypsa-earth D:\pypsa-earth`. Record the tag in `docs/project-history/config-changes.md`.
 - [x] **Step 3:** Create the env from PyPSA-Earth's Windows instructions (pinned env file if the release ships one, else `envs/environment.yaml`) with `mamba env create`. Then `mamba install -n pypsa-earth pytest openpyxl`.
 Verify: `python -c "import pypsa, linopy, highspy, snakemake; print(pypsa.__version__)"` prints a version.
 - [x] **Step 4: Write the failing test** `tests/test_smoke.py`:
@@ -74,11 +74,11 @@ def test_package_imports():
 - [x] **Step 5:** Run `pytest tests/test_smoke.py -v`. Expected: FAIL (`ModuleNotFoundError`).
 - [x] **Step 6:** Write `pyproject.toml` (setuptools, `src` layout, name `tn2030`, version `0.1.0`), `src/tn2030/__init__.py` with `__version__ = "0.1.0"`; `pip install -e . --no-deps`.
 - [x] **Step 7:** Run `pytest -v`. Expected: 1 passed.
-- [x] **Step 8:** Commit: `git add pyproject.toml src tests docs/config-changes.md && git commit -m "build: add tn2030 package skeleton and environment notes"`
+- [x] **Step 8:** Commit: `git add pyproject.toml src tests docs/project-history/config-changes.md && git commit -m "build: add tn2030 package skeleton and environment notes"`
 
 ### Task 2: Assumptions register and loader
 
-**Files:** Create `src/tn2030/register.py`, `tests/test_register.py`, `data/assumptions_register.xlsx` (use the `anthropic-skills:xlsx` skill)
+**Files:** Create `src/tn2030/register.py`, `tests/test_register.py`, `data/assumptions_register.xlsx` (written with openpyxl)
 
 **Interfaces:**
 - Produces: `REGISTER_COLUMNS: tuple[str, ...] = ("id", "parameter", "value", "unit", "type", "source_title", "source_url", "accessed", "notes")`; `load_register(path: Path) -> dict[str, float]` returning `id → value` for rows with `type` in `{"sourced", "assumption"}`; rows typed `pending` are left out, so code asking for them fails with `KeyError`.
@@ -137,7 +137,7 @@ def test_annualised_capex_adds_fom():
 
 ### Task 4: Toy network, solve, explanation
 
-**Files:** Modify `src/tn2030/toy.py`; create `tests/conftest.py`, `scripts/phase1_toy_model.py`, `docs/phase1-toy-model.md`; test in `tests/test_toy.py`
+**Files:** Modify `src/tn2030/toy.py`; create `tests/conftest.py`, `scripts/dev/phase1_toy_model.py`, `docs/project-history/phase1-toy-model.md`; test in `tests/test_toy.py`
 
 **Interfaces:**
 - Consumes: `load_register`, `annualised_capex`.
@@ -160,9 +160,9 @@ def test_toy_battery_soc_within_bounds(toy_network): ...
 - [x] **Step 2:** Run. Expected: FAIL (`build_toy_network` not defined).
 - [x] **Step 3:** Implement `build_toy_network`.
 - [x] **Step 4:** Run `pytest -v`. Expected: all pass.
-- [x] **Step 5:** `scripts/phase1_toy_model.py`: build a 168 h network, solve, print capacities and cost, and save `results/figures/phase1_toy_dispatch.png` (stacked dispatch + load line, footer "Illustrative inputs; costs: PyPSA technology-data 2030"). Use the `dataviz` skill for the style.
-Verify: `python scripts/phase1_toy_model.py` prints `status ok` and the PNG exists.
-- [x] **Step 6:** `docs/phase1-toy-model.md` (use `concept-explainer`): objective (min Σ annualised capex × capacity + Σ marginal cost × dispatch × weighting), constraints (nodal energy balance, capacity limits with availability profiles, storage state-of-charge continuity, energy ≤ p_nom × max_hours), each mapped to the PyPSA component that creates it, plus what the results show.
+- [x] **Step 5:** `scripts/dev/phase1_toy_model.py`: build a 168 h network, solve, print capacities and cost, and save `results/figures/phase1_toy_dispatch.png` (stacked dispatch + load line, footer "Illustrative inputs; costs: PyPSA technology-data 2030").
+Verify: `python scripts/dev/phase1_toy_model.py` prints `status ok` and the PNG exists.
+- [x] **Step 6:** `docs/project-history/phase1-toy-model.md`: objective (min Σ annualised capex × capacity + Σ marginal cost × dispatch × weighting), constraints (nodal energy balance, capacity limits with availability profiles, storage state-of-charge continuity, energy ≤ p_nom × max_hours), each mapped to the PyPSA component that creates it, plus what the results show.
 - [x] **Step 7:** Commit: `git commit -m "feat: add Phase 1 single-node toy model and explanation"`
 - [x] **Step 8: Phase gate** (see Global Constraints). Evidence: pytest output, solve log, dispatch PNG.
 
@@ -170,38 +170,38 @@ Verify: `python scripts/phase1_toy_model.py` prints `status ok` and the PNG exis
 
 # Phase 2: PyPSA-Earth (branch `phase-2-pypsa-earth`)
 
-Failures here go through `superpowers:systematic-debugging` and the `operations-planning-mitigation` skill. Fix root causes only; log every change in `docs/config-changes.md` (what, why, file:key).
+Failures here are debugged to their root cause, never patched around; log every change in `docs/project-history/config-changes.md` (what, why, file:key).
 
 ### Task 5: Tutorial run
 
-**Files:** Modify `docs/config-changes.md`
+**Files:** Modify `docs/project-history/config-changes.md`
 
 - [x] **Step 1:** In `D:\pypsa-earth`, follow the release's tutorial instructions (copy the tutorial config as instructed by its docs).
 - [x] **Step 2:** Dry run: `snakemake -j 1 solve_all_networks -n`. Expected: a job list, no errors.
 - [x] **Step 3:** Before the real run, find the size of each data bundle it will retrieve. If the total is > 2 GB, stop and ask.
 - [x] **Step 4:** Run `snakemake -j 1 solve_all_networks`. Expected: a solved network in `results/networks/`.
-- [x] **Step 5:** Record runtime, peak RAM and bundle sizes in `docs/config-changes.md`; commit in this repo: `git commit -m "docs: record PyPSA-Earth tutorial run"`
+- [x] **Step 5:** Record runtime, peak RAM and bundle sizes in `docs/project-history/config-changes.md`; commit in this repo: `git commit -m "docs: record PyPSA-Earth tutorial run"`
 
 ### Task 6: Tunisia base network
 
-**Files:** Create `config/tn_base.yaml`, `scripts/inspect_base.py`, `docs/phase2-base-network.md`
+**Files:** Create `config/tn_base.yaml`, `scripts/dev/inspect_base.py`, `docs/project-history/phase2-base-network.md`
 
 **Interfaces:**
 - Produces: a prepared (not solved) base network `.nc` path, written into `config/pipeline.yaml` as `base_network:`; the list of carrier names actually used (feeds the constants in Task 13).
 
 - [x] **Step 1:** Write `config/tn_base.yaml` with only the keys we change, checked against the pinned `config.default.yaml`: `countries: ["TN"]`, clusters `[2]`, time resolution `3H` (changed to 1 h after Task 7), cost year 2030, extendable carriers CCGT, OCGT, solar, onwind, battery, solver `highs`. Each key gets a one-line comment saying why.
-- [x] **Step 2:** Check whether the pinned release has a built-in minimum-renewable-share option. Record the answer (key name, or "none, custom constraint in Task 13") in `docs/config-changes.md`.
+- [x] **Step 2:** Check whether the pinned release has a built-in minimum-renewable-share option. Record the answer (key name, or "none, custom constraint in Task 13") in `docs/project-history/config-changes.md`.
 - [x] **Step 3:** Dry run with `--configfile <repo>/config/tn_base.yaml` up to the prepared network. Check bundle sizes (> 2 GB → ask). Then run.
-- [x] **Step 4:** `scripts/inspect_base.py <network.nc>` prints buses, carriers, `p_nom` by carrier, annual load (TWh, using weightings), peak load. Save the output in `docs/phase2-base-network.md`.
+- [x] **Step 4:** `scripts/dev/inspect_base.py <network.nc>` prints buses, carriers, `p_nom` by carrier, annual load (TWh, using weightings), peak load. Save the output in `docs/project-history/phase2-base-network.md`.
 Verify: TN-only buses; ≥ 1 gas generator; annual load > 0.
 - [x] **Step 5:** Commit: `git commit -m "feat: add Tunisia PyPSA-Earth base configuration"`
 
 ### Task 7: Resolution benchmark (risk R1)
 
-**Files:** Modify `docs/phase2-base-network.md`
+**Files:** Modify `docs/project-history/phase2-base-network.md`
 
 - [x] **Step 1:** Solve the base network as-is at 3 H and at 1 H (same config otherwise). Record solve time and peak RAM.
-- [x] **Step 2:** Present both numbers to the author with a recommendation. **Their decision** sets the resolution for all scenarios; record it in the spec's D11 and in `docs/config-changes.md`.
+- [x] **Step 2:** Present both numbers to the author with a recommendation. **Their decision** sets the resolution for all scenarios; record it in the spec's D11 and in `docs/project-history/config-changes.md`.
 - [x] **Step 3:** Commit, then **Phase gate**. Evidence: run logs, network summary, config-change log, benchmark table.
 
 ---
@@ -212,7 +212,7 @@ Verify: TN-only buses; ≥ 1 gas generator; annual load > 0.
 
 **Files:** Modify `data/assumptions_register.xlsx`; create `data/committed_projects.csv`, `data/raw/SOURCES.md`
 
-Use the `anthropic-skills:pdf` skill for STEG / ANME / IRENA reports, and `superpowers:dispatching-parallel-agents` to search independent sources in parallel. Read Ember's own Tunisia data directly (risk R7).
+Read STEG / ANME / IRENA reports as PDFs, and search independent sources in parallel. Read Ember's own Tunisia data directly (risk R7).
 
 - [x] **Step 1:** Fill the pending register rows: `demand_2024_twh`, `imports_2024_twh`, `gas_price_eur_per_mwh_th` (from the technology-data version used by PyPSA-Earth). Add validation rows: `cap_2024_<carrier>_mw` (STEG), `gen_2024_<carrier>_twh` and `gas_share_2024` (Ember). Each has a URL and access date; disagreements get a `notes` line. If a sourced ANME efficiency programme cost exists, add `ee_programme_cost_eur_per_mwh` (compared with the headline value in the report, spec §1); if none is found, say so in the README limitations.
 - [x] **Step 2:** `data/committed_projects.csv` with columns `name, carrier, p_nom_mw, e_nom_mwh, bus, status, source_url`. `status` ∈ {`under_construction`, `signed_contract`}; announced-only projects are not included (spec D6). `bus` = nearest base-network bus to the site. *As built:* extra columns `governorate, cod_expected, notes`; a third status `operating_since_2025/2026` for plants that came online after the 2024 fleet; `bus` = the bus region holding most of the governorate's area (method in `data/raw/SOURCES.md`), since no source gives site coordinates.
@@ -255,14 +255,14 @@ def test_peak_check_flags_outside_tolerance():
 
 ### Task 10: Baseline validation
 
-**Files:** Create `scripts/validate_baseline.py`, `docs/phase3-validation.md`, `results/validation.csv`
+**Files:** Create `scripts/validate_baseline.py`, `docs/project-history/phase3-validation.md`, `results/validation.csv`
 
 **Interfaces:**
 - Consumes: the base network, `load_register`, `scale_profile`, `subtract_imports`.
 
 - [x] **Step 1:** Script: (a) compare existing `p_nom` by carrier in the base network with `cap_2024_*` rows; (b) copy the network, freeze all capacities (`p_nom_extendable = False`), scale load to 2024 demand minus 2024 imports, solve a dispatch-only run, compare generation by carrier and gas share with `gen_2024_*` and `gas_share_2024`. Write `results/validation.csv` with columns `metric, model, reference, diff_pct, source`.
 Verify: `python scripts/validate_baseline.py` writes the CSV with one row per compared metric.
-- [x] **Step 2:** `docs/phase3-validation.md`: comparison table, explanation of each gap > 10%, and each calibration (what changed, why, source). Calibrations go into `config/tn_base.yaml` or the register, never as unexplained edits to the network.
+- [x] **Step 2:** `docs/project-history/phase3-validation.md`: comparison table, explanation of each gap > 10%, and each calibration (what changed, why, source). Calibrations go into `config/tn_base.yaml` or the register, never as unexplained edits to the network.
 - [ ] **Step 3:** Commit, then **Phase gate**. Evidence: validation table, explained gaps, calibration log.
 
 ---
@@ -418,7 +418,7 @@ def test_sanity_check_fails_on_missing_committed(solved_toy):
 **Interfaces:**
 - Consumes: Tasks 9, 10 (calibrations), 11, 12.
 - Produces:
-  - `calibrate_base(n_base: pypsa.Network, register: dict[str, float]) -> pypsa.Network` (copy). Applies the Phase 3 calibrations (see `docs/phase3-validation.md`):
+  - `calibrate_base(n_base: pypsa.Network, register: dict[str, float]) -> pypsa.Network` (copy). Applies the Phase 3 calibrations (see `docs/project-history/phase3-validation.md`):
     - `fleet.rebuild_thermal_fleet` with the ONEM capacities (steam counted with OCGT) and `existing_gas_efficiency_factor`;
     - `fleet.add_ocgt_candidates`, with capital cost = annuity(`discount_rate`, `ocgt_lifetime`) × `ocgt_investment` + FOM;
     - existing solar and onwind floor `p_nom_min = p_nom` (PyPSA-Earth's 2024 estimate, incl. the IRENA top-up the validation run used).
@@ -427,7 +427,7 @@ def test_sanity_check_fails_on_missing_committed(solved_toy):
   - `apply_committed(n: pypsa.Network, committed: pd.DataFrame) -> None`: raises `p_nom_min` (and `p_nom` floor) of the extendable component with the same `carrier` and `bus` by `p_nom_mw`; `ValueError` if none exists
   - `scale_gas_cost(n: pypsa.Network, factor: float, gas_price_eur_per_mwh_th: float) -> None`: for carriers `CCGT`, `OCGT`, `marginal_cost += (factor − 1) × price / efficiency`
   - `build_scenario(n_base: pypsa.Network, scenario: dict, register: dict[str, float], committed: pd.DataFrame, calibrate: bool = True) -> pypsa.Network` (returns a copy). Order fixed by spec §5.1: `calibrate_base` (if `calibrate`) → reshape total load with `demand.reshape_profile` (load factor = `demand_2024_twh` / 8,784 h / `peak_2024_mw`, `min_to_peak_2030`) → scale to `annual_demand_2030` split by base bus shares → efficiency cut → subtract imports split by the same shares → `apply_committed` (all rows of `data/committed_projects.csv`, including `operating_since_*`) → `scale_gas_cost` (existing and new CCGT/OCGT) → `add_shiftable_load` if `p_max_mw > 0`.
-  - Decided 2026-10-28 (author): the efficiency-factor issue (it also absorbs outages; see `docs/phase3-validation.md`, gap 2) is recorded as a limitation, no sensitivity run. Added instead: STEG's 10% reserve margin in all runs (spec D14) and a two-way 3 h shift limit (spec D5).
+  - Decided 2026-10-28 (author): the efficiency-factor issue (it also absorbs outages; see `docs/project-history/phase3-validation.md`, gap 2) is recorded as a limitation, no sensitivity run. Added instead: STEG's 10% reserve margin in all runs (spec D14) and a two-way 3 h shift limit (spec D5).
 
 Scenario files (`reference` is the scenario it is compared against):
 
@@ -488,8 +488,8 @@ def test_pipeline_end_to_end_on_toy(tmp_path):
 - [x] **Step 2:** Run. Expected: FAIL.
 - [x] **Step 3:** Implement `pipeline.py` and `Snakefile`.
 - [x] **Step 4:** Run `pytest -v`. Expected: all pass. Then `snakemake -n` lists 11 build + 11 solve + 1 summarize jobs.
-- [x] **Step 5:** Run `snakemake -j 1` on the real base network. Expected: `results/summary.csv` (11 rows), `results/avoided.csv` (8 rows: every scenario except the three self-referenced ones), no sanity-check failure. Failures → `superpowers:systematic-debugging` + `operations-planning-mitigation`.
-- [x] **Step 6:** `docs/phase4-scenarios.md`: how efficiency and flexibility are represented (spec §5.2–5.3 in plain words), runtimes, all warnings.
+- [x] **Step 5:** Run `snakemake -j 1` on the real base network. Expected: `results/summary.csv` (11 rows), `results/avoided.csv` (8 rows: every scenario except the three self-referenced ones), no sanity-check failure. Failures are debugged to their root cause.
+- [x] **Step 6:** `docs/project-history/phase4-scenarios.md`: how efficiency and flexibility are represented (spec §5.2–5.3 in plain words), runtimes, all warnings.
 - [x] **Step 7:** Commit, then **Phase gate**. Evidence: Snakemake log, both CSVs, pytest output.
 
 ---
@@ -503,7 +503,7 @@ def test_pipeline_end_to_end_on_toy(tmp_path):
 **Interfaces:**
 - Produces: `PALETTE: dict[str, str]` (one colour per carrier, fixed across all figures); `finish_figure(fig, ax, title: str, ylabel: str, source: str) -> None` (title, unit label, source footer).
 
-Use the `dataviz` skill before writing any chart code.
+Use one fixed chart style: one colour per carrier, a colour-blind-checked palette, thin marks, a light grid.
 
 - [x] **Step 1: Write the failing test:**
 ```python
@@ -524,14 +524,14 @@ Verify: 9 PNGs exist; inspect each visually.
 
 - [x] **Step 1:** `conda env export -n pypsa-earth --from-history > environment.yml`; add the PyPSA-Earth tag and `pip install -e .` line to README.
 Verify: README "How to reproduce" steps run from a clean clone up to `pytest` passing.
-- [x] **Step 2:** `README.md` (`technical-writing-guide`, then `humanizer`): question, method, assumptions (link to register), results (headline table + figure), limitations (programme costs not modelled, R1 resolution, secondary sources R6/R7, flat imports), how to reproduce.
-- [x] **Step 3:** `report/report.docx` via `anthropic-skills:docx`; `report/deck.pptx` (6–8 slides) via `presentation-builder` + `anthropic-skills:pptx`. Numbers are pulled only from `results/*.csv`.
-- [x] **Step 4:** `test-coverage-analyzer` on `src/tn2030`; record the coverage figure in the README.
+- [x] **Step 2:** `README.md` (plain technical writing: short sentences, no hype): question, method, assumptions (link to register), results (headline table + figure), limitations (programme costs not modelled, R1 resolution, secondary sources R6/R7, flat imports), how to reproduce.
+- [x] **Step 3:** `report/report.docx` (python-docx); `report/deck.pptx` (6–8 slides, python-pptx). Numbers are pulled only from `results/*.csv`.
+- [x] **Step 4:** Measure the test coverage of `src/tn2030` (pytest-cov); record the coverage figure in the README.
 - [x] **Step 5:** Commit: `git commit -m "docs: add README, environment, report and deck"`
 
 ### Task 19: Reusable skill
 
-- [x] **Step 1:** With `anthropic-skills:skill-creator` and `superpowers:writing-skills`, package the workflow as `pypsa-country-study` (country config → validation → scenario pipeline → deliverables), with this repo as the worked example. Ask the author where it should live (user skills folder and/or a `skill/` folder in this repo).
+- [x] **Step 1:** Package the workflow as `pypsa-country-study` (country config → validation → scenario pipeline → deliverables), with this repo as the worked example. Ask the author where it should live (user skills folder and/or a `skill/` folder in this repo).
 - [x] **Step 2:** **Phase gate.** Evidence: figures, report, deck, README reproduce check, coverage figure. Ask before any push to GitHub.
 
 ### Task 20 (optional): ELMED

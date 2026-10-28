@@ -9,7 +9,7 @@ description: Use when planning, building or reviewing a single-country power-sys
 
 A country study is four stages, each ending with evidence before the next starts: **base network → 2024 validation → scenario pipeline → deliverables**. PyPSA-Earth stays unmodified; all changes live in your own package, applied to its prepared network. Most wrong results come from a short list of known traps (see `pitfalls.md`), not from the solver.
 
-Worked example: the Tunisia study at https://github.com/RayenRomdhani/TEP30-35 (`src/tn2030/`, `docs/phase*.md`). File references in `pitfalls.md` point there.
+Worked example: the Tunisia study at https://github.com/RayenRomdhani/TEP30-35 (`src/tn2030/`, `docs/project-history/phase*.md`, and the learning path in `docs/learn/`). File references in `pitfalls.md` point there.
 
 ## When to use
 

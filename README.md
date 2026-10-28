@@ -1,164 +1,131 @@
-# The value of energy efficiency in Tunisia's power system (2030)
+# What is one saved MWh worth to Tunisia?
 
-How much gas, CO2, system cost and new capacity does Tunisia avoid in 2030 for each MWh of electricity it does not use? This study answers that question with an open capacity-expansion model built on [PyPSA-Earth](https://github.com/pypsa-meets-earth/pypsa-earth). It keeps the government's 35% renewable target in place throughout.
+### Energy efficiency and demand flexibility in Tunisia's 2030 power system, modelled hour by hour with PyPSA-Earth
 
-Author: Rayen Romdhani, Energy Engineering student, ENIM (Monastir, Tunisia).
+[![Code: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE) [![Docs: CC BY 4.0](https://img.shields.io/badge/docs-CC%20BY%204.0-lightgrey.svg)](LICENSE-docs.md) ![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg) ![Model: PyPSA-Earth](https://img.shields.io/badge/model-PyPSA--Earth%20v0.10.0-green.svg)
 
-## Headline result
+*By Rayen Romdhani, energy engineering student at ENIM (Monastir, Tunisia).*
 
-Saving 15% of 2030 electricity demand in every hour (scenario S1-15, against the base case S0) avoids, per MWh saved:
+---
 
-| System cost | Gas burnt | CO2 | New capacity |
-|---|---|---|---|
-| 60 EUR | 0.91 MWh of gas | 0.18 t | 449 MW per TWh saved per year |
+In 2024, **94.5%** of the electricity generated in Tunisia came from burning natural gas, and about three quarters of the country's gas came from Algeria. The country has promised **35% renewable electricity by 2030**, while demand is forecast to grow 3.2% a year.
 
-![What each MWh saved avoids](results/figures/8_avoided_per_mwh.png)
+Everyone talks about building more solar. I wanted to know what happens on the other side of the meter:
 
-What the scenarios show:
+> **If Tunisia uses one MWh less in 2030, what does its power system no longer have to buy, burn or build?**
 
-- With STEG's 10% reserve margin, the base case needs 423 MW of new gas turbines. A 10% saving already avoids all of them.
-- Timing matters. If the same 15% comes first out of summer air conditioning (S1-15C), each MWh saved avoids 20% more gas and CO2, although only 39% of the saving fits on the cooling load.
-- Flexibility adds to efficiency. Letting 300 MW of load move by up to 3 hours (S2-300) saves another 22 M EUR per year and 0.24 Mt of CO2. The model moves morning and evening load into the midday solar hours.
-- The gas price changes the result more than any efficiency choice. At half the gas price, each MWh saved avoids 0.28 t of CO2. At 1.5 times the price it avoids only 0.11 t, because the system is already 70% renewable.
-- At the base gas price the 35% target does not bind: the least-cost 2030 system reaches 56% renewables on its own. That is the least-cost outcome and should not be read as a forecast (see Limitations).
+So I built a model of the whole Tunisian power system, ran 2030 eleven different ways, and measured the difference.
 
-The full tables are in [`results/summary.csv`](results/summary.csv) and [`results/avoided.csv`](results/avoided.csv). The method and every result are explained in [`docs/phase4-scenarios.md`](docs/phase4-scenarios.md).
+![Every MWh Tunisia does not use in 2030 saves 60 EUR, 0.91 MWh of gas, 0.18 t of CO2 and 449 MW of new capacity per TWh saved](results/figures/0_headline.png)
 
-## Question and scope
+## Four things the model found
 
-The study asks what each MWh of electricity saved through efficiency, or moved in time through demand flexibility, avoids in 2030 in capacity, gas, system cost and CO2. It is anchored on Tunisia's target of 35% renewable electricity by 2030 (register row `re_target_2030`).
+**1. A 10% saving cancels a gas plant.** To keep a safe margin above the 2030 peak, the base case needs **423 MW of new gas turbines**. Save 10% in every hour and the model builds none of them.
 
-The model covers Tunisia only, with 2 network nodes (north and south), 8,760 hourly steps and one weather year (2013). It is solved with the open-source solver HiGHS. It leaves out the cost of efficiency programmes (the study values the saving only), the electricity link to Italy (ELMED) and other countries.
+**2. Timing changes what a saved MWh is worth.** Take the same 15% of energy out of summer air conditioning first, and each saved MWh avoids **20% more gas and CO2** than an even cut.
 
-## Method
+**3. Moving demand by three hours has real value.** Let 300 MW of demand shift a few hours into the midday sun, and the system saves another **22 M EUR a year** and **0.24 Mt of CO2**, on top of the 15% saving. (That is a gross value: shifting is free in the model, so the cost of making it happen is not counted.)
 
-1. PyPSA-Earth v0.10.0, unmodified, builds the base network: Tunisia's grid, power plants, renewable potentials and hourly demand, from open data. The settings are in [`config/tn_base.yaml`](config/tn_base.yaml) and are logged in [`docs/config-changes.md`](docs/config-changes.md).
-2. The network is calibrated to 2024 ([`docs/phase3-validation.md`](docs/phase3-validation.md)). The thermal fleet is rebuilt from the official 2024 statistics (ONEM Memento 2024). One efficiency factor for existing gas units is then fitted so that the model burns as much gas as STEG did. After calibration the 2024 model matches the official gas burnt within 0.4% and the peak within 0.3%.
-3. 2024 demand (22.5 TWh) grows to 2030 at 3.2% per year, STEG's base-case forecast as quoted by JICA (2022). The hourly shape is stretched to STEG's load factor and minimum-to-peak ratio. Imports stay at their 2024 level.
-4. Each scenario changes the 2030 demand or the gas price (table below). The model then builds new solar, wind, batteries and gas turbines at least cost. In every scenario it must:
-   - produce at least 35% of domestic generation from renewables;
-   - keep firm capacity at least 10% above peak demand (STEG's planning margin);
-   - build the committed projects listed in [`data/committed_projects.csv`](data/committed_projects.csv).
-5. After each solve the pipeline checks the energy balance, the renewable share, the reserve margin, that no load is shed, and that committed and existing capacity is kept. It stops if any check fails. All 11 scenarios pass.
+**4. The gas price decides what a saved MWh replaces.** With cheap gas, a saved MWh mostly displaces gas (**0.28 t of CO2** avoided). With expensive gas, the system is already 70% renewable, so it mostly displaces solar, wind and batteries (**0.11 t**, but more money).
 
-| Scenario | What changes against S0 |
-|---|---|
-| S0 | Base case: 2030 demand, base gas price |
-| S1-10, S1-15, S1-20 | Demand 10, 15 or 20% lower in every hour |
-| S1-15C | Same 15% of annual energy, taken first from summer cooling load |
-| S2-300, S2-600 | S1-15 plus 300 or 600 MW of load that can move by up to 3 hours |
-| G-lo-S0, G-lo-S1-15 | S0 and S1-15 with the gas price halved |
-| G-hi-S0, G-hi-S1-15 | S0 and S1-15 with the gas price 1.5 times higher |
+And a plot twist: with 2030 cost projections, the cheapest 2030 system reaches **56% renewables** without being forced to. The 35% target binds only in the half-price gas case.
 
-Each scenario is compared with the reference at its own gas price, so "per MWh saved" always compares like with like.
+## What this study is not
 
-## Assumptions and data
+- **Not a forecast.** It shows the least-cost 2030 system, and the model has no limit on how fast Tunisia can build solar and wind.
+- **Not a cost-benefit analysis of programmes.** Saving and shifting are free in the model: the results are what they are worth to the power system, before the cost of achieving them.
+- **Not the whole grid.** Imports are fixed at 2024 levels, there are 2 nodes, and the model's daily peak comes about two hours later than the real one.
 
-Every input number is a row in [`data/assumptions_register.xlsx`](data/assumptions_register.xlsx) with its unit, source and source link. A number with no published source is labelled `assumption` and explained in the notes. The main sources are:
+All the limits, and which way each one pushes the results, are in [chapter 6](docs/learn/06-how-far-to-trust-it.md).
 
-| Input | Value | Source |
-|---|---|---|
-| Renewable target 2030 | 35% | TAP news agency, 9 Oct 2026 |
-| Electricity demand 2024 | 22.5 TWh | ONEM, *Memento du secteur de l'énergie, chiffres de 2024* |
-| Demand growth | 3.2% per year | STEG forecast, quoted by JICA (2022) |
-| Gas fleet 2024 | 2,527 MW combined cycle, 3,117 MW gas turbines and steam | ONEM Memento 2024 |
-| Reserve margin | 10% of peak | STEG planning target, quoted by JICA (2022) |
-| Gas price | 28.4 EUR/MWh (thermal) | PyPSA technology-data v0.15.0 (World Bank, ENTSO-E/ENTSOG) |
-| Technology costs and efficiencies | 2030 values | PyPSA technology-data v0.15.0 (Danish Energy Agency) |
-| Shiftable load | 300 MW | Peak-demand reduction target of the government action plan (TAP, 9 Oct 2026) |
-| Shiftable load, high case; shift window; gas price ±50% | 600 MW; 3 h; ×0.5 and ×1.5 | Assumptions |
+## How it works, in one picture
 
-Downloaded source documents are listed in `data/raw/SOURCES.md`. They are not stored in the repository.
-
-## Figures
-
-All figures are in [`results/figures/`](results/figures/) and are made by [`scripts/make_figures.py`](scripts/make_figures.py) from the result files.
-
-| | |
-|---|---|
-| Installed capacity by scenario | [`1_capacity_mix.png`](results/figures/1_capacity_mix.png) |
-| Domestic generation by scenario | [`2_generation_mix.png`](results/figures/2_generation_mix.png) |
-| Gas burnt, system cost, CO2 | [`3_gas_use.png`](results/figures/3_gas_use.png), [`4_system_cost.png`](results/figures/4_system_cost.png), [`5_co2.png`](results/figures/5_co2.png) |
-| Hourly price, sorted | [`6_price_duration.png`](results/figures/6_price_duration.png) |
-| Dispatch in the peak week, S0 and S2-300 | [`7_dispatch_peak_week.png`](results/figures/7_dispatch_peak_week.png) |
-| What each MWh saved avoids | [`8_avoided_per_mwh.png`](results/figures/8_avoided_per_mwh.png) |
-| Saving evenly or from cooling first | [`9_uniform_vs_cooling.png`](results/figures/9_uniform_vs_cooling.png) |
-
-## Limitations
-
-- Nothing limits how fast renewables are built. The model adds about 6 GW of solar and wind by 2030, far above Tunisia's recent pace (about 1 GW of committed projects), with no build-rate, financing or grid-integration limits beyond its 2-node grid.
-- Programme costs are not modelled. The avoided cost per MWh is the most an efficiency programme could cost and still pay off for the power system.
-- All runs use 1-hour steps and one weather year (2013). A 3-hour test run built 2.7% more solar and 3.9% more wind (risk R1 in the design spec).
-- Demand growth and the 2030 peak come from STEG's forecast as quoted by JICA (2022), a secondary source (risk R6). Ember's figures for the gas share of generation disagree (about 85% and 95%); this study uses the official ONEM figure of 94.5% (risk R7).
-- Imports are held at their 2024 level in every hour, so every MWh saved falls on domestic generation.
-- The fitted efficiency factor for existing gas units also stands in for plant outages, which the model does not represent.
-- The reserve margin is one national capacity rule, not a reliability study. Wind, solar, batteries and flexibility get no firm credit, so flexibility earns no capacity value here.
-- System cost includes the annualised cost of plants that already exist. Differences between scenarios are meaningful, but the absolute level is not the cost of the real system.
-
-## Repository layout
-
-| Path | Contents |
-|---|---|
-| `src/tn2030/` | The study code: demand, efficiency, flexibility, constraints, scenario builder, results, checks, figures |
-| `tests/` | pytest tests, mostly on a small 2-day test network |
-| `Snakefile`, `config/` | Scenario pipeline and settings (`config/scenarios/*.yaml`, one file per scenario) |
-| `data/` | Assumptions register and committed projects |
-| `scripts/` | Base-network inspection, 2024 validation, figures, report and slides |
-| `results/` | Result tables, figures and solve logs (solved networks are not stored) |
-| `report/` | Study report (`report.docx`) and slides (`deck.pptx`) |
-| `skill/` | `pypsa-country-study`: the workflow and pitfalls of this study, packaged for reuse on another country |
-| `docs/` | Design spec, plan, and one write-up per phase |
-
-## How to reproduce
-
-The study ran on Windows 11 (i3-1215U, 24 GB RAM). `environment.yml` pins Windows builds. Building the base network downloads about 16 GB of data, which takes about 41 GB of disk once unpacked.
-
-1. Install [Miniforge](https://github.com/conda-forge/miniforge), then clone PyPSA-Earth at the version used here:
-   ```bash
-   git clone --branch v0.10.0 https://github.com/pypsa-meets-earth/pypsa-earth.git
-   ```
-2. Create the environment from this repository and activate it:
-   ```bash
-   conda env create -f environment.yml
-   ```
-   ```bash
-   conda activate pypsa-earth
-   ```
-3. Install this package (from the root of this repository):
-   ```bash
-   pip install -e .
-   ```
-4. Build the Tunisia base network (from the PyPSA-Earth folder, about 6 hours the first time, mostly downloads):
-   ```bash
-   snakemake -j 1 networks/TN/elec_s_2_ec_lcopt_1h.nc --configfile <path-to-this-repo>/config/tn_base.yaml
-   ```
-   Then set `base_network` in `config/pipeline.yaml` to the path of the new file.
-5. Run the tests (from this repository; tests that need the base network are skipped if it is missing):
-   ```bash
-   pytest
-   ```
-6. Run the 11 scenarios (about 1 hour), then draw the figures and write the report and slides (`report/`):
-   ```bash
-   snakemake -j 1
-   ```
-   ```bash
-   python scripts/make_figures.py
-   ```
-   ```bash
-   python scripts/make_report.py
-   ```
-   ```bash
-   python scripts/make_deck.py
-   ```
-
-## Tests
-
-95 tests check the study code. Most run on a 2-day network at 3-hour steps, which also catches energy sums that forget the snapshot weighting. Two integration tests run on the real Tunisia network.
-
-Test coverage of `src/tn2030` is 98% (lines and branches together, measured with pytest-cov on 2026-10-28):
-
-```bash
-pytest --cov=tn2030 --cov-branch --cov-report=term-missing
+```mermaid
+flowchart LR
+    A[Open data<br/>grid, plants, weather] --> B[PyPSA-Earth<br/>builds the<br/>Tunisia network]
+    B --> C[Calibrated to<br/>official 2024<br/>statistics]
+    C --> D[11 scenarios<br/>savings, shifting,<br/>gas price]
+    D --> E[Least-cost plan<br/>for all 8,760<br/>hours of 2030]
+    E --> F[Checks<br/>35% renewables,<br/>10% reserve,<br/>no unserved demand]
+    F --> G[What one<br/>MWh saved<br/>avoids]
 ```
 
-The 5 lines not covered are error branches that need a failing solver or an unreachable target, and the figure-size helper used only by `scripts/make_figures.py`.
+The model plays power planner: for each scenario it decides what to build (solar, wind, batteries, gas turbines) and how to run every plant in every hour of 2030 so that the total cost is as low as possible, while meeting demand everywhere, at all times, with at least 35% renewables and a 10% reserve margin. Comparing two scenarios that differ only in demand tells you what the saving was worth.
+
+Before using it for 2030, I calibrated it to reproduce 2024: the official gas fleet, the official peak, and the gas Tunisia's power plants actually burnt (within 0.4%).
+
+## Learn the topic, step by step
+
+New to power systems? The learning path explains everything from scratch, one short chapter at a time:
+
+| | Chapter | You will learn |
+|---|---|---|
+| 1 | [The problem](docs/learn/01-the-problem.md) | How Tunisia makes its electricity, where its gas comes from, the 2030 promise |
+| 2 | [Key ideas](docs/learn/02-key-ideas.md) | Energy vs power, the merit order, reserve margins, efficiency vs flexibility |
+| 3 | [How the model works](docs/learn/03-how-the-model-works.md) | Least-cost planning as a game with rules; PyPSA-Earth; where each piece of code fits |
+| 4 | [The experiment](docs/learn/04-the-experiment.md) | The 11 scenarios in plain words |
+| 5 | [Results](docs/learn/05-results.md) | Every figure, what to look at, what it means |
+| 6 | [How far to trust it](docs/learn/06-how-far-to-trust-it.md) | The 2024 check and what the model cannot see |
+| 7 | [Try it yourself](docs/learn/07-try-it-yourself.md) | Run the model, add your own scenario |
+| | [Glossary](docs/learn/glossary.md) | Every term in one or two lines |
+
+Prefer a document? There is a [written report](report/report.docx) and an [8-slide deck](report/deck.pptx).
+
+## Where the numbers come from
+
+No number in this study is made up. Every input is a row in the [assumptions register](data/assumptions_register.md), with its source and link: ONEM's 2024 energy statistics, STEG's forecasts (via JICA, 2022), and 2030 technology costs from PyPSA technology-data. A value with no published source is labelled `assumption` and explained.
+
+## What is in the repository
+
+| Folder | What is inside |
+|---|---|
+| [`docs/learn/`](docs/learn/) | The learning path (start here) |
+| [`results/`](results/) | Result tables and figures |
+| [`data/`](data/) | The assumptions register and committed projects |
+| [`config/`](config/) | One small file per scenario, and the PyPSA-Earth settings |
+| [`src/tn2030/`](src/tn2030/) | The study's Python package |
+| [`scripts/`](scripts/) | Figures, report, slides, register export, 2024 validation (`scripts/dev/` holds one-off helpers) |
+| [`tests/`](tests/) | Automated tests |
+| [`report/`](report/) | Report and slides |
+| [`skill/`](skill/) | `pypsa-country-study`: the method and its pitfalls, packaged for a study of another country |
+| [`docs/project-history/`](docs/project-history/) | The lab notebook: how the study was built, phase by phase |
+
+## Run it yourself
+
+You need Windows (the environment file pins Windows builds), [Miniforge](https://github.com/conda-forge/miniforge), and about 45 GB of free disk (PyPSA-Earth's data takes 41 GB once unpacked). [Chapter 7](docs/learn/07-try-it-yourself.md) has the full walkthrough; the short version. Clone PyPSA-Earth and this repository side by side:
+
+```bash
+git clone --branch v0.10.0 https://github.com/pypsa-meets-earth/pypsa-earth.git
+```
+```bash
+git clone https://github.com/RayenRomdhani/TEP30-35.git
+```
+Then, inside this repository's folder:
+```bash
+conda env create -f environment.yml
+```
+```bash
+conda activate pypsa-earth
+```
+```bash
+pip install -e .
+```
+```bash
+snakemake -j 1 networks/TN/elec_s_2_ec_lcopt_1h.nc --configfile <path-to-this-repo>/config/tn_base.yaml
+```
+(run that one in the PyPSA-Earth folder; about 6 hours the first time, mostly downloads; then set `base_network` in `config/pipeline.yaml`). Back in this repository:
+```bash
+pytest
+```
+```bash
+snakemake -j 1
+```
+```bash
+python scripts/make_figures.py
+```
+
+The 100 tests cover 98% of the study's code (`pytest --cov=tn2030 --cov-branch`); those that need the real Tunisia network skip themselves if it is missing.
+
+## Licence and citation
+
+Code under the [MIT licence](LICENSE); text, figures, report and slides under [CC BY 4.0](LICENSE-docs.md). To cite this work, use [`CITATION.cff`](CITATION.cff) (GitHub shows a "Cite this repository" button).

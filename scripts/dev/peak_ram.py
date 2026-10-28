@@ -1,7 +1,7 @@
 """Run a command and record the peak memory (RSS) of its whole process tree.
 
 Snakemake cannot measure memory on Windows, so this samples it every 0.5 s.
-Run:  python scripts/peak_ram.py <log_file> <command...>
+Run:  python scripts/dev/peak_ram.py <log_file> <command...>
 """
 
 import subprocess
@@ -32,5 +32,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
-        sys.exit("usage: python scripts/peak_ram.py <log_file> <command...>")
+        sys.exit("usage: python scripts/dev/peak_ram.py <log_file> <command...>")
     main()

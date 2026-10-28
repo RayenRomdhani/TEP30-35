@@ -25,6 +25,4 @@ logs/
 Thumbs.db
 .vscode/
 ~$*
-.claude/worktrees/
-.superpowers/
 *.egg-info/

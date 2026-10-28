@@ -1,7 +1,7 @@
 # PyPSA-Earth v0.10.0 overrides for the Tunisia 2030 study.
 # Only keys we set; all differ from D:\pypsa-earth\config.default.yaml except `tutorial`.
 # Run from D:\pypsa-earth:  snakemake -j 1 <target> --configfile <this file>
-# Every change is also logged, with its reason, in docs/config-changes.md.
+# Every change is also logged, with its reason, in docs/project-history/config-changes.md.
 
 tutorial: false            # same as the default; stated so it is clear we use the full data bundles, not the tutorial set
 
