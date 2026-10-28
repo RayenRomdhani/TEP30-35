@@ -293,7 +293,7 @@ if rest > 0: out = out * (1 - rest / (out * weights).sum())
 return out, on_cooling / S
 ```
 
-- [ ] **Step 1: Write the failing tests** (full 2030 hourly index; base 1000 MW flat, +500 MW at 12:00–17:00 in July):
+- [x] **Step 1: Write the failing tests** (full 2030 hourly index; base 1000 MW flat, +500 MW at 12:00–17:00 in July):
 ```python
 def test_uniform_cut_scales_every_hour():
     assert np.allclose(uniform_cut(p, 0.15), p * 0.85)
@@ -309,10 +309,10 @@ def test_cooling_weighted_cut_flat_profile_falls_back_to_uniform():
     out, frac = cooling_weighted_cut(flat, w, 0.15)
     assert frac == 0.0 and np.allclose(out, flat * 0.85)
 ```
-- [ ] **Step 2:** Run `pytest tests/test_efficiency.py -v`. Expected: 5 FAIL.
-- [ ] **Step 3:** Implement.
-- [ ] **Step 4:** Run. Expected: 5 passed.
-- [ ] **Step 5:** Commit: `git commit -m "feat: add uniform and cooling-weighted efficiency cuts"`
+- [x] **Step 2:** Run `pytest tests/test_efficiency.py -v`. Expected: 5 FAIL.
+- [x] **Step 3:** Implement.
+- [x] **Step 4:** Run. Expected: 5 passed.
+- [x] **Step 5:** Commit: `git commit -m "feat: add uniform and cooling-weighted efficiency cuts"`
 
 ### Task 12: Flexibility module
 
