@@ -1,6 +1,6 @@
 # Project history: how the study was built
 
-This folder is the lab notebook. If you want to *learn* the topic, start with the [README](../../README.md) instead; come here when you want to check how a result was produced or why a decision was taken.
+This folder is the lab notebook. If you want to *learn* the topic, start with the [learning path](../learn/01-the-problem.md) instead; come here when you want to check how a result was produced or why a decision was taken.
 
 The study was built in five phases, each ending with evidence before the next one started.
 
