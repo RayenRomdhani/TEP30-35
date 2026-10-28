@@ -9,6 +9,12 @@ Every number used by the model is in `data/assumptions_register.xlsx`, with its 
 |---|---|---|---|---|
 | `technology-data_v0.15.0_costs_2030.csv` | https://github.com/PyPSA/technology-data/blob/v0.15.0/outputs/costs_2030.csv | 281 KB | 2026-10-27 | – |
 | `onem/Chiffres_cles_energie_2024.pdf` | ONEM / Ministry of Industry, Mines and Energy, *Memento du secteur de l'énergie, Chiffres de 2024* (Aug 2025): https://www.energiemines.gov.tn/fileadmin/docs-u1/Chiffres_cl%C3%A9s_%C3%A9nergie_2024.pdf | 3.7 MB | 2026-10-28 | `76a0a8de…8690892b` |
+| `jica/jica_2022_12342283.pdf` | JICA / TEPSCO / KPMG, *Data Collection Survey on Power Sector in Tunisia*, Final Report (Mar 2022): https://openjicareport.jica.go.jp/pdf/12342283.pdf | 14.5 MB | 2026-10-28 | `883af51f…6c636935` |
+
+How the JICA survey was read:
+- **Text:** extracted with `pdftotext`. Page numbers are the report's own (e.g. 2-17).
+- **What it gives:** STEG's base-case demand forecast (3.2%/yr from 2019; 28,362 GWh and 6,000 MW in 2030; 54% load factor; minimum-to-peak ratio 34%).
+- **Thermal plans:** STEG's planned thermal retirements and additions to 2030.
 
 How the ONEM Memento was read:
 - **Text tables:** extracted with `pdftotext` (2024 production by fuel, exchanges, peak, specific consumption). Pages are given as printed page numbers.
@@ -35,7 +41,6 @@ How the ONEM Memento was read:
 - **An evaluated cost per MWh saved for ANME / FTE efficiency programmes.**
   - The only figures found are 152 TND per toe saved (industry contract programmes, 2004–2010, mostly fuel savings, cost basis not stated; Osman 2012, https://www.citego.org/bdf_fiche-document-984_fr.html) and an ex-ante estimate below 1 US cent/kWh for fridge labelling (eceee 2005, https://www.osti.gov/etdeweb/biblio/20646780).
   - Neither is a defensible electricity cost per MWh, so no `ee_programme_cost_eur_per_mwh` row was added. The README will state this as a limitation (spec §1).
-- **An official 2030 electricity demand or peak projection.** The Energy Strategy 2035 synthesis has none.
-  - The JICA 2022 survey reportedly contains STEG's forecast (about 3.2%/yr, about 6,000 MW in 2030). It is not yet read: https://openjicareport.jica.go.jp/pdf/12342283.pdf, 14.5 MB.
+- **A recent official 2030 demand projection.** The Energy Strategy 2035 synthesis has none. The newest STEG forecast found is the 2022 one quoted in the JICA survey (above). It is used for the growth rate.
 - **A public hourly load curve for Tunisia** (risk R5).
 - **2024 capacity by individual plant.** Fleet validation therefore uses capacity by plant type.
