@@ -532,7 +532,7 @@ Verify: README "How to reproduce" steps run from a clean clone up to `pytest` pa
 ### Task 19: Reusable skill
 
 - [x] **Step 1:** With `anthropic-skills:skill-creator` and `superpowers:writing-skills`, package the workflow as `pypsa-country-study` (country config → validation → scenario pipeline → deliverables), with this repo as the worked example. Ask the author where it should live (user skills folder and/or a `skill/` folder in this repo).
-- [ ] **Step 2:** **Phase gate.** Evidence: figures, report, deck, README reproduce check, coverage figure. Ask before any push to GitHub.
+- [x] **Step 2:** **Phase gate.** Evidence: figures, report, deck, README reproduce check, coverage figure. Ask before any push to GitHub.
 
 ### Task 20 (optional): ELMED
 
