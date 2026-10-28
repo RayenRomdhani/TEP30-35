@@ -321,7 +321,7 @@ def test_cooling_weighted_cut_flat_profile_falls_back_to_uniform():
 **Interfaces:**
 - Produces: `add_shiftable_load(n: pypsa.Network, p_max_mw: float, max_hours: float) -> None`. Adds one `StorageUnit` per load bus named `"demand_shift <bus>"`, carrier `"demand_shift"` (added to `n.carriers` if missing), `p_nom` = `p_max_mw` × (bus annual load share), `max_hours`, `efficiency_store = efficiency_dispatch = 1`, `capital_cost = marginal_cost = 0`, `p_nom_extendable = False`, `cyclic_state_of_charge = False`. `state_of_charge_set` = 0 at the last snapshot of each calendar day, NaN elsewhere (spec §5.3).
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 ```python
 def test_shift_split_by_bus_load_share(two_bus_network):        # loads 3:1
     add_shiftable_load(two_bus_network, 300.0, 3.0)
@@ -337,10 +337,10 @@ def test_shift_soc_reset_on_partial_last_day(toy_network_partial_day):  # 52 h h
 def test_shift_is_energy_neutral(toy_network): ...
     assert (p * w).sum() == pytest.approx(0.0, abs=1e-6)
 ```
-- [ ] **Step 2:** Run. Expected: 4 FAIL.
-- [ ] **Step 3:** Implement. Add fixtures `two_bus_network` and `toy_network_partial_day` to `conftest.py`.
-- [ ] **Step 4:** Run. Expected: 4 passed.
-- [ ] **Step 5:** Commit: `git commit -m "feat: add shiftable load as daily energy-neutral virtual storage"`
+- [x] **Step 2:** Run. Expected: 4 FAIL.
+- [x] **Step 3:** Implement. Add fixtures `two_bus_network` and `toy_network_partial_day` to `conftest.py`.
+- [x] **Step 4:** Run. Expected: 4 passed.
+- [x] **Step 5:** Commit: `git commit -m "feat: add shiftable load as daily energy-neutral virtual storage"`
 
 ### Task 13: RES constraint and solve wrapper
 
