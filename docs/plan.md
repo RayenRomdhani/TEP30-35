@@ -260,9 +260,9 @@ def test_peak_check_flags_outside_tolerance():
 **Interfaces:**
 - Consumes: the base network, `load_register`, `scale_profile`, `subtract_imports`.
 
-- [ ] **Step 1:** Script: (a) compare existing `p_nom` by carrier in the base network with `cap_2024_*` rows; (b) copy the network, freeze all capacities (`p_nom_extendable = False`), scale load to 2024 demand minus 2024 imports, solve a dispatch-only run, compare generation by carrier and gas share with `gen_2024_*` and `gas_share_2024`. Write `results/validation.csv` with columns `metric, model, reference, diff_pct, source`.
+- [x] **Step 1:** Script: (a) compare existing `p_nom` by carrier in the base network with `cap_2024_*` rows; (b) copy the network, freeze all capacities (`p_nom_extendable = False`), scale load to 2024 demand minus 2024 imports, solve a dispatch-only run, compare generation by carrier and gas share with `gen_2024_*` and `gas_share_2024`. Write `results/validation.csv` with columns `metric, model, reference, diff_pct, source`.
 Verify: `python scripts/validate_baseline.py` writes the CSV with one row per compared metric.
-- [ ] **Step 2:** `docs/phase3-validation.md`: comparison table, explanation of each gap > 10%, and each calibration (what changed, why, source). Calibrations go into `config/tn_base.yaml` or the register, never as unexplained edits to the network.
+- [x] **Step 2:** `docs/phase3-validation.md`: comparison table, explanation of each gap > 10%, and each calibration (what changed, why, source). Calibrations go into `config/tn_base.yaml` or the register, never as unexplained edits to the network.
 - [ ] **Step 3:** Commit, then **Phase gate**. Evidence: validation table, explained gaps, calibration log.
 
 ---

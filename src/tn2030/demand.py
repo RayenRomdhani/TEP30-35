@@ -16,6 +16,30 @@ def scale_profile(profile: pd.Series, weights: pd.Series, annual_total_mwh: floa
     return profile * annual_total_mwh / (profile * weights).sum()
 
 
+def reshape_profile(profile: pd.Series, weights: pd.Series, load_factor: float, min_to_peak: float) -> pd.Series:
+    """Stretch a too-flat load profile to an official load factor and minimum/peak ratio (Phase 3 calibration).
+
+    Every hour keeps its rank (the timing of peaks and troughs comes from the input), the annual energy is kept,
+    and the new shape relative to the peak is  min_to_peak + (1 - min_to_peak) * x**k,  where x runs from 0 at the
+    lowest hour to 1 at the highest. The exponent k is found by bisection so the weighted mean (= load factor) matches.
+    """
+    if not min_to_peak < load_factor < 1:
+        raise ValueError(f"load factor {load_factor} must lie between min_to_peak {min_to_peak} and 1")
+    x = (profile - profile.min()) / (profile.max() - profile.min())
+
+    def shape(k):
+        return min_to_peak + (1 - min_to_peak) * x**k
+
+    def mean_over_peak(k):  # the load factor of shape(k); it falls as k grows
+        return float((shape(k) * weights).sum() / weights.sum())
+
+    lo, hi = 1e-3, 1e3
+    for _ in range(100):  # bisection on a log scale
+        mid = (lo * hi) ** 0.5
+        lo, hi = (mid, hi) if mean_over_peak(mid) > load_factor else (lo, mid)
+    return scale_profile(shape((lo * hi) ** 0.5), weights, (profile * weights).sum())
+
+
 def subtract_imports(profile: pd.Series, weights: pd.Series, annual_imports_mwh: float) -> pd.Series:
     """Remove a flat import flow from the load: what is left must be served by domestic plants (spec D3)."""
     flat_mw = annual_imports_mwh / weights.sum()  # same MW in every hour of the year

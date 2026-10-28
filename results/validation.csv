@@ -1,0 +1,35 @@
+case,metric,model,reference,diff_pct,source
+pypsa_earth,cap_ccgt_mw,5580.0,2527.0,120.8,ONEM Memento 2024
+pypsa_earth,cap_ocgt_and_steam_mw,0.0,3117.0,-100.0,ONEM Memento 2024
+pypsa_earth,cap_oil_mw,1408.956,0.0,,ONEM Memento 2024 (no oil category)
+pypsa_earth,cap_thermal_mw,6988.956,5644.0,23.8,ONEM Memento 2024
+pypsa_earth,cap_renewable_mw,583.992,368.0,58.7,ONEM Memento 2024 (centralised only)
+pypsa_earth,gen_gas_twh,18.15,18.156,-0.0,ONEM Memento 2024
+pypsa_earth,gen_oil_twh,0.0,0.072,-100.0,ONEM Memento 2024
+pypsa_earth,gen_wind_twh,0.483,0.337,43.3,ONEM Memento 2024
+pypsa_earth,gen_solar_twh,0.752,0.628,19.8,ONEM Memento 2024
+pypsa_earth,gen_hydro_twh,0.009,0.016,-43.2,ONEM Memento 2024
+pypsa_earth,gen_total_twh,19.394,19.208,1.0,ONEM Memento 2024 (excl. 0.187 TWh third-party purchases)
+pypsa_earth,gas_share,0.936,0.945,-1.0,ONEM Memento 2024
+pypsa_earth,unserved_twh,0.0,0.0,,should be zero
+pypsa_earth,gas_fleet_efficiency_ncv,0.58,0.49,18.3,ONEM Memento 2024 specific consumption x 1/0.9 (gross to net)
+pypsa_earth,peak_mw,3480.006,4888.0,-28.8,ONEM Memento 2024
+pypsa_earth,load_factor,0.738,0.524,40.8,"ONEM Memento 2024 (2024 demand / 8,784 h / peak)"
+pypsa_earth,min_to_peak,0.525,0.34,54.4,STEG 2030 forecast in JICA 2022
+calibrated,cap_ccgt_mw,2527.0,2527.0,0.0,ONEM Memento 2024
+calibrated,cap_ocgt_and_steam_mw,3117.0,3117.0,0.0,ONEM Memento 2024
+calibrated,cap_oil_mw,0.0,0.0,,ONEM Memento 2024 (no oil category)
+calibrated,cap_thermal_mw,5644.0,5644.0,0.0,ONEM Memento 2024
+calibrated,cap_renewable_mw,583.992,368.0,58.7,ONEM Memento 2024 (centralised only)
+calibrated,gen_gas_twh,18.15,18.156,-0.0,ONEM Memento 2024
+calibrated,gen_oil_twh,0.0,0.072,-100.0,ONEM Memento 2024
+calibrated,gen_wind_twh,0.483,0.337,43.3,ONEM Memento 2024
+calibrated,gen_solar_twh,0.752,0.628,19.8,ONEM Memento 2024
+calibrated,gen_hydro_twh,0.009,0.016,-43.2,ONEM Memento 2024
+calibrated,gen_total_twh,19.394,19.208,1.0,ONEM Memento 2024 (excl. 0.187 TWh third-party purchases)
+calibrated,gas_share,0.936,0.945,-1.0,ONEM Memento 2024
+calibrated,unserved_twh,0.0,0.0,,should be zero
+calibrated,gas_fleet_efficiency_ncv,0.49,0.49,-0.0,ONEM Memento 2024 specific consumption x 1/0.9 (gross to net)
+calibrated,peak_mw,4901.392,4888.0,0.3,ONEM Memento 2024
+calibrated,load_factor,0.524,0.524,0.0,"ONEM Memento 2024 (2024 demand / 8,784 h / peak)"
+calibrated,min_to_peak,0.34,0.34,0.0,STEG 2030 forecast in JICA 2022

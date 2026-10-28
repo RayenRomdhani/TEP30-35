@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from tn2030.demand import annual_demand_2030, peak_check, scale_profile, subtract_imports
+from tn2030.demand import annual_demand_2030, peak_check, reshape_profile, scale_profile, subtract_imports
 
 
 def _day(step_hours: int = 1):
@@ -40,6 +40,33 @@ def test_subtract_imports_raises_when_load_goes_negative():
     p, w = _day()
     with pytest.raises(ValueError, match="negative"):
         subtract_imports(p, w, 1e6)
+
+
+def _flat_year():
+    """A deliberately flat 'year' (load factor ~0.8), like the PyPSA-Earth profile."""
+    idx = pd.date_range("2030-01-01", periods=240, freq="3h")
+    rng = np.random.default_rng(0)
+    return pd.Series(3000 + 600 * rng.random(len(idx)), index=idx), pd.Series(3.0, index=idx)
+
+
+def test_reshape_profile_hits_load_factor_min_ratio_and_energy():
+    p, w = _flat_year()
+    out = reshape_profile(p, w, load_factor=0.52, min_to_peak=0.34)
+    assert (out * w).sum() == pytest.approx((p * w).sum())  # same energy
+    assert out.min() / out.max() == pytest.approx(0.34)
+    assert (out * w).sum() / w.sum() / out.max() == pytest.approx(0.52, abs=1e-4)
+
+
+def test_reshape_profile_keeps_hour_ranking():  # timing of peaks and troughs comes from the input
+    p, w = _flat_year()
+    out = reshape_profile(p, w, load_factor=0.52, min_to_peak=0.34)
+    assert (out.rank() == p.rank()).all()
+
+
+def test_reshape_profile_raises_on_impossible_target():  # load factor must lie between min/peak and 1
+    p, w = _flat_year()
+    with pytest.raises(ValueError, match="load factor"):
+        reshape_profile(p, w, load_factor=0.30, min_to_peak=0.34)
 
 
 def test_peak_check_flags_outside_tolerance():
