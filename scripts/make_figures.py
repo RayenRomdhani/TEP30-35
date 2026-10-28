@@ -1,7 +1,7 @@
 """Draw the result figures from results/*.csv and the solved networks (plan Task 17).
 
 Run from the repo root after `snakemake -j 1`:  python scripts/make_figures.py
-Writes 9 PNGs to results/figures/.
+Writes 10 PNGs to results/figures/ (0_headline.png is the README's opening picture).
 """
 
 import sys
@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))  # this che
 import matplotlib
 
 matplotlib.use("Agg")  # write files, open no window
+import matplotlib.patches
 import matplotlib.pyplot as plt
 import pandas as pd
 import pypsa
@@ -164,6 +165,28 @@ def avoided(avoided_df: pd.DataFrame, labels: dict) -> None:
     save(fig, "8_avoided_per_mwh")
 
 
+def headline(avoided_df: pd.DataFrame) -> None:
+    """The answer in one picture: what one MWh saved avoids (S1-15 against S0), as four big numbers."""
+    a = avoided_df.loc["S1-15"]
+    tiles = [(f"{a['cost_eur_per_mwh']:.0f} EUR", "of power-system cost"),
+             (f"{a['gas_mwh_th_per_mwh']:.2f} MWh", "of gas not burnt"),
+             (f"{a['co2_t_per_mwh']:.2f} t", "of CO2 not emitted"),
+             (f"{a['capacity_mw_per_twh']:.0f} MW", "less new capacity\nper TWh saved per year")]
+    fig = plt.figure(figsize=(12, 4), facecolor="white")
+    fig.text(0.03, 0.88, "Every MWh Tunisia does not use in 2030 saves", fontsize=18, color=INK, weight="bold")
+    fig.text(0.03, 0.79, "Saving 15% of demand in every hour (scenario S1-15) against the base case (S0)",
+             fontsize=11, color=INK_2)
+    for i, (value, label) in enumerate(tiles):
+        x = 0.03 + i * 0.24
+        fig.patches.append(matplotlib.patches.FancyBboxPatch(
+            (x, 0.14), 0.215, 0.56, boxstyle="round,pad=0,rounding_size=0.02", transform=fig.transFigure,
+            facecolor="#eef3f4", edgecolor="none"))
+        fig.text(x + 0.02, 0.48, value, fontsize=32, color=SINGLE, weight="bold")
+        fig.text(x + 0.02, 0.36, label, fontsize=12, color=INK, va="top")
+    add_source(fig, SOURCE + "; numbers from results/avoided.csv")
+    save(fig, "0_headline")
+
+
 def uniform_vs_cooling(avoided_df: pd.DataFrame) -> None:
     """The same 15% of energy saved evenly (S1-15) or from summer cooling first (S1-15C)."""
     fig, axes = plt.subplots(1, 4, figsize=(12, 4), facecolor="white")
@@ -189,6 +212,7 @@ def main() -> None:
     avoided_df = pd.read_csv(RESULTS / "avoided.csv", index_col="scenario")
     networks = {s: pypsa.Network(str(RESULTS / "networks" / f"{s}_solved.nc")) for s in ORDER}
 
+    headline(avoided_df)
     capacity_mix(summary, labels)
     generation_mix(networks, labels)
     single_bars(summary["gas_use_twh_th"], labels, "Gas burnt for power in 2030", "TWh of gas (thermal) per year",
