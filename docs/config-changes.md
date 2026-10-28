@@ -46,7 +46,7 @@ All overrides live in [`config/tn_base.yaml`](../config/tn_base.yaml), passed wi
 | `countries` | `["NG", "BJ"]` | `["TN"]` | Tunisia only (spec D11) |
 | `run.name` | `""` | `"TN"` | Keeps Tunisia files apart from the tutorial run |
 | `scenario.clusters` | `[10]` | `[2]` | Small, fast network (spec D11) |
-| `scenario.opts` | `[Co2L-3h]` | `[3h]` | 3-hour steps; no CO2 cap because Tunisia has none (spec D9) |
+| `scenario.opts` | `[Co2L-3h]` | `[1h]` | 1-hour steps (Task 7 decision, see below); no CO2 cap because Tunisia has none (spec D9) |
 | `electricity.extendable_carriers.Generator` | `[solar, onwind, offwind-ac, offwind-dc, OCGT]` | `[solar, onwind, OCGT, CCGT]` | Candidate technologies of spec D1 |
 | `electricity.extendable_carriers.StorageUnit` | `[]` | `[]` | No pumped hydro or H2 storage units |
 | `electricity.extendable_carriers.Store` | `[battery, H2]` | `[battery]` | Li-ion only; no hydrogen (spec D1) |
@@ -76,3 +76,21 @@ Command (from `D:\pypsa-earth`):
 | Runtime | 347.6 min, of which about 5.3 h downloads and 17 min modelling |
 | Disk after the run | `data/` 21.4 GB, `cutouts/` 19.5 GB (includes the tutorial data); 41.2 GB free on D: |
 | Output | `networks/TN/elec_s_2_ec_lcopt_3h.nc` (2 buses, 2,920 snapshots × 3 h, 29.88 TWh load) |
+
+## Time resolution decision (Task 7, risk R1)
+
+**Decision (author, 2026-10-28): 1-hour steps for all scenarios.** It replaces the 3 h first planned in spec D11.
+
+| | 3 h | 1 h |
+|---|---|---|
+| HiGHS solve time | 50–58 s | 536–578 s |
+| Peak memory | 0.72 GiB | 1.26 GiB |
+| Objective (M EUR/yr) | 1,369.3 | 1,374.0 |
+
+Reasons:
+- Affordable: about 10 min per run, roughly 2 h for all 11 scenarios.
+- At 3 h, a "shift up to 3 h" is a single step.
+- 3 h averaging smooths peaks: it built 3–4% more solar and wind and burned 3% less gas than 1 h.
+
+Base network from now on: `networks/TN/elec_s_2_ec_lcopt_1h.nc` (8,760 snapshots × 1 h, 29.88 TWh, peak 4,620 MW), recorded in `config/pipeline.yaml`.
+Full table: `docs/phase2-base-network.md`.

@@ -12,7 +12,7 @@ run:
 
 scenario:
   clusters: [2]            # 2 nodes to start; 4 later if runtime allows (spec D11)
-  opts: ["3h"]             # 3-hour steps (spec D11, risk R1). No "Co2L": Tunisia has no CO2 cap; CO2 is reported, not limited (spec D9)
+  opts: ["1h"]             # 1-hour steps, chosen after the 3h-vs-1h benchmark (spec D11, risk R1). No "Co2L": Tunisia has no CO2 cap; CO2 is reported, not limited (spec D9)
 
 electricity:
   extendable_carriers:

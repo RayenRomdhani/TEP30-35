@@ -14,7 +14,7 @@
 
 - No invented data: every input number is a row in `data/assumptions_register.xlsx` with a source URL, or is typed `assumption`.
 - Renewable target: renewables (solar + wind + hydro) ≥ **35%** of **domestic** generation; imports and battery discharge excluded from both sides.
-- Scope: countries `["TN"]`, **2 clusters** (4 if runtime allows), **3-hour** steps unless R1 (Task 7) moves everything to 1 h with the author's approval, solver **HiGHS**.
+- Scope: countries `["TN"]`, **2 clusters** (4 if runtime allows), **1-hour** steps (chosen by the author after the R1 benchmark in Task 7; first planned at 3 h), solver **HiGHS**.
 - Platform: native Windows 11. Miniforge, PyPSA-Earth and its data on **`D:`**; this repo on `C:`.
 - Ask the author before any download > 2 GB, and before any download at all (filename, source, size).
 - All commands run from the repo root in the activated `pypsa-earth` conda env.
@@ -24,7 +24,7 @@
 
 ## Review Focus
 
-1. **3-hour snapshot weightings.** Any energy sum (MWh, TWh, gas use, CO2, RES share) must multiply power by `n.snapshot_weightings.generators`; a sum of raw `p` under-counts by 3×. Pinned by `test_scale_profile_hits_annual_total_with_3h_weights` (Task 9) and `test_summary_uses_snapshot_weightings` (Task 14).
+1. **3-hour snapshot weightings.** Any energy sum (MWh, TWh, gas use, CO2, RES share) must multiply power by `n.snapshot_weightings.generators`; a sum of raw `p` under-counts by 3×. The real runs use 1 h steps (weight 1), where this bug would be invisible, so the 3 h toy fixture is what catches it. Pinned by `test_scale_profile_hits_annual_total_with_3h_weights` (Task 9) and `test_summary_uses_snapshot_weightings` (Task 14).
 2. **Imports larger than load in some hour.** Flat imports can exceed night-time load and produce negative demand; this must fail loudly, not silently clip. Pinned by `test_subtract_imports_raises_when_load_goes_negative` (Task 9).
 3. **Carrier names differ from our constants** (e.g. `onwind` vs `wind`). The RES constraint would then count nothing and still "solve". Pinned by `test_res_constraint_raises_when_no_carrier_matches` (Task 13).
 4. **Avoided metric with zero demand saved.** Gas-price variants of S0 have no saving vs S0; each scenario is compared to its own `reference`, and division by zero raises. Pinned by `test_avoided_per_mwh_raises_on_zero_saving` (Task 14) and the `reference` field (Task 15).

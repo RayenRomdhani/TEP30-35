@@ -1,17 +1,19 @@
 # Phase 2: Tunisia base network
 
 PyPSA-Earth v0.10.0 (unmodified) built a prepared, unsolved network for Tunisia using [`config/tn_base.yaml`](../config/tn_base.yaml).
-Our scenario pipeline starts from this file. Its path is in [`config/pipeline.yaml`](../config/pipeline.yaml).
+It was first built at 3-hour steps. After the benchmark below, the author chose **1-hour steps** for all scenarios (spec D11). Our scenario pipeline starts from the 1-hour file, whose path is in [`config/pipeline.yaml`](../config/pipeline.yaml).
 
 Command, run from `D:\pypsa-earth`:
 
 ```
-snakemake -j 1 networks/TN/elec_s_2_ec_lcopt_3h.nc --configfile <repo>/config/tn_base.yaml
+snakemake -j 1 networks/TN/elec_s_2_ec_lcopt_1h.nc --configfile <repo>/config/tn_base.yaml
 ```
 
-The file name reads as: `s` simplified, `2` clusters, `ec` extra components (batteries), `lcopt` line expansion left to the optimizer, `3h` three-hour steps.
+The file name reads as: `s` simplified, `2` clusters, `ec` extra components (batteries), `lcopt` line expansion left to the optimizer, `1h` one-hour steps.
 
 ## Network summary
+
+The 1-hour base network (`elec_s_2_ec_lcopt_1h.nc`) has the same buses, plants and annual load as the 3-hour one below. It has 8,760 snapshots × 1 h, and its peak load is 4,620 MW at 2013-08-07 17:00 (3-hour averaging lowers the peak to 4,604 MW).
 
 Output of `python scripts/inspect_base.py D:\pypsa-earth\networks\TN\elec_s_2_ec_lcopt_3h.nc`:
 
