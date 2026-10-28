@@ -29,6 +29,14 @@ def toy_network_partial_day(reg):
 
 
 @pytest.fixture
+def solved_toy(toy_network):
+    """The toy network solved with the 35% renewable target."""
+    from tn2030.constraints import solve_network
+    solve_network(toy_network, 0.35)
+    return toy_network
+
+
+@pytest.fixture
 def toy_network_cheap_gas(toy_network):
     """Toy network where wind and solar cost 5x more, so without a target the optimizer picks mostly gas."""
     re = toy_network.generators.carrier.isin(["solar", "onwind"])

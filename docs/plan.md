@@ -381,7 +381,7 @@ def test_res_constraint_raises_when_no_carrier_matches(toy_network):
   - `avoided_per_mwh(base: pd.Series, scen: pd.Series) -> pd.Series` with keys `cost_eur_per_mwh`, `co2_t_per_mwh`, `gas_mwh_th_per_mwh`, `capacity_mw_per_twh`. `ValueError` "zero saving" if `base.demand_twh == scen.demand_twh`.
   - `sanity_check(n: pypsa.Network, res_share_min: float, committed: pd.DataFrame, peak_ref_mw: float) -> list[str]` raising `AssertionError` on: energy balance gap > 1e-4 relative, RES share < min − 1e-6, any load-shedding dispatch > 0, any committed capacity not met; returns warnings (peak outside ±10%).
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 ```python
 def test_summary_uses_snapshot_weightings(solved_toy):
     s = summarize(solved_toy)
@@ -406,10 +406,10 @@ def test_sanity_check_fails_on_res_shortfall(solved_toy):
 def test_sanity_check_fails_on_missing_committed(solved_toy):
     with pytest.raises(AssertionError, match="committed"): sanity_check(solved_toy, 0.0, committed_10gw_solar, ...)
 ```
-- [ ] **Step 2:** Run. Expected: FAIL.
-- [ ] **Step 3:** Implement both modules. Add fixture `solved_toy` (toy solved with `solve_network(n, 0.35)`).
-- [ ] **Step 4:** Run. Expected: 7 passed.
-- [ ] **Step 5:** Commit: `git commit -m "feat: add result metrics, avoided-per-MWh and sanity checks"`
+- [x] **Step 2:** Run. Expected: FAIL.
+- [x] **Step 3:** Implement both modules. Add fixture `solved_toy` (toy solved with `solve_network(n, 0.35)`).
+- [x] **Step 4:** Run. Expected: 7 passed.
+- [x] **Step 5:** Commit: `git commit -m "feat: add result metrics, avoided-per-MWh and sanity checks"`
 
 ### Task 15: Scenario builder
 
