@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this study, please cite it as below."
+title: "The value of energy efficiency in Tunisia's power system (2030)"
+authors:
+  - family-names: Romdhani
+    given-names: Rayen
+    affiliation: "École Nationale d'Ingénieurs de Monastir (ENIM)"
+date-released: 2026-10-28
+repository-code: "https://github.com/RayenRomdhani/TEP30-35"
+license: MIT
+keywords:
+  - energy efficiency
+  - demand flexibility
+  - power system modelling
+  - capacity expansion
+  - PyPSA-Earth
+  - Tunisia
