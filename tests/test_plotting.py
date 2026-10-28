@@ -49,6 +49,20 @@ def test_dispatch_handles_battery_not_built(pe_battery_network):  # PyPSA drops 
     assert (dispatch_by_carrier(n)["battery"] == 0).all()
 
 
+def test_dispatch_raises_on_carrier_without_colour(solved_toy):  # else a figure silently under-reports output
+    solved_toy.generators.loc["CCGT", "carrier"] = "nuclear"
+    with pytest.raises(ValueError, match="nuclear"):
+        dispatch_by_carrier(solved_toy)
+
+
+def test_dispatch_leaves_out_demand_shift(toy_network):  # shifting moves load, it does not generate
+    from tn2030.constraints import solve_network
+    from tn2030.flexibility import add_shiftable_load
+    add_shiftable_load(toy_network, 300, 3)
+    solve_network(toy_network, 0.35)
+    assert "demand_shift" not in dispatch_by_carrier(toy_network).columns
+
+
 def test_annual_generation_uses_snapshot_weightings(solved_toy):  # review focus 1: the toy has 3 h steps
     n = solved_toy
     twh = annual_generation_twh(n)

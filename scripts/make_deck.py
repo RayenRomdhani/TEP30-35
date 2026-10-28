@@ -4,6 +4,7 @@ Run from the repo root after make_figures.py:  python scripts/make_deck.py
 """
 
 import sys
+from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))  # this checkout's tn2030
@@ -16,7 +17,10 @@ from pptx.enum.text import PP_ALIGN
 from pptx.util import Inches, Pt
 
 from tn2030.register import load_register
+from tn2030.scenario import load_scenario
 
+AUTHOR = "Rayen Romdhani"
+TITLE = "The value of energy efficiency in Tunisia's power system"
 FIG = Path("results/figures")
 DARK, SUN, INK, MUTED, TINT, WHITE = "17323B", "EDA100", "1F1F1F", "6B6A66", "EEF3F4", "FFFFFF"
 HEAD, BODY = "Cambria", "Calibri"
@@ -91,27 +95,38 @@ def main() -> None:
     flex = s.loc["S1-15", "system_cost_meur"] - s.loc["S2-300", "system_cost_meur"]
     flex_co2 = s.loc["S1-15", "co2_mt"] - s.loc["S2-300", "co2_mt"]
     cool_gas = a.loc["S1-15C", "gas_mwh_th_per_mwh"] / head["gas_mwh_th_per_mwh"] - 1
+    cal = pd.read_csv("results/validation.csv").query("case == 'calibrated'").set_index("metric")
+    target, reserve = f"{reg['re_target_2030']:.0%}", f"{reg['reserve_margin']:.0%}"
+    lo, hi = reg["gas_price_factor_lo"], reg["gas_price_factor_hi"]
+    scenarios = [load_scenario(p) for p in sorted(Path("config/scenarios").glob("*.yaml"))]
+    cuts = sorted({sc["efficiency"]["share"] for sc in scenarios
+                   if sc["efficiency"]["mode"] == "uniform" and sc["efficiency"]["share"] > 0})
+    # Slide 4's title says the smallest cut avoids all new gas turbines; stop if a re-run changes that.
+    assert s.loc["S1-10", "new_cap_OCGT_mw"] < 0.5, "S1-10 builds new OCGT: rewrite slide 4"
 
     deck = Presentation()
+    props = deck.core_properties  # otherwise the file names the python-pptx template's author
+    props.author = props.last_modified_by = AUTHOR
+    props.title, props.comments = TITLE, ""
+    props.created = props.modified = datetime.now()
     deck.slide_width, deck.slide_height = Inches(13.333), Inches(7.5)
     blank = deck.slide_layouts[6]
 
     # 1. Title
     sl = deck.slides.add_slide(blank)
     background(sl, DARK)
-    text(sl, 0.8, 2.0, 11.5, 1.8, "The value of energy efficiency in Tunisia's power system",
-         size=44, colour=WHITE, bold=True, font=HEAD)
-    text(sl, 0.8, 3.9, 11.5, 0.6, "What each MWh saved avoids in 2030, under the 35% renewable target",
+    text(sl, 0.8, 2.0, 11.5, 1.8, TITLE, size=44, colour=WHITE, bold=True, font=HEAD)
+    text(sl, 0.8, 3.9, 11.5, 0.6, f"What each MWh saved avoids in 2030, under the {target} renewable target",
          size=22, colour=SUN)
-    text(sl, 0.8, 5.6, 11.5, 0.9, ["Rayen Romdhani, Energy Engineering, ENIM (Monastir, Tunisia)",
+    text(sl, 0.8, 5.6, 11.5, 0.9, [f"{AUTHOR}, Energy Engineering, ENIM (Monastir, Tunisia)",
                                    "PyPSA-Earth capacity-expansion model, 2 nodes, 8,760 hours"], size=16, colour=WHITE)
     sl.notes_slide.notes_text_frame.text = (
-        "Tunisia generates almost all its electricity from gas and plans 35% renewables by 2030. "
+        f"Tunisia generates almost all its electricity from gas and plans {target} renewables by 2030. "
         "This study asks what saving electricity, or moving it in time, is worth to that system.")
 
     # 2. Answer first
     sl = deck.slides.add_slide(blank)
-    title(sl, "Each MWh saved avoids about 60 EUR of system cost")
+    title(sl, f"Each MWh saved avoids about {head['cost_eur_per_mwh']:.0f} EUR of system cost")
     text(sl, 0.6, 1.4, 12.1, 0.6, "Saving 15% of 2030 demand in every hour (S1-15 against the base case S0), per MWh saved:",
          size=18, colour=MUTED)
     stats = [(f"{head['cost_eur_per_mwh']:.0f} EUR", "of system cost (investment + operation)"),
@@ -126,8 +141,8 @@ def main() -> None:
          "the gas turbines the saving makes unnecessary.", size=16)
     footer(sl)
     sl.notes_slide.notes_text_frame.text = (
-        "The headline metric compares two least-cost 2030 systems that both meet the 35% target and a 10% reserve "
-        "margin. The only difference is demand.")
+        f"The headline metric compares two least-cost 2030 systems that both meet the {target} target and a {reserve} "
+        "reserve margin. The only difference is demand.")
 
     # 3. Method
     sl = deck.slides.add_slide(blank)
@@ -135,11 +150,11 @@ def main() -> None:
     steps = [("1", "Base network", "PyPSA-Earth builds Tunisia's grid, plants, solar and wind potential and hourly "
                                    "demand from open data"),
              ("2", "2024 calibration", "Official ONEM fleet; one efficiency factor fitted so gas burnt matches "
-                                       "STEG within 0.4%"),
-             ("3", "11 scenarios", "Demand cut 10-20%, cooling-first saving, shiftable load, gas price x0.5 "
-                                   "and x1.5"),
-             ("4", "Least-cost 2030", f"New solar, wind, batteries and gas; at least {reg['re_target_2030']:.0%} "
-                                      f"renewable and {reg['reserve_margin']:.0%} reserve in every run")]
+                                       f"STEG within {abs(cal.at['gas_fuel_for_power_twh_th', 'diff_pct']):.1f}%"),
+             ("3", f"{len(s)} scenarios", f"Demand cut {cuts[0]:.0%}-{cuts[-1]:.0%}, cooling-first saving, "
+                                          f"shiftable load, gas price x{lo:g} and x{hi:g}"),
+             ("4", "Least-cost 2030", f"New solar, wind, batteries and gas; at least {target} renewable and "
+                                      f"{reserve} reserve in every run")]
     for i, (num, head_text, body) in enumerate(steps):
         x = 0.6 + i * 3.1
         circle = sl.shapes.add_shape(MSO_SHAPE.OVAL, Inches(x), Inches(1.9), Inches(0.8), Inches(0.8))
@@ -153,8 +168,7 @@ def main() -> None:
         text(sl, x, 2.9, 2.8, 0.6, head_text, size=20, bold=True, font=HEAD)
         text(sl, x, 3.5, 2.8, 2.4, body, size=15)
     text(sl, 0.6, 6.0, 12.1, 0.7, "Every input number has a row and a source in the assumptions register. "
-                                  "93 tests; 98% code coverage; all 11 runs pass the post-solve checks.",
-         size=15, colour=MUTED)
+                                  f"All {len(s)} runs pass the post-solve checks.", size=15, colour=MUTED)
     footer(sl)
     sl.notes_slide.notes_text_frame.text = (
         "Calibration matters because PyPSA-Earth's open plant list overstated combined-cycle capacity and missed "
@@ -163,7 +177,7 @@ def main() -> None:
     # 4. Capacity
     sl = deck.slides.add_slide(blank)
     s0_ocgt = s.loc["S0", "new_cap_OCGT_mw"]
-    title(sl, "A 10% saving removes the need for new gas plant")
+    title(sl, f"A {cuts[0]:.0%} saving removes the need for new gas plant")
     picture(sl, "1_capacity_mix", 0.4, 1.5, 8.6)
     card(sl, 9.3, 1.6, 3.5, 4.6)
     stat(sl, 9.5, 1.8, 3.1, f"{s0_ocgt:.0f} MW", "of new gas turbines in the base case, to keep a "
@@ -172,7 +186,8 @@ def main() -> None:
                                  "mostly solar and wind that would otherwise be built.", size=15)
     footer(sl)
     sl.notes_slide.notes_text_frame.text = (
-        "This is why the first 10% saved is worth the most per MWh: it carries all of the avoided gas capacity.")
+        f"This is why the first {cuts[0]:.0%} saved is worth the most per MWh: it carries all of the avoided gas "
+        "capacity.")
 
     # 5. Timing
     sl = deck.slides.add_slide(blank)
@@ -210,8 +225,9 @@ def main() -> None:
          size=16)
     footer(sl)
     sl.notes_slide.notes_text_frame.text = (
-        f"At the base gas price the least-cost system reaches {s.loc['S0', 'res_share']:.0%} renewables, so the 35% "
-        "target only binds when gas costs half as much.")
+        f"At the base gas price the least-cost system reaches {s.loc['S0', 'res_share']:.0%} renewables, so the "
+        f"{target} target binds only in "
+        f"{', '.join(sorted(s.index[s.res_share < reg['re_target_2030'] + 1e-4]))}.")
 
     # 8. Limits and next steps
     sl = deck.slides.add_slide(blank)

@@ -103,8 +103,10 @@ All figures are in [`results/figures/`](results/figures/) and are made by [`scri
 | `tests/` | pytest tests, mostly on a small 2-day test network |
 | `Snakefile`, `config/` | Scenario pipeline and settings (`config/scenarios/*.yaml`, one file per scenario) |
 | `data/` | Assumptions register and committed projects |
-| `scripts/` | Base-network inspection, 2024 validation, figures |
+| `scripts/` | Base-network inspection, 2024 validation, figures, report and slides |
 | `results/` | Result tables, figures and solve logs (solved networks are not stored) |
+| `report/` | Study report (`report.docx`) and slides (`deck.pptx`) |
+| `skill/` | `pypsa-country-study`: the workflow and pitfalls of this study, packaged for reuse on another country |
 | `docs/` | Design spec, plan, and one write-up per phase |
 
 ## How to reproduce
@@ -151,7 +153,7 @@ The study ran on Windows 11 (i3-1215U, 24 GB RAM). `environment.yml` pins Window
 
 ## Tests
 
-93 tests check the study code. Most run on a 2-day network at 3-hour steps, which also catches energy sums that forget the snapshot weighting. Two integration tests run on the real Tunisia network.
+95 tests check the study code. Most run on a 2-day network at 3-hour steps, which also catches energy sums that forget the snapshot weighting. Two integration tests run on the real Tunisia network.
 
 Test coverage of `src/tn2030` is 98% (lines and branches together, measured with pytest-cov on 2026-10-28):
 

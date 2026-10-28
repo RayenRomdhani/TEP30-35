@@ -66,6 +66,9 @@ def dispatch_by_carrier(n: pypsa.Network) -> pd.DataFrame:
     if len(discharger):  # PyPSA-Earth battery: power leaves the discharger at bus1, so p1 is negative
         p1 = n.links_t.p1.reindex(columns=discharger, fill_value=0)
         out["battery"] = out.get("battery", 0) - p1.sum(axis=1)
+    unknown = set(out.columns) - set(STACK_ORDER)
+    if unknown:  # a carrier with no colour would silently drop out of the figures
+        raise ValueError(f"no colour or stack position for carriers {sorted(unknown)}")
     return out[[c for c in STACK_ORDER if c in out.columns]]
 
 

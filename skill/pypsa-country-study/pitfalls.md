@@ -67,7 +67,7 @@ The Tunisia example is a gas system with no modelled interconnector. Before reus
 **Shiftable load as a StorageUnit** (`p_nom` = shift cap, `max_hours` = 2 × window, efficiency 1, zero cost):
 - start every day half full and force it back to half full at each day's last snapshot (`state_of_charge_set`), including a partial last day;
 - limit the duration with a rolling window: state of charge above neutral ≤ what was stored in the last `window` snapshots (and the mirror for below);
-- add `p_store + p_dispatch <= p_nom`, or charging and discharging at once (free, lossless) refreshes the window.
+- add `p_store + p_dispatch <= p_nom`. Charging and discharging at once is free and lossless, so without this cap it refreshes the window at full power; with it, any overlap is limited to the unused part of the cap.
 A year-cyclic store with a few hours of `max_hours` still moves energy across days.
 
 ## Results

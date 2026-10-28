@@ -94,10 +94,12 @@ def generation_mix(networks: dict, labels: dict) -> None:
 def price_duration(networks: dict) -> None:
     fig, ax = new_figure(9, 4.5)
     for colour, s in zip(LINE_COLOURS, ["S0", "S1-15", "S2-300"]):
-        price = load_weighted_price(networks[s]).sort_values(ascending=False).reset_index(drop=True)
-        ax.plot(price.index, price.values, color=colour, linewidth=2, label=s)
+        n = networks[s]
+        price = load_weighted_price(n).sort_values(ascending=False)
+        hours = n.snapshot_weightings.generators[price.index].cumsum()  # x axis in hours, whatever the step length
+        ax.plot(hours.values, price.values, color=colour, linewidth=2, label=s, drawstyle="steps-pre")
     ax.set_xlabel("Hours of the year, most expensive first", color=INK_2)
-    ax.set_xlim(0, 8760)
+    ax.set_xlim(0, n.snapshot_weightings.generators.sum())
     ax.legend(frameon=False)
     finish_figure(fig, ax, "Price duration curves: hourly electricity price (load-weighted over both buses)",
                   "EUR/MWh", SOURCE)
@@ -191,7 +193,8 @@ def main() -> None:
     generation_mix(networks, labels)
     single_bars(summary["gas_use_twh_th"], labels, "Gas burnt for power in 2030", "TWh of gas (thermal) per year",
                 "3_gas_use", "{:.1f}")
-    single_bars(summary["system_cost_meur"], labels, "Annual system cost in 2030 (investment + operation)",
+    single_bars(summary["system_cost_meur"], labels,
+                "Annual system cost in 2030, investment + operation (includes existing plants: compare differences)",
                 "million EUR per year", "4_system_cost", "{:.0f}")
     single_bars(summary["co2_mt"], labels, "CO2 from power generation in 2030", "Mt CO2 per year", "5_co2", "{:.2f}")
     price_duration(networks)

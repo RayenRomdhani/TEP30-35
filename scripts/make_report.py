@@ -4,6 +4,7 @@ Run from the repo root after make_figures.py:  python scripts/make_report.py
 """
 
 import sys
+from datetime import datetime
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))  # this checkout's tn2030
@@ -15,6 +16,8 @@ from docx.shared import Cm, Pt, RGBColor
 
 from tn2030.register import load_register
 
+AUTHOR = "Rayen Romdhani"
+TITLE = "The value of energy efficiency in Tunisia's power system (2030)"
 RESULTS = Path("results")
 FIG = RESULTS / "figures"
 MAIN = ["S0", "S1-10", "S1-15", "S1-20", "S1-15C", "S2-300", "S2-600"]
@@ -83,8 +86,16 @@ def main() -> None:
     flex_co2 = s.loc["S1-15", "co2_mt"] - s.loc["S2-300", "co2_mt"]
     cool_gas = a.loc["S1-15C", "gas_mwh_th_per_mwh"] / head["gas_mwh_th_per_mwh"] - 1
     s0_ocgt = s.loc["S0", "new_cap_OCGT_mw"]
+    lo, hi = reg["gas_price_factor_lo"], reg["gas_price_factor_hi"]
+    binding = sorted(s.index[s.res_share < reg["re_target_2030"] + 1e-4])  # runs where the target binds
+    # The findings text says a 10% saving avoids all new gas turbines; stop if a re-run changes that.
+    assert s.loc["S1-10", "new_cap_OCGT_mw"] < 0.5, "S1-10 builds new OCGT: rewrite the findings text"
 
     doc = Document()
+    props = doc.core_properties  # otherwise the file says it was written by the python-docx template's author
+    props.author = props.last_modified_by = AUTHOR
+    props.title, props.comments = TITLE, ""
+    props.created = props.modified = datetime.now()
     doc.styles["Normal"].font.name = "Calibri"
     doc.styles["Normal"].font.size = Pt(11)
     for section in doc.sections:
@@ -93,11 +104,11 @@ def main() -> None:
     if zoom is not None:  # python-docx's template omits this attribute, which the Word schema requires
         zoom.set(qn("w:percent"), "100")
 
-    doc.add_heading("The value of energy efficiency in Tunisia's power system (2030)", level=0)
-    para(doc, "Rayen Romdhani, Energy Engineering, ENIM (Monastir, Tunisia). October 2026.")
+    doc.add_heading(TITLE, level=0)
+    para(doc, f"{AUTHOR}, Energy Engineering, ENIM (Monastir, Tunisia). October 2026.")
     para(doc, "Model: PyPSA-Earth v0.10.0 with the study code in this repository. All result numbers come from "
-              "results/summary.csv and results/avoided.csv; all inputs come from data/assumptions_register.xlsx.",
-         size=9)
+              "results/summary.csv, results/avoided.csv and results/validation.csv; all inputs come from "
+              "data/assumptions_register.xlsx.", size=9)
 
     doc.add_heading("Summary", level=1)
     para(doc, f"Tunisia plans {reg['re_target_2030']:.0%} renewable electricity by 2030 and generates almost all "
@@ -117,7 +128,7 @@ def main() -> None:
         f"Letting {reg['flex_cap_mw']:.0f} MW of load move by up to {reg['flex_max_hours']:.0f} hours, on top of the "
         f"15% saving, cuts another {flex:.0f} M EUR per year and {flex_co2:.2f} Mt of CO2.",
         f"At the base gas price the least-cost system reaches {s.loc['S0', 'res_share']:.0%} renewables, so the "
-        f"{reg['re_target_2030']:.0%} target does not bind. It binds only when gas costs half as much.",
+        f"{reg['re_target_2030']:.0%} target does not bind. It binds only in {', '.join(binding)}.",
     ])
 
     doc.add_heading("1. Question and scope", level=1)
@@ -165,10 +176,9 @@ def main() -> None:
         "build the committed solar and wind projects (data/committed_projects.csv) and keep the existing fleet.",
     ])
     para(doc, "After each solve the pipeline checks the energy balance, the renewable share, the reserve margin, "
-              "that no load is shed and that committed and existing capacity is kept. All 11 scenarios pass.")
+              f"that no load is shed and that committed and existing capacity is kept. All {len(s)} scenarios pass.")
 
     doc.add_heading("2.3 Scenarios", level=2)
-    lo, hi = reg["gas_price_factor_lo"], reg["gas_price_factor_hi"]
     table(doc, ["Scenario", "What changes against S0"], [
         ["S0", "Base case: 2030 demand, base gas price"],
         ["S1-10, S1-15, S1-20", "Demand 10, 15 or 20% lower in every hour"],
@@ -180,7 +190,8 @@ def main() -> None:
     ], widths_cm=[4, 12])
     para(doc, "Shiftable load is modelled as a free, lossless store at each node that starts and ends every day half "
               "full. Load can be brought forward or postponed, but every MWh moved must come back within "
-              f"{reg['flex_max_hours']:.0f} hours, and only one direction is allowed in each hour.")
+              f"{reg['flex_max_hours']:.0f} hours, and the load moved up plus the load moved down in one hour "
+              "cannot exceed the shift limit.")
 
     doc.add_heading("3. Results", level=1)
     doc.add_heading("3.1 Main scenarios", level=2)
@@ -243,7 +254,8 @@ def main() -> None:
         "2030, far above Tunisia's recent pace. The results show what least cost would do, not a forecast.",
         "The cost of efficiency programmes is not modelled. The avoided cost per MWh is the most a programme could "
         "cost and still pay off for the power system.",
-        "One weather year (2013) at 1-hour steps. A 3-hour test run built 2.7% more solar and 3.9% more wind.",
+        "One weather year (2013) at 1-hour steps. A 3-hour test run built 2.7% more solar and 3.9% more wind "
+        "(resolution benchmark in docs/phase2-base-network.md).",
         "Demand growth and the 2030 peak come from STEG's forecast as quoted by JICA (2022), a secondary source.",
         "Imports are flat at their 2024 level, so every MWh saved falls on domestic generation.",
         "The fitted efficiency factor for existing gas units also stands in for plant outages, which are not modelled.",

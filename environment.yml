@@ -1,6 +1,8 @@
 name: pypsa-earth
-channels:
+channels:  # same as PyPSA-Earth's envs/win-64.lock.yaml (snakemake-minimal from bioconda, gurobi from gurobi)
   - conda-forge
+  - bioconda
+  - gurobi
 dependencies:
   - _openmp_mutex=4.5=2_gnu
   - _python_abi3_support=1.0=hd8ed1ab_2
@@ -462,9 +464,9 @@ dependencies:
   - zstandard=0.23.0=py311he736701_2
   - zstd=1.5.7=hbeecb71_2
   - openjdk
-  - python-pptx
-  - python-docx
-  - pytest-cov
+  - python-pptx=1.0.2
+  - python-docx=1.2.0
+  - pytest-cov=7.1.0
   - pip
   - pip:  # installed by PyPSA-Earth's own setup with pip (versions from this environment)
     - atlite==0.4.1
