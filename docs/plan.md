@@ -61,20 +61,20 @@
 
 **Interfaces:** Produces the importable package `tn2030` and the `pypsa-earth` conda env used by every later task.
 
-- [ ] **Step 1:** Ask the author for permission to download the Miniforge Windows installer (state the URL from github.com/conda-forge/miniforge and its size). Install to `D:\miniforge3` (just me, no PATH change).
-- [ ] **Step 2:** Find the latest PyPSA-Earth release tag on GitHub; `git clone --branch <tag> --depth 1 https://github.com/pypsa-meets-earth/pypsa-earth D:\pypsa-earth`. Record the tag in `docs/config-changes.md`.
-- [ ] **Step 3:** Create the env from PyPSA-Earth's Windows instructions (pinned env file if the release ships one, else `envs/environment.yaml`) with `mamba env create`. Then `mamba install -n pypsa-earth pytest openpyxl`.
+- [x] **Step 1:** Ask the author for permission to download the Miniforge Windows installer (state the URL from github.com/conda-forge/miniforge and its size). Install to `D:\miniforge3` (just me, no PATH change).
+- [x] **Step 2:** Find the latest PyPSA-Earth release tag on GitHub; `git clone --branch <tag> --depth 1 https://github.com/pypsa-meets-earth/pypsa-earth D:\pypsa-earth`. Record the tag in `docs/config-changes.md`.
+- [x] **Step 3:** Create the env from PyPSA-Earth's Windows instructions (pinned env file if the release ships one, else `envs/environment.yaml`) with `mamba env create`. Then `mamba install -n pypsa-earth pytest openpyxl`.
 Verify: `python -c "import pypsa, linopy, highspy, snakemake; print(pypsa.__version__)"` prints a version.
-- [ ] **Step 4: Write the failing test** `tests/test_smoke.py`:
+- [x] **Step 4: Write the failing test** `tests/test_smoke.py`:
 ```python
 def test_package_imports():
     import tn2030
     assert tn2030.__version__ == "0.1.0"
 ```
-- [ ] **Step 5:** Run `pytest tests/test_smoke.py -v`. Expected: FAIL (`ModuleNotFoundError`).
-- [ ] **Step 6:** Write `pyproject.toml` (setuptools, `src` layout, name `tn2030`, version `0.1.0`), `src/tn2030/__init__.py` with `__version__ = "0.1.0"`; `pip install -e . --no-deps`.
-- [ ] **Step 7:** Run `pytest -v`. Expected: 1 passed.
-- [ ] **Step 8:** Commit: `git add pyproject.toml src tests docs/config-changes.md && git commit -m "build: add tn2030 package skeleton and environment notes"`
+- [x] **Step 5:** Run `pytest tests/test_smoke.py -v`. Expected: FAIL (`ModuleNotFoundError`).
+- [x] **Step 6:** Write `pyproject.toml` (setuptools, `src` layout, name `tn2030`, version `0.1.0`), `src/tn2030/__init__.py` with `__version__ = "0.1.0"`; `pip install -e . --no-deps`.
+- [x] **Step 7:** Run `pytest -v`. Expected: 1 passed.
+- [x] **Step 8:** Commit: `git add pyproject.toml src tests docs/config-changes.md && git commit -m "build: add tn2030 package skeleton and environment notes"`
 
 ### Task 2: Assumptions register and loader
 
@@ -83,7 +83,7 @@ def test_package_imports():
 **Interfaces:**
 - Produces: `REGISTER_COLUMNS: tuple[str, ...] = ("id", "parameter", "value", "unit", "type", "source_title", "source_url", "accessed", "notes")`; `load_register(path: Path) -> dict[str, float]` returning `id → value` for rows with `type` in `{"sourced", "assumption"}`; rows typed `pending` are left out, so code asking for them fails with `KeyError`.
 
-- [ ] **Step 1: Write the failing tests** (build a tiny xlsx in `tmp_path` with pandas):
+- [x] **Step 1: Write the failing tests** (build a tiny xlsx in `tmp_path` with pandas):
 ```python
 def test_load_register_returns_sourced_and_assumption_rows(tmp_path): ...
     assert reg == {"re_target_2030": 0.35, "flex_max_hours": 3.0}
@@ -94,10 +94,10 @@ def test_load_register_rejects_sourced_row_without_url(tmp_path):
 def test_load_register_rejects_duplicate_ids(tmp_path):
     with pytest.raises(ValueError, match="duplicate"): load_register(path)
 ```
-- [ ] **Step 2:** Run `pytest tests/test_register.py -v`. Expected: 4 FAIL.
-- [ ] **Step 3:** Implement `load_register` with `pd.read_excel(path, sheet_name="register")`.
-- [ ] **Step 4:** Run the tests. Expected: 4 passed.
-- [ ] **Step 5:** Create the real register (sheet `register`) with these rows:
+- [x] **Step 2:** Run `pytest tests/test_register.py -v`. Expected: 4 FAIL.
+- [x] **Step 3:** Implement `load_register` with `pd.read_excel(path, sheet_name="register")`.
+- [x] **Step 4:** Run the tests. Expected: 4 passed.
+- [x] **Step 5:** Create the real register (sheet `register`) with these rows:
 
 | id | value | type | source |
 |---|---|---|---|
@@ -110,7 +110,7 @@ def test_load_register_rejects_duplicate_ids(tmp_path):
 | `peak_ref_2030_mw` | 6000 | sourced | REGlobal (secondary) |
 | `demand_2024_twh`, `imports_2024_twh`, `gas_price_eur_per_mwh_th` | (blank) | pending | Phase 3 |
 
-- [ ] **Step 6:** Commit: `git commit -m "feat: add assumptions register and loader"`
+- [x] **Step 6:** Commit: `git commit -m "feat: add assumptions register and loader"`
 
 ### Task 3: Annuity and toy costs
 
@@ -121,7 +121,7 @@ def test_load_register_rejects_duplicate_ids(tmp_path):
 
 Toy costs come from PyPSA `technology-data` `outputs/costs_2030.csv` (ask before download; small file into `data/raw/`). Add every value used to the register (`toy_*` ids, `sourced`, with the CSV URL and commit hash).
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 ```python
 def test_annuity_known_value():
     assert annuity(0.07, 25) == pytest.approx(0.08581, abs=1e-5)
@@ -130,10 +130,10 @@ def test_annuity_zero_rate_is_straight_line():
 def test_annualised_capex_adds_fom():
     assert annualised_capex(1000.0, 2.0, 25, 0.07) == pytest.approx(1000 * (0.08581 + 0.02), rel=1e-4)
 ```
-- [ ] **Step 2:** Run `pytest tests/test_toy.py -v`. Expected: 3 FAIL.
-- [ ] **Step 3:** Implement both functions (annuity = r / (1 − (1+r)^−n), 1/n when r = 0).
-- [ ] **Step 4:** Run the tests. Expected: 3 passed.
-- [ ] **Step 5:** Commit: `git commit -m "feat: add annuity and annualised capex"`
+- [x] **Step 2:** Run `pytest tests/test_toy.py -v`. Expected: 3 FAIL.
+- [x] **Step 3:** Implement both functions (annuity = r / (1 − (1+r)^−n), 1/n when r = 0).
+- [x] **Step 4:** Run the tests. Expected: 3 passed.
+- [x] **Step 5:** Commit: `git commit -m "feat: add annuity and annualised capex"`
 
 ### Task 4: Toy network, solve, explanation
 
@@ -143,7 +143,7 @@ def test_annualised_capex_adds_fom():
 - Consumes: `load_register`, `annualised_capex`.
 - Produces: `build_toy_network(register: dict[str, float], hours: int = 168, step_hours: int = 1) -> pypsa.Network` with one bus `"TN"`, carriers `"CCGT"`, `"solar"`, `"onwind"` (extendable `Generator`s), `"battery"` (extendable `StorageUnit`, `max_hours` from register), load `"TN load"`. Carriers carry `co2_emissions` (t/MWh_th). `snapshot_weightings` = `step_hours`. Load, solar and wind profiles are **illustrative synthetic shapes** (sine-based), stated in the docstring and figure footer. Fixture `toy_network` in `conftest.py` = `build_toy_network(reg, hours=48, step_hours=3)`, with `reg` from a fixture register dict (no file I/O).
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 ```python
 def test_toy_solves_optimal(toy_network):
     status, _ = toy_network.optimize(solver_name="highs")
@@ -157,14 +157,14 @@ def test_toy_energy_balance_closes(toy_network):
 def test_toy_battery_soc_within_bounds(toy_network): ...
     assert (soc <= su.p_nom_opt * su.max_hours + 1e-6).all() and (soc >= -1e-6).all()
 ```
-- [ ] **Step 2:** Run. Expected: FAIL (`build_toy_network` not defined).
-- [ ] **Step 3:** Implement `build_toy_network`.
-- [ ] **Step 4:** Run `pytest -v`. Expected: all pass.
-- [ ] **Step 5:** `scripts/phase1_toy_model.py`: build a 168 h network, solve, print capacities and cost, and save `results/figures/phase1_toy_dispatch.png` (stacked dispatch + load line, footer "Illustrative inputs; costs: PyPSA technology-data 2030"). Use the `dataviz` skill for the style.
+- [x] **Step 2:** Run. Expected: FAIL (`build_toy_network` not defined).
+- [x] **Step 3:** Implement `build_toy_network`.
+- [x] **Step 4:** Run `pytest -v`. Expected: all pass.
+- [x] **Step 5:** `scripts/phase1_toy_model.py`: build a 168 h network, solve, print capacities and cost, and save `results/figures/phase1_toy_dispatch.png` (stacked dispatch + load line, footer "Illustrative inputs; costs: PyPSA technology-data 2030"). Use the `dataviz` skill for the style.
 Verify: `python scripts/phase1_toy_model.py` prints `status ok` and the PNG exists.
-- [ ] **Step 6:** `docs/phase1-toy-model.md` (use `concept-explainer`): objective (min Σ annualised capex × capacity + Σ marginal cost × dispatch × weighting), constraints (nodal energy balance, capacity limits with availability profiles, storage state-of-charge continuity, energy ≤ p_nom × max_hours), each mapped to the PyPSA component that creates it, plus what the results show.
-- [ ] **Step 7:** Commit: `git commit -m "feat: add Phase 1 single-node toy model and explanation"`
-- [ ] **Step 8: Phase gate** (see Global Constraints). Evidence: pytest output, solve log, dispatch PNG.
+- [x] **Step 6:** `docs/phase1-toy-model.md` (use `concept-explainer`): objective (min Σ annualised capex × capacity + Σ marginal cost × dispatch × weighting), constraints (nodal energy balance, capacity limits with availability profiles, storage state-of-charge continuity, energy ≤ p_nom × max_hours), each mapped to the PyPSA component that creates it, plus what the results show.
+- [x] **Step 7:** Commit: `git commit -m "feat: add Phase 1 single-node toy model and explanation"`
+- [x] **Step 8: Phase gate** (see Global Constraints). Evidence: pytest output, solve log, dispatch PNG.
 
 ---
 
@@ -176,11 +176,11 @@ Failures here go through `superpowers:systematic-debugging` and the `operations-
 
 **Files:** Modify `docs/config-changes.md`
 
-- [ ] **Step 1:** In `D:\pypsa-earth`, follow the release's tutorial instructions (copy the tutorial config as instructed by its docs).
-- [ ] **Step 2:** Dry run: `snakemake -j 1 solve_all_networks -n`. Expected: a job list, no errors.
-- [ ] **Step 3:** Before the real run, find the size of each data bundle it will retrieve. If the total is > 2 GB, stop and ask.
-- [ ] **Step 4:** Run `snakemake -j 1 solve_all_networks`. Expected: a solved network in `results/networks/`.
-- [ ] **Step 5:** Record runtime, peak RAM and bundle sizes in `docs/config-changes.md`; commit in this repo: `git commit -m "docs: record PyPSA-Earth tutorial run"`
+- [x] **Step 1:** In `D:\pypsa-earth`, follow the release's tutorial instructions (copy the tutorial config as instructed by its docs).
+- [x] **Step 2:** Dry run: `snakemake -j 1 solve_all_networks -n`. Expected: a job list, no errors.
+- [x] **Step 3:** Before the real run, find the size of each data bundle it will retrieve. If the total is > 2 GB, stop and ask.
+- [x] **Step 4:** Run `snakemake -j 1 solve_all_networks`. Expected: a solved network in `results/networks/`.
+- [x] **Step 5:** Record runtime, peak RAM and bundle sizes in `docs/config-changes.md`; commit in this repo: `git commit -m "docs: record PyPSA-Earth tutorial run"`
 
 ### Task 6: Tunisia base network
 
@@ -189,19 +189,19 @@ Failures here go through `superpowers:systematic-debugging` and the `operations-
 **Interfaces:**
 - Produces: a prepared (not solved) base network `.nc` path, written into `config/pipeline.yaml` as `base_network:`; the list of carrier names actually used (feeds the constants in Task 13).
 
-- [ ] **Step 1:** Write `config/tn_base.yaml` with only the keys we change, checked against the pinned `config.default.yaml`: `countries: ["TN"]`, clusters `[2]`, time resolution `3H`, cost year 2030, extendable carriers CCGT, OCGT, solar, onwind, battery, solver `highs`. Each key gets a one-line comment saying why.
-- [ ] **Step 2:** Check whether the pinned release has a built-in minimum-renewable-share option. Record the answer (key name, or "none, custom constraint in Task 13") in `docs/config-changes.md`.
-- [ ] **Step 3:** Dry run with `--configfile <repo>/config/tn_base.yaml` up to the prepared network. Check bundle sizes (> 2 GB → ask). Then run.
-- [ ] **Step 4:** `scripts/inspect_base.py <network.nc>` prints buses, carriers, `p_nom` by carrier, annual load (TWh, using weightings), peak load. Save the output in `docs/phase2-base-network.md`.
+- [x] **Step 1:** Write `config/tn_base.yaml` with only the keys we change, checked against the pinned `config.default.yaml`: `countries: ["TN"]`, clusters `[2]`, time resolution `3H` (changed to 1 h after Task 7), cost year 2030, extendable carriers CCGT, OCGT, solar, onwind, battery, solver `highs`. Each key gets a one-line comment saying why.
+- [x] **Step 2:** Check whether the pinned release has a built-in minimum-renewable-share option. Record the answer (key name, or "none, custom constraint in Task 13") in `docs/config-changes.md`.
+- [x] **Step 3:** Dry run with `--configfile <repo>/config/tn_base.yaml` up to the prepared network. Check bundle sizes (> 2 GB → ask). Then run.
+- [x] **Step 4:** `scripts/inspect_base.py <network.nc>` prints buses, carriers, `p_nom` by carrier, annual load (TWh, using weightings), peak load. Save the output in `docs/phase2-base-network.md`.
 Verify: TN-only buses; ≥ 1 gas generator; annual load > 0.
-- [ ] **Step 5:** Commit: `git commit -m "feat: add Tunisia PyPSA-Earth base configuration"`
+- [x] **Step 5:** Commit: `git commit -m "feat: add Tunisia PyPSA-Earth base configuration"`
 
 ### Task 7: Resolution benchmark (risk R1)
 
 **Files:** Modify `docs/phase2-base-network.md`
 
-- [ ] **Step 1:** Solve the base network as-is at 3 H and at 1 H (same config otherwise). Record solve time and peak RAM.
-- [ ] **Step 2:** Present both numbers to the author with a recommendation. **Their decision** sets the resolution for all scenarios; record it in the spec's D11 and in `docs/config-changes.md`.
+- [x] **Step 1:** Solve the base network as-is at 3 H and at 1 H (same config otherwise). Record solve time and peak RAM.
+- [x] **Step 2:** Present both numbers to the author with a recommendation. **Their decision** sets the resolution for all scenarios; record it in the spec's D11 and in `docs/config-changes.md`.
 - [ ] **Step 3:** Commit, then **Phase gate**. Evidence: run logs, network summary, config-change log, benchmark table.
 
 ---

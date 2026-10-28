@@ -17,9 +17,7 @@ scenario:
 electricity:
   extendable_carriers:
     Generator: [solar, onwind, OCGT, CCGT]   # new builds allowed by spec D1 (no offshore wind)
-    StorageUnit: []
     Store: [battery]                          # Li-ion battery (store + charger/discharger links); no hydrogen (spec D1)
-    Link: []
   renewable_carriers: [solar, onwind, hydro]  # skip offshore wind profiles: not a candidate technology (spec D1)
 
 solving:

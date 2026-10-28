@@ -1,0 +1,70 @@
+﻿Phase 2 evidence: lines copied verbatim from the run logs on D:\downloads (logs not in the repo: tn_run.log alone is 2.7 million lines).
+
+Note: in tn_solve.log the solver output (stdout) and Snakemake messages (stderr) are interleaved out of order. The LP size identifies each solve: 464,299 rows = 1h, 154,779 rows = 3h. The 1h solve ran first (23:03:37 to 23:13:19 = 582 s), then the 3h solve (23:13:19 to 23:14:29 = 70 s). D:\pypsa-earth\benchmarks\TN\solve_network\ was overwritten by the second run.
+
+== tn_timing.txt (Task 6 build of networks/TN/elec_s_2_ec_lcopt_3h.nc)
+start: 10/27/2026 17:12:35
+end: 10/27/2026 23:00:10 exit: 0 minutes: 347.6
+21 of 21 steps (100%) done
+
+== tn_solve_timing.txt / tn_solve.log (Task 7, first run: 3h and 1h solves; Snakemake step times from the rule timestamps)
+start: 10/27/2026 23:02:58
+end: 10/27/2026 23:14:30 exit: 0
+[Tue Oct 27 23:03:20 2026]
+rule prepare_network:
+Benchmark: unable to collect cpu and memory benchmark statistics
+[Tue Oct 27 23:03:37 2026]
+[Tue Oct 27 23:03:37 2026]
+rule solve_network:
+output: results/TN/networks/elec_s_2_ec_lcopt_1h.nc
+INFO:__main__:Objective function: 1373999290.1352878
+INFO:__main__:Objective constant: 842453440.7944546
+Benchmark: unable to collect cpu and memory benchmark statistics
+[Tue Oct 27 23:13:19 2026]
+[Tue Oct 27 23:13:19 2026]
+rule solve_network:
+output: results/TN/networks/elec_s_2_ec_lcopt_3h.nc
+LP   linopy-problem-bkn560iv has 464299 rows; 227774 cols; 839284 nonzeros
+IPX model has 147223 rows, 161319 columns and 551156 nonzeros
+INFO:__main__:Objective function: 1369287135.9894133
+INFO:__main__:Objective constant: 842453440.7944546
+Benchmark: unable to collect cpu and memory benchmark statistics
+[Tue Oct 27 23:14:29 2026]
+3 of 3 steps (100%) done
+Runtime:                                            535.83s
+WARNING: Unwelcome IPX status of Unknown: basis is valid; solution is valid; run_crossover is "on"
+WARNING: Number of threads available = 4 < 8 = Simplex concurrency to be used: Parallel performance may be less than anticipated
+HiGHS run time      :        546.74
+Objective function: 1373999290.1352878
+Objective constant: 842453440.7944546
+LP   linopy-problem-vxeflaoq has 154779 rows; 75934 cols; 280042 nonzeros
+IPX model has 49341 rows, 54092 columns and 184809 nonzeros
+Runtime:                                            49.92s
+HiGHS run time      :         50.67
+Objective function: 1369287135.9894133
+Objective constant: 842453440.7944546
+
+== tn_solve_3h.log (Task 7, second run under scripts/peak_ram.py)
+LP   linopy-problem-nodzzij8 has 154779 rows; 75934 cols; 280042 nonzeros
+IPX model has 49341 rows, 54092 columns and 184809 nonzeros
+Runtime:                                            58.45s
+HiGHS run time      :         59.53
+Objective function: 1369287135.9894133
+INFO:__main__:Objective function: 1369287135.9894133
+1 of 1 steps (100%) done
+
+== tn_solve_1h.log (Task 7, second run under scripts/peak_ram.py)
+LP   linopy-problem-ftowzsro has 464299 rows; 227774 cols; 839284 nonzeros
+IPX model has 147223 rows, 161319 columns and 551156 nonzeros
+Runtime:                                            578.24s
+WARNING: Unwelcome IPX status of Unknown: basis is valid; solution is valid; run_crossover is "on"
+HiGHS run time      :        591.75
+Objective function: 1373999290.1352878
+INFO:__main__:Objective function: 1373999290.1352878
+1 of 1 steps (100%) done
+
+== scripts/peak_ram.py console output (second run)
+== 3h
+exit 0 | wall 105 s | peak RSS 0.72 GiB
+== 1h
+exit 0 | wall 639 s | peak RSS 1.26 GiB
