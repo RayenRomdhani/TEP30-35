@@ -353,7 +353,7 @@ def test_shift_is_energy_neutral(toy_network): ...
   - `solve_network(n: pypsa.Network, res_share: float, solver_name: str = "highs") -> None` (`RuntimeError` if status ≠ `"ok"`)
   - `res_share(n: pypsa.Network, res_carriers: tuple[str, ...] = RES_CARRIERS) -> float` (ex-post, same definition)
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 ```python
 def test_res_share_binding_when_gas_is_cheap(toy_network_cheap_gas):
     toy_network_cheap_gas.optimize(solver_name="highs")
@@ -366,10 +366,10 @@ def test_res_constraint_raises_when_no_carrier_matches(toy_network):
         solve_network_with(toy_network, res_carriers=("wind",))
 ```
 (`solve_network_with` is a test helper calling `n.optimize(extra_functionality=lambda n, s: add_min_res_share(n, 0.35, ("wind",)))`.)
-- [ ] **Step 2:** Run. Expected: FAIL.
-- [ ] **Step 3:** Add fixture `toy_network_cheap_gas` to `conftest.py` (toy network with solar and wind `capital_cost` × 5, so the unconstrained RES share falls below 35%). Implement with linopy: `n.model["Generator-p"]` and `n.model["StorageUnit-p_dispatch"]`, multiplied by `n.snapshot_weightings.generators`. If Task 6 found a built-in option, still keep `res_share` for the check and document why the custom constraint is kept or dropped.
-- [ ] **Step 4:** Run. Expected: 3 passed.
-- [ ] **Step 5:** Commit: `git commit -m "feat: add 35% renewable share constraint and solve wrapper"`
+- [x] **Step 2:** Run. Expected: FAIL.
+- [x] **Step 3:** Add fixture `toy_network_cheap_gas` to `conftest.py` (toy network with solar and wind `capital_cost` × 5, so the unconstrained RES share falls below 35%). Implement with linopy: `n.model["Generator-p"]` and `n.model["StorageUnit-p_dispatch"]`, multiplied by `n.snapshot_weightings.generators`. If Task 6 found a built-in option, still keep `res_share` for the check and document why the custom constraint is kept or dropped.
+- [x] **Step 4:** Run. Expected: 3 passed.
+- [x] **Step 5:** Commit: `git commit -m "feat: add 35% renewable share constraint and solve wrapper"`
 
 ### Task 14: Results and sanity checks
 

@@ -29,6 +29,14 @@ def toy_network_partial_day(reg):
 
 
 @pytest.fixture
+def toy_network_cheap_gas(toy_network):
+    """Toy network where wind and solar cost 5x more, so without a target the optimizer picks mostly gas."""
+    re = toy_network.generators.carrier.isin(["solar", "onwind"])
+    toy_network.generators.loc[re, "capital_cost"] *= 5
+    return toy_network
+
+
+@pytest.fixture
 def two_bus_network():
     """Two buses whose loads are in the ratio 3:1 over the day."""
     n = pypsa.Network()
