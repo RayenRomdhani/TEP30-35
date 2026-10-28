@@ -2,6 +2,7 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+.coverage
 .ipynb_checkpoints/
 
 # Large or downloaded data (sources listed in data/assumptions_register.xlsx)
