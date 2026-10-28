@@ -26,18 +26,22 @@ The study tests both, separately and together.
 
 Each hour, the grid runs the cheapest plants first and adds more expensive ones until demand is met. Solar and wind cost almost nothing to run once built, so they go first when available. Gas plants follow, cheapest first:
 
-| Plant type | Turns gas into electricity at | Fuel cost per MWh of electricity (gas at 28.4 EUR/MWh) | CO2 per MWh of electricity |
+| Plant type | Turns gas into electricity at | Running cost per MWh of electricity (fuel + variable upkeep, gas at 28.4 EUR/MWh) | CO2 per MWh of electricity |
 |---|---|---|---|
-| Combined cycle (CCGT), new | 58% | about 49 EUR | about 0.34 t |
-| Gas turbine (OCGT), new | 41% | about 69 EUR | about 0.48 t |
+| Combined cycle (CCGT), new | 58% | about 55 EUR | about 0.34 t |
+| Combined cycle, existing (calibrated) | 50% | about 62 EUR | about 0.40 t |
+| Gas turbine (OCGT), new | 41% | about 75 EUR | about 0.48 t |
+| Gas turbine or steam unit, existing (calibrated) | 35% | about 86 EUR | about 0.56 t |
 
-(Efficiencies, gas price and CO2 content from PyPSA technology-data 2030, via the [register](../../data/assumptions_register.md); 0.198 t of CO2 per MWh of gas burnt.)
+(New-plant efficiencies, variable upkeep, gas price and CO2 content are from PyPSA technology-data 2030; existing plants use the same efficiencies times the factor 0.863 fitted to Tunisia's 2024 fuel use. All in the [register](../../data/assumptions_register.md); 0.198 t of CO2 per MWh of gas burnt.)
+
+In the model, the existing plants are the ones that set most prices: you will meet the 62 and 86 EUR again as the two plateaus of the price curve in [chapter 5](05-results.md).
 
 The last plant needed in an hour sets that hour's **price**. So a MWh saved in an hour when an old gas turbine is running is worth much more than one saved at noon on a sunny day.
 
 ## 5. Capacity and the reserve margin
 
-Plants break down and forecasts miss, so planners keep more firm capacity than the expected peak. STEG plans for a **reserve margin** of 10-15% above the peak; this study uses 10%. "Firm" here means plants that can run whenever needed: gas and hydro. Solar and wind get no credit, because the sun sets and the wind drops.
+Plants break down and forecasts miss, so planners keep more firm capacity than the expected peak. STEG plans for a **reserve margin** of 10-15% above the peak; this study uses 10%. "Firm" here means plants that can run whenever needed: gas and hydro. In this study, to stay on the safe side, solar, wind and batteries get no firm credit. (Real planners often give solar some, since Tunisia's peak falls on summer afternoons; that would mean fewer new gas turbines.)
 
 This is how saving electricity can avoid *building* plants: lower the peak, and the reserve margin needs fewer firm megawatts.
 

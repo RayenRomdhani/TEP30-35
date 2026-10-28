@@ -68,7 +68,7 @@ Let's ask a question the study did not: **what if Tunisia saves 12%?**
    ```bash
    snakemake -j 1 results/networks/S1-12_solved.nc
    ```
-   It takes about 6 minutes. At the end you will see a warning that the peak (4,855 MW) is more than 10% below STEG's 2030 forecast. That is expected: STEG's forecast assumes no extra savings.
+   It takes about 6 minutes. At the end you will see a warning that the peak (4,855 MW) is more than 10% from the reference 5,645 MW. That reference is STEG's 2030 forecast (6,000 MW) minus the flat import flow, and the warning is expected: STEG's forecast assumes no extra savings.
 3. Compare it with the base case. Save this as `my_scenario.py` in the repository folder and run `python my_scenario.py`:
    ```python
    import pypsa
@@ -96,7 +96,7 @@ new gas turbines (MW): 0
 
 ## More things to try
 
-- **Gas price:** set `gas_price_factor: 1.2` in a copy of S0 and of S1-15 (give both a new name, and make the S1-15 copy's `reference` the S0 copy). Does a dearer gas make saving worth more?
+- **Gas price:** make copies of S0 and S1-15 with `gas_price_factor: 1.2` and new names (say `G12-S0` and `G12-S1-15`). Set the `reference` of **both** copies to `G12-S0`, as in `G-hi-S0.yaml`; a copy of S0 that still points at S0 has nothing to compare and stops the pipeline. Does dearer gas make saving worth more?
 - **Timing:** copy S1-15C and change the share to 0.10. Is the cooling-first bonus bigger or smaller for a smaller saving?
 - **Flexibility:** copy S2-300 and set `p_max_mw: 150`. Is the value per MW higher for a smaller amount of shifting?
 

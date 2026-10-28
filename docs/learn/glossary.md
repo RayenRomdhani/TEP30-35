@@ -26,6 +26,8 @@
 
 **Efficiency (energy efficiency).** Getting the same service with less electricity.
 
+**Electricity price (marginal price).** In the model, the cost of supplying one more MWh at a node in a given hour: usually the running cost of the most expensive plant that is running. It is what the optimisation's energy-balance rule is "worth" in that hour.
+
 **Energy (MWh, TWh).** Power times time. 1 TWh = 1,000,000 MWh.
 
 **Firm capacity.** Plants that can produce whenever needed: here gas and hydro. Solar, wind and batteries get no firm credit in this study.
@@ -36,13 +38,15 @@
 
 **JICA.** The Japan International Cooperation Agency. Its 2022 survey of Tunisia's power sector is the source for STEG's forecasts used here.
 
-**ktep.** Thousand tonnes of oil equivalent, a unit of energy used in Tunisian energy statistics. "Net CV" (net calorific value) means the heat of the fuel without counting the heat lost in water vapour.
+**ktep.** Thousand tonnes of oil equivalent, a unit of energy used in Tunisian energy statistics. 1 ktep = 11.63 GWh. "Net CV" (net calorific value) means the heat of the fuel without counting the heat lost in water vapour.
 
 **Linear program (LP).** An optimisation problem where the cost and all the rules are straight-line (linear) relationships. Solvers can find the exact optimum of very large ones.
 
 **Load factor.** Average demand divided by peak demand. Tunisia's was 0.52 in 2024.
 
 **Marginal cost.** The cost of producing one more MWh from a plant: mostly fuel divided by efficiency, plus variable maintenance.
+
+**Minimum-to-peak ratio.** The lowest hourly demand of the year divided by the highest. STEG forecasts 0.34 for 2030: at night, demand falls to about a third of the summer peak.
 
 **Merit order.** Running plants from cheapest to most expensive marginal cost until demand is met.
 
@@ -52,7 +56,9 @@
 
 **ONEM.** Tunisia's national energy observatory, which publishes the yearly energy statistics (*Memento*) used to calibrate the model.
 
-**Peak.** The highest demand in one hour of the year, in MW.
+**Peak.** The highest demand of the year, in MW. The official 2024 figure (4,888 MW) is a record at one moment; the model's peak is the highest hourly average.
+
+**Price duration curve.** The 8,760 hourly prices of a year sorted from highest to lowest. Its shape shows how many hours are expensive, how many are cheap, and which plants set the price.
 
 **Power (MW).** The rate of producing or using electricity at a moment.
 
@@ -69,5 +75,7 @@
 **STEG.** Société Tunisienne de l'Électricité et du Gaz, the state-owned electricity and gas company (founded 1962). It runs the grid and supplies gas.
 
 **System cost.** Everything the power system pays in a year: annualised cost of the plants plus the cost of running them.
+
+**UTC.** Coordinated Universal Time, used for all model hours. Tunisian time is UTC+1 all year, so 14:00 UTC is 15:00 in Tunis.
 
 **Thermal (MWh_th).** Energy in the fuel, before conversion to electricity. 1 MWh of electricity from a 58% efficient plant needs about 1.7 MWh of gas (thermal).

@@ -49,7 +49,7 @@ flowchart LR
 
 ## Before trusting it: calibration
 
-PyPSA-Earth's open data got the 2024 gas fleet wrong (it saw everything as combined cycles, plus 1,409 MW of oil plants that the official statistics do not list) and its demand curve was too flat. So the study first rebuilt the 2024 system from official numbers and checked it: the calibrated model burns the same gas as STEG did in 2024 within 0.4%, and hits the 2024 peak within 0.3%. [Chapter 6](06-how-far-to-trust-it.md) has the full check.
+PyPSA-Earth's open data got the 2024 gas fleet wrong (it saw everything as combined cycles, plus 1,409 MW of oil plants that the official statistics do not list) and its demand curve was too flat. So the study first rebuilt the 2024 system from official numbers and calibrated it until it reproduced 2024: the official fleet, the official peak, and the gas actually burnt (within 0.4%). [Chapter 6](06-how-far-to-trust-it.md) explains what that does and does not prove.
 
 ## Where each piece lives in the code
 

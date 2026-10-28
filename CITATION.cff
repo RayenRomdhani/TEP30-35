@@ -7,7 +7,9 @@ authors:
     affiliation: "École Nationale d'Ingénieurs de Monastir (ENIM)"
 date-released: 2026-10-28
 repository-code: "https://github.com/RayenRomdhani/TEP30-35"
-license: MIT
+license:
+  - MIT
+  - CC-BY-4.0
 keywords:
   - energy efficiency
   - demand flexibility

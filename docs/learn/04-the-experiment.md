@@ -9,7 +9,7 @@ A model on its own answers nothing. The trick is to run it twice, change exactly
 - 2024 demand: **22.5 TWh** (ONEM).
 - Growth: **3.2% a year** (STEG's forecast), so 2030 demand is 22.5 × 1.032⁶ = **27.2 TWh**.
 - Imports stay at their 2024 level (3.1 TWh), so power plants in Tunisia must produce **24.1 TWh**.
-- The hourly shape is stretched to match STEG's official load factor and minimum-to-peak ratio.
+- The hourly shape is stretched to match the 2024 load factor (ONEM) and the minimum-to-peak ratio of STEG's 2030 forecast.
 - Gas costs 28.4 EUR per MWh (thermal).
 
 Everything else in the experiment is measured against this base case.
@@ -29,6 +29,8 @@ Everything else in the experiment is measured against this base case.
 | **G-lo-S1-15** | Cheap gas, save 15% | S1-15 with gas at half price |
 | **G-hi-S0** | Expensive gas | S0 with gas 50% more expensive |
 | **G-hi-S1-15** | Expensive gas, save 15% | S1-15 with gas 50% more expensive |
+
+The savings apply to total demand (27.2 TWh), while imports stay fixed, so the demand on Tunisian plants falls a little more: 11.3% in S1-10, for example.
 
 Each scenario is one small text file in [`config/scenarios/`](../../config/scenarios/). Open `S1-15.yaml` and you will see the whole definition in a handful of lines.
 
@@ -52,7 +54,7 @@ For each pair, the model reports:
 | Avoided cost (EUR per MWh saved) | Lower yearly system cost, divided by the MWh not used |
 | Avoided gas (MWh of gas per MWh saved) | Gas not burnt in power plants |
 | Avoided CO2 (t per MWh saved) | CO2 not emitted |
-| Avoided capacity (MW per TWh saved per year) | New plants the model no longer builds |
+| Avoided capacity (MW per TWh saved per year) | New plants the model no longer builds (all types added together, mostly solar and wind) |
 
 ---
 

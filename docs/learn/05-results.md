@@ -8,7 +8,7 @@ Every number on this page comes from [`results/summary.csv`](../../results/summa
 
 ![What one MWh saved avoids](../../results/figures/0_headline.png)
 
-Saving 15% of demand in every hour (S1-15 against S0) avoids, **per MWh saved**: about **60 EUR** of system cost, **0.91 MWh** of gas, **0.18 t** of CO2, and **449 MW** of new plants per TWh saved each year.
+Saving 15% of demand in every hour (S1-15 against S0) avoids, **per MWh saved**: about **60 EUR** of system cost, **0.91 MWh** of gas, **0.18 t** of CO2, and **449 MW** of new plants (mostly solar and wind) per TWh saved each year.
 
 Where does the 60 EUR come from? Roughly, the average price of electricity in the base case (54.7 EUR/MWh), plus the gas turbines the saving makes unnecessary.
 
@@ -16,7 +16,7 @@ Where does the 60 EUR come from? Roughly, the average price of electricity in th
 
 ![Installed capacity by scenario](../../results/figures/1_capacity_mix.png)
 
-To keep a 10% reserve above the 2030 peak, the base case has to build **423 MW of new gas turbines**. Save 10% in every hour and the peak drops enough that the model builds **none**. That is why the first 10% saved is worth the most (62.6 EUR/MWh, against 59.6 for 15% and 58.0 for 20%): it carries all of the avoided gas capacity. After that, extra savings mostly avoid solar and wind that would otherwise be built.
+To keep a 10% reserve above the 2030 peak, the base case has to build **423 MW of new gas turbines**. Save 10% in every hour and the peak drops enough that the model builds **none**. That is why the first 10% saved is worth the most (62.6 EUR/MWh on average, against 59.6 for 15% and 58.0 for 20%): it carries all of the avoided gas capacity. Look at the *extra* savings instead: going from 10% to 15% is worth about 53.7 EUR per extra MWh, and from 15% to 20% about 53.0, close to the average electricity price. Once the gas turbines are gone, a saved MWh is worth roughly what electricity costs.
 
 ## Finding 2: a saved MWh cuts gas *and* renewables
 
@@ -29,11 +29,13 @@ The gas and CO2 bars tell the same story in absolute terms:
 ![Gas burnt by scenario](../../results/figures/3_gas_use.png)
 ![CO2 by scenario](../../results/figures/5_co2.png)
 
-## Finding 3: timing beats size
+## Finding 3: timing changes what a saved MWh is worth
 
 ![Saving evenly vs cooling first](../../results/figures/9_uniform_vs_cooling.png)
 
-S1-15C saves exactly as much energy as S1-15, but takes it first from summer air conditioning. Only 39% of the saving fits there, and still each MWh saved avoids **20% more gas and CO2**, and the system costs **11.5 M EUR a year less** than with an even cut. Air-conditioning hours are the hours when the gas plants run.
+S1-15C saves exactly as much energy as S1-15, but takes it first from summer air conditioning. Only 39% of the saving fits there, and still each MWh saved avoids **20% more gas and CO2**, and the system costs **11.5 M EUR a year less** than with an even cut: saving in those hours displaces more gas than saving in an average hour.
+
+Size still matters more in total: saving 20% evenly (S1-20) burns less gas than saving 15% cooling-first (16.6 against 17.1 TWh). Timing is about making each MWh count. (One caution: the model's daily peak comes about two hours later than the real one, which affects this result; see [chapter 6](06-how-far-to-trust-it.md).)
 
 ## Finding 4: moving demand by three hours is worth a lot
 
@@ -43,9 +45,11 @@ Look at the right-hand panel: the dashed line (load after shifting) climbs into 
 
 - the model moves morning (05:00-08:00 UTC) and evening (16:00-20:00 UTC) load into midday (09:00-14:00 UTC), about 1.07 TWh a year;
 - it builds about 525 MW more solar and 85 MW less wind, and burns less gas;
-- the system costs **22.1 M EUR a year less** than S1-15 and emits **0.24 Mt less CO2**. That is about **74,000 EUR per MW of shifting per year**. With 600 MW the gain is 39.2 M EUR, about 65,000 EUR per MW: still worth it, a bit less per MW.
+- the system costs **22.1 M EUR a year less** than S1-15 and emits **0.24 Mt less CO2**. That is about **74,000 EUR per MW of shifting per year**. With 600 MW the gain is 39.2 M EUR, about 65,000 EUR per MW: still large, a bit less per MW.
 
-The price curves show why. Sorted from the most expensive hour to the cheapest, most hours sit on a long flat stretch set by gas plants, and the cheapest hours (solar surplus) are free. Shifting turns some expensive hours into cheap ones:
+These are **gross values**: shifting is free in the model, so whatever it costs to make demand flexible (smart controls, tariffs, programmes) has to come out of them.
+
+The price curves show where the value comes from. Sorted from the most expensive hour to the cheapest, prices sit on two plateaus, about 86 EUR (existing gas turbines at the margin) and about 62 EUR (existing combined cycles), and the cheapest hours (solar surplus) are free. With shifting, fewer hours sit at the top price, and some of the free solar-surplus hours get used:
 
 ![Price duration curves](../../results/figures/6_price_duration.png)
 

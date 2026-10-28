@@ -30,7 +30,7 @@ How the ONEM Memento was read:
   - Demand growth of 4.1% in 2025.
 - **La Presse, 9 Oct 2026** (STEG short-term plan: restoring the full capacity of the Kchabta and Metline plants, about 190 MW): https://www.lapresse.tn/2026/10/09/electricite-la-steg-prevoit-des-capacites-supplementaires-de-250-mw-grace-a-lamelioration-des-centrales/
 - **IRENA, Tunisia renewable energy statistical profile** (wind 245 MW in 2024): https://www.irena.org/-/media/Files/IRENA/Agency/Statistics/Statistical_Profiles/Africa/Tunisia_Africa_RE_SP.pdf
-  - The 245 MW was reported by a research agent and not re-read by the author.
+  - The 245 MW comes from a secondary report and has not yet been checked against the IRENA document by the author; it is used for context only.
 - **PyPSA-Earth DemandCast data** (`D:\pypsa-earth\data\demand\forecasts_on_historical_period.parquet`, from the approved data bundle).
   - The Tunisia 2024 load factor of 0.70 was computed from it in Phase 3.
 - **Committed projects:** see `source_url` and `notes` in `data/committed_projects.csv`.

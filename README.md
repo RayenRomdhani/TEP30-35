@@ -8,7 +8,7 @@
 
 ---
 
-In 2024, **94.5%** of Tunisia's electricity came from burning natural gas, and about three quarters of the country's gas came from Algeria. The country has promised **35% renewable electricity by 2030**, while demand keeps growing by about 3% a year.
+In 2024, **94.5%** of the electricity generated in Tunisia came from burning natural gas, and about three quarters of the country's gas came from Algeria. The country has promised **35% renewable electricity by 2030**, while demand is forecast to grow 3.2% a year.
 
 Everyone talks about building more solar. I wanted to know what happens on the other side of the meter:
 
@@ -22,13 +22,21 @@ So I built a model of the whole Tunisian power system, ran 2030 eleven different
 
 **1. A 10% saving cancels a gas plant.** To keep a safe margin above the 2030 peak, the base case needs **423 MW of new gas turbines**. Save 10% in every hour and the model builds none of them.
 
-**2. When you save matters as much as how much.** Take the same 15% of energy out of summer air conditioning first, and each saved MWh avoids **20% more gas and CO2**. Air-conditioning hours are exactly when the gas plants run.
+**2. Timing changes what a saved MWh is worth.** Take the same 15% of energy out of summer air conditioning first, and each saved MWh avoids **20% more gas and CO2** than an even cut.
 
-**3. Moving demand by three hours is worth real money.** Let 300 MW of demand shift a few hours into the midday sun, and the system saves another **22 M EUR a year** and **0.24 Mt of CO2**, on top of the 15% saving.
+**3. Moving demand by three hours has real value.** Let 300 MW of demand shift a few hours into the midday sun, and the system saves another **22 M EUR a year** and **0.24 Mt of CO2**, on top of the 15% saving. (That is a gross value: shifting is free in the model, so the cost of making it happen is not counted.)
 
 **4. The gas price decides what a saved MWh replaces.** With cheap gas, a saved MWh mostly displaces gas (**0.28 t of CO2** avoided). With expensive gas, the system is already 70% renewable, so it mostly displaces solar, wind and batteries (**0.11 t**, but more money).
 
-And a plot twist: with 2030 cost projections, the cheapest 2030 system reaches **56% renewables** without being forced to. The 35% target only bites if gas gets cheap. (Big caveat: the model has no limit on how fast Tunisia can actually build. More in [chapter 6](docs/learn/06-how-far-to-trust-it.md).)
+And a plot twist: with 2030 cost projections, the cheapest 2030 system reaches **56% renewables** without being forced to. The 35% target binds only in the half-price gas case.
+
+## What this study is not
+
+- **Not a forecast.** It shows the least-cost 2030 system, and the model has no limit on how fast Tunisia can build solar and wind.
+- **Not a cost-benefit analysis of programmes.** Saving and shifting are free in the model: the results are what they are worth to the power system, before the cost of achieving them.
+- **Not the whole grid.** Imports are fixed at 2024 levels, there are 2 nodes, and the model's daily peak comes about two hours later than the real one.
+
+All the limits, and which way each one pushes the results, are in [chapter 6](docs/learn/06-how-far-to-trust-it.md).
 
 ## How it works, in one picture
 
@@ -44,7 +52,7 @@ flowchart LR
 
 The model plays power planner: for each scenario it decides what to build (solar, wind, batteries, gas turbines) and how to run every plant in every hour of 2030 so that the total cost is as low as possible, while meeting demand everywhere, at all times, with at least 35% renewables and a 10% reserve margin. Comparing two scenarios that differ only in demand tells you what the saving was worth.
 
-Before trusting it with 2030, I checked it against 2024: it burns the same gas as Tunisia's power plants did (within 0.4%) and hits the real peak (within 0.3%).
+Before using it for 2030, I calibrated it to reproduce 2024: the official gas fleet, the official peak, and the gas Tunisia's power plants actually burnt (within 0.4%).
 
 ## Learn the topic, step by step
 
@@ -84,11 +92,15 @@ No number in this study is made up. Every input is a row in the [assumptions reg
 
 ## Run it yourself
 
-You need Windows (the environment file pins Windows builds), [Miniforge](https://github.com/conda-forge/miniforge), and about 45 GB of free disk (PyPSA-Earth's data takes 41 GB once unpacked). [Chapter 7](docs/learn/07-try-it-yourself.md) has the full walkthrough; the short version:
+You need Windows (the environment file pins Windows builds), [Miniforge](https://github.com/conda-forge/miniforge), and about 45 GB of free disk (PyPSA-Earth's data takes 41 GB once unpacked). [Chapter 7](docs/learn/07-try-it-yourself.md) has the full walkthrough; the short version. Clone PyPSA-Earth and this repository side by side:
 
 ```bash
 git clone --branch v0.10.0 https://github.com/pypsa-meets-earth/pypsa-earth.git
 ```
+```bash
+git clone https://github.com/RayenRomdhani/TEP30-35.git
+```
+Then, inside this repository's folder:
 ```bash
 conda env create -f environment.yml
 ```
@@ -101,7 +113,7 @@ pip install -e .
 ```bash
 snakemake -j 1 networks/TN/elec_s_2_ec_lcopt_1h.nc --configfile <path-to-this-repo>/config/tn_base.yaml
 ```
-(run that one in the PyPSA-Earth folder; about 6 hours the first time, mostly downloads; then set `base_network` in `config/pipeline.yaml`)
+(run that one in the PyPSA-Earth folder; about 6 hours the first time, mostly downloads; then set `base_network` in `config/pipeline.yaml`). Back in this repository:
 ```bash
 pytest
 ```
@@ -112,7 +124,7 @@ snakemake -j 1
 python scripts/make_figures.py
 ```
 
-The tests (about a hundred) cover 98% of the study's code; those that need the real Tunisia network skip themselves if it is missing.
+The 100 tests cover 98% of the study's code (`pytest --cov=tn2030 --cov-branch`); those that need the real Tunisia network skip themselves if it is missing.
 
 ## Licence and citation
 
