@@ -255,7 +255,7 @@ def main() -> None:
         "The cost of efficiency programmes is not modelled. The avoided cost per MWh is the most a programme could "
         "cost and still pay off for the power system.",
         "One weather year (2013) at 1-hour steps. A 3-hour test run built 2.7% more solar and 3.9% more wind "
-        "(resolution benchmark in docs/phase2-base-network.md).",
+        "(resolution benchmark in docs/project-history/phase2-base-network.md).",
         "Demand growth and the 2030 peak come from STEG's forecast as quoted by JICA (2022), a secondary source.",
         "Imports are flat at their 2024 level, so every MWh saved falls on domestic generation.",
         "The fitted efficiency factor for existing gas units also stands in for plant outages, which are not modelled.",

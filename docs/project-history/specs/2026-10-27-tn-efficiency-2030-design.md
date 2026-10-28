@@ -29,7 +29,7 @@ system. If a sourced ANME programme cost is found, it is compared against this v
 | # | Decision | Choice |
 |---|---|---|
 | D1 | Capacity | **Brownfield capacity expansion.** Existing plants + committed projects are fixed; the optimizer builds new gas (CCGT, OCGT), solar PV, onshore wind and Li-ion batteries at least cost. Avoided capacity = difference in what gets built. |
-| D2 | 2030 demand | **2024 actual demand × (1 + g)^6.** 2024 demand from ONEM (22.51 TWh; Ember kept as a cross-check). Growth rate g = 3.2%/yr, STEG's base-case forecast (JICA 2022), chosen 2026-10-28 over REGlobal's unsourced 3.7%. Hourly shape from PyPSA-Earth, **reshaped** to the official load factor and minimum/peak ratio (Phase 3, `docs/phase3-validation.md`), then scaled to the annual total. Resulting peak checked against STEG's 6,000 MW 2030 forecast (warning, not a hard fail). |
+| D2 | 2030 demand | **2024 actual demand × (1 + g)^6.** 2024 demand from ONEM (22.51 TWh; Ember kept as a cross-check). Growth rate g = 3.2%/yr, STEG's base-case forecast (JICA 2022), chosen 2026-10-28 over REGlobal's unsourced 3.7%. Hourly shape from PyPSA-Earth, **reshaped** to the official load factor and minimum/peak ratio (Phase 3, `docs/project-history/phase3-validation.md`), then scaled to the annual total. Resulting peak checked against STEG's 6,000 MW 2030 forecast (warning, not a hard fail). |
 | D3 | Imports | **Fixed at the cited 2024 import volume**, flat hourly profile, subtracted from demand. Identical in all scenarios, so efficiency only reduces domestic generation. |
 | D4 | Efficiency | **Main runs: uniform cut** of every hour by 10 / 15 / 20%. **Sensitivity at -15%: cooling-weighted** (same annual MWh saved, concentrated on the cooling component, see §5.2). |
 | D5 | Flexibility | **Shiftable load** capped at 300 MW, shift up to 3 h **earlier or later** (every MWh back within 3 h; author, 2026-10-28), energy-neutral each day. Sensitivity at 600 MW. Batteries are extendable in **all** scenarios, so scenario 3 isolates the extra value of demand shifting. |
@@ -108,7 +108,7 @@ TEP30-35/
 ├── data/        assumptions_register.xlsx (+ raw/ gitignored, with a list of sources)
 ├── results/     CSV tables, figures (small, committed)
 ├── report/      report.docx, deck.pptx
-└── docs/        this spec, plan.md, config-change log, skills-inventory.md
+└── docs/        this spec, plan.md, config-change log
 ```
 
 **Locations:** project repo on C: (small). Miniforge, PyPSA-Earth and its data on **D:** (C: has 14 GB free).
@@ -129,7 +129,7 @@ openpyxl), exported to `environment.yml`. Created at the start of Phase 1 (softw
 
 | Phase | Output | Evidence before "done" |
 |---|---|---|
-| 0 | Skill inventory, this spec, `docs/plan.md` | Files committed |
+| 0 | This spec, `docs/project-history/plan.md` | Files committed |
 | 1 | Environment + single-node toy model (gas, solar, wind, battery, hourly load) + explanation of objective and constraints | Solve log, dispatch plot, passing tests |
 | 2 | PyPSA-Earth installed; tutorial run; TN base network built | Run logs, network summary, config-change log |
 | 3 | Baseline validated against STEG / IRENA / Ember; committed-projects list | Comparison table, explained gaps, justified calibration |
@@ -142,7 +142,7 @@ Each phase: own git branch, code review, then a 5-line summary + evidence, then 
 
 | ID | Risk | Mitigation |
 |---|---|---|
-| R1 | **Time resolution vs shift window.** At 3-hour steps, a "shift up to 3 h" can only move load by exactly one step, a coarse approximation. | Benchmark in Phase 2. If a 1-hour run for 2 clusters solves in reasonable time, use 1 h for **all** scenarios (needs your approval). Otherwise keep 3 h and state the limitation. **Outcome (2026-10-28):** 1 h solved in about 10 min with 1.3 GiB peak memory (3 h: about 1 min, 0.7 GiB), and 3 h built 2.7% more solar and 3.9% more wind than 1 h. The author chose 1 h for all scenarios. See `docs/phase2-base-network.md`. |
+| R1 | **Time resolution vs shift window.** At 3-hour steps, a "shift up to 3 h" can only move load by exactly one step, a coarse approximation. | Benchmark in Phase 2. If a 1-hour run for 2 clusters solves in reasonable time, use 1 h for **all** scenarios (needs your approval). Otherwise keep 3 h and state the limitation. **Outcome (2026-10-28):** 1 h solved in about 10 min with 1.3 GiB peak memory (3 h: about 1 min, 0.7 GiB), and 3 h built 2.7% more solar and 3.9% more wind than 1 h. The author chose 1 h for all scenarios. See `docs/project-history/phase2-base-network.md`. |
 | R2 | PyPSA-Earth install problems on native Windows | systematic-debugging; WSL fallback only with your approval |
 | R3 | Data bundle larger than 2 GB | Check size first; ask before downloading |
 | R4 | Open plant databases inaccurate for Tunisia | Phase 3 calibration against STEG, documented |

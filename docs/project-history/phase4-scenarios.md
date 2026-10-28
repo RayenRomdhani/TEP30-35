@@ -2,14 +2,14 @@
 
 **What this phase does:** one Snakemake pipeline turns the calibrated Tunisia base network into the 11 scenarios of spec §4, solves each one as a 2030 least-cost investment and dispatch problem, checks it, and writes two tables:
 
-- [`results/summary.csv`](../results/summary.csv): one row per scenario (capacity, new capacity, generation, demand, gas, CO2, system cost, average price, renewable share, cooling share).
-- [`results/avoided.csv`](../results/avoided.csv): each scenario against its reference, per MWh of demand saved (the headline metric).
+- [`results/summary.csv`](../../results/summary.csv): one row per scenario (capacity, new capacity, generation, demand, gas, CO2, system cost, average price, renewable share, cooling share).
+- [`results/avoided.csv`](../../results/avoided.csv): each scenario against its reference, per MWh of demand saved (the headline metric).
 
 **To reproduce:** run `snakemake -j 1` from the repo root. The base network path is in `config/pipeline.yaml`. The rules depend on the `src/tn2030` code, so a code change re-runs them.
 
 ## How a scenario network is built
 
-[`src/tn2030/scenario.py`](../src/tn2030/scenario.py) `build_scenario`, in the order of spec §5.1:
+[`src/tn2030/scenario.py`](../../src/tn2030/scenario.py) `build_scenario`, in the order of spec §5.1:
 
 1. **Calibrate the base network** (`calibrate_base`, Phase 3):
    - official 2024 thermal fleet with the fitted efficiency factor;
@@ -33,7 +33,7 @@
 
 ### Flexibility in plain words (spec D5, §5.3)
 
-[`src/tn2030/flexibility.py`](../src/tn2030/flexibility.py)
+[`src/tn2030/flexibility.py`](../../src/tn2030/flexibility.py)
 
 - Shiftable load works like a free, lossless battery at each bus, split by each bus's share of demand. It starts every day **half full**.
   - **Above half full:** consumers used power *earlier* than planned (load went up), and they use less later.
@@ -48,7 +48,7 @@
 
 ### Constraints added to the least-cost problem
 
-[`src/tn2030/constraints.py`](../src/tn2030/constraints.py)
+[`src/tn2030/constraints.py`](../../src/tn2030/constraints.py)
 
 - **Renewable target (spec D12):**
   - Over the year, solar + onshore wind + hydro output ≥ 35% of all domestic generation.
@@ -61,7 +61,7 @@
 
 ### Checks after every solve
 
-[`src/tn2030/checks.py`](../src/tn2030/checks.py). The pipeline stops if any of these fails:
+[`src/tn2030/checks.py`](../../src/tn2030/checks.py). The pipeline stops if any of these fails:
 - the whole-system energy balance closes (relative gap ≤ 1e-4);
 - the renewable share is ≥ 35%;
 - no load is shed;

@@ -39,7 +39,7 @@ Lesson for the Tunisia run: on-disk size is several times the download size, so 
 
 ## PyPSA-Earth configuration changes
 
-All overrides live in [`config/tn_base.yaml`](../config/tn_base.yaml), passed with `--configfile`. PyPSA-Earth itself is unmodified.
+All overrides live in [`config/tn_base.yaml`](../../config/tn_base.yaml), passed with `--configfile`. PyPSA-Earth itself is unmodified.
 
 | Key | Default | Ours | Why |
 |---|---|---|---|
@@ -68,7 +68,7 @@ Our spec needs **at least** 35% of domestic generation (D12).
 
 ### Missing OCGT candidate
 
-PyPSA-Earth adds extendable OCGT only at buses that already have a plant labelled OCGT (`scripts/add_electricity.py`, line 772). The Tunisian plant list has none, so listing OCGT in `extendable_carriers` adds the carrier but no generator. Our own code will add OCGT candidates (see `docs/phase2-base-network.md`).
+PyPSA-Earth adds extendable OCGT only at buses that already have a plant labelled OCGT (`scripts/add_electricity.py`, line 772). The Tunisian plant list has none, so listing OCGT in `extendable_carriers` adds the carrier but no generator. Our own code will add OCGT candidates (see `docs/project-history/phase2-base-network.md`).
 
 ## Tunisia base network run (Task 6)
 
@@ -79,7 +79,7 @@ Command (from `D:\pypsa-earth`):
 |---|---|
 | Date | 2026-10-27, 17:12 → 23:00 |
 | Result | 21 of 21 steps done, exit 0 |
-| Runtime | 347.6 min, of which about 5.3 h downloads and 14 min modelling (breakdown in `docs/phase2-base-network.md`) |
+| Runtime | 347.6 min, of which about 5.3 h downloads and 14 min modelling (breakdown in `docs/project-history/phase2-base-network.md`) |
 | Disk after the run | `data/` 21.4 GB, `cutouts/` 19.5 GB (includes the tutorial data); 41.2 GB free on D: |
 | Output | `networks/TN/elec_s_2_ec_lcopt_3h.nc` (2 buses, 2,920 snapshots × 3 h, 29.88 TWh load) |
 
@@ -99,4 +99,4 @@ Reasons:
 - 3 h averaging smooths peaks: compared with 1 h, it built 2.7% more solar and 3.9% more wind, and burned 2.7% less gas.
 
 Base network from now on: `networks/TN/elec_s_2_ec_lcopt_1h.nc` (8,760 snapshots × 1 h, 29.88 TWh, peak 4,620 MW), recorded in `config/pipeline.yaml`.
-Full table: `docs/phase2-base-network.md`.
+Full table: `docs/project-history/phase2-base-network.md`.

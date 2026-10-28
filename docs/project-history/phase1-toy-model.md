@@ -1,7 +1,7 @@
 # Phase 1: the toy model, its objective and its constraints
 
-Code: [`src/tn2030/toy.py`](../src/tn2030/toy.py) · run: `python scripts/phase1_toy_model.py`
-Figure: [`results/figures/phase1_toy_dispatch.png`](../results/figures/phase1_toy_dispatch.png)
+Code: [`src/tn2030/toy.py`](../../src/tn2030/toy.py) · run: `python scripts/phase1_toy_model.py`
+Figure: [`results/figures/phase1_toy_dispatch.png`](../../results/figures/phase1_toy_dispatch.png)
 
 ## In one sentence
 
@@ -30,7 +30,7 @@ the cheapest system look like under these assumptions", nothing more.
 | Onshore wind | `Generator` + hourly `p_max_pu` | 1,383 EUR/kW, illustrative curve with a lull on 2-3 July |
 | Battery | `StorageUnit`, `max_hours=4` | inverter 214 EUR/kW + storage 190 EUR/kWh; 96 % round trip, so √0.96 ≈ 98 % each way (as PyPSA-Earth does) |
 
-Every number comes from [`data/assumptions_register.xlsx`](../data/assumptions_register.xlsx). Load, solar and
+Every number comes from [`data/assumptions_register.xlsx`](../../data/assumptions_register.xlsx). Load, solar and
 wind **shapes are illustrative**, not measured; they exist only to show the mechanics.
 
 ## The objective function

@@ -22,7 +22,7 @@ What the scenarios show:
 - The gas price changes the result more than any efficiency choice. At half the gas price, each MWh saved avoids 0.28 t of CO2. At 1.5 times the price it avoids only 0.11 t, because the system is already 70% renewable.
 - At the base gas price the 35% target does not bind: the least-cost 2030 system reaches 56% renewables on its own. That is the least-cost outcome and should not be read as a forecast (see Limitations).
 
-The full tables are in [`results/summary.csv`](results/summary.csv) and [`results/avoided.csv`](results/avoided.csv). The method and every result are explained in [`docs/phase4-scenarios.md`](docs/phase4-scenarios.md).
+The full tables are in [`results/summary.csv`](results/summary.csv) and [`results/avoided.csv`](results/avoided.csv). The method and every result are explained in [`docs/project-history/phase4-scenarios.md`](docs/project-history/phase4-scenarios.md).
 
 ## Question and scope
 
@@ -32,8 +32,8 @@ The model covers Tunisia only, with 2 network nodes (north and south), 8,760 hou
 
 ## Method
 
-1. PyPSA-Earth v0.10.0, unmodified, builds the base network: Tunisia's grid, power plants, renewable potentials and hourly demand, from open data. The settings are in [`config/tn_base.yaml`](config/tn_base.yaml) and are logged in [`docs/config-changes.md`](docs/config-changes.md).
-2. The network is calibrated to 2024 ([`docs/phase3-validation.md`](docs/phase3-validation.md)). The thermal fleet is rebuilt from the official 2024 statistics (ONEM Memento 2024). One efficiency factor for existing gas units is then fitted so that the model burns as much gas as STEG did. After calibration the 2024 model matches the official gas burnt within 0.4% and the peak within 0.3%.
+1. PyPSA-Earth v0.10.0, unmodified, builds the base network: Tunisia's grid, power plants, renewable potentials and hourly demand, from open data. The settings are in [`config/tn_base.yaml`](config/tn_base.yaml) and are logged in [`docs/project-history/config-changes.md`](docs/project-history/config-changes.md).
+2. The network is calibrated to 2024 ([`docs/project-history/phase3-validation.md`](docs/project-history/phase3-validation.md)). The thermal fleet is rebuilt from the official 2024 statistics (ONEM Memento 2024). One efficiency factor for existing gas units is then fitted so that the model burns as much gas as STEG did. After calibration the 2024 model matches the official gas burnt within 0.4% and the peak within 0.3%.
 3. 2024 demand (22.5 TWh) grows to 2030 at 3.2% per year, STEG's base-case forecast as quoted by JICA (2022). The hourly shape is stretched to STEG's load factor and minimum-to-peak ratio. Imports stay at their 2024 level.
 4. Each scenario changes the 2030 demand or the gas price (table below). The model then builds new solar, wind, batteries and gas turbines at least cost. In every scenario it must:
    - produce at least 35% of domestic generation from renewables;

@@ -1,7 +1,7 @@
 # Phase 2: Tunisia base network
 
-PyPSA-Earth v0.10.0 (unmodified) built a prepared, unsolved network for Tunisia using [`config/tn_base.yaml`](../config/tn_base.yaml).
-It was first built at 3-hour steps. After the benchmark below, the author chose **1-hour steps** for all scenarios (spec D11). Our scenario pipeline starts from the 1-hour file, whose path is in [`config/pipeline.yaml`](../config/pipeline.yaml).
+PyPSA-Earth v0.10.0 (unmodified) built a prepared, unsolved network for Tunisia using [`config/tn_base.yaml`](../../config/tn_base.yaml).
+It was first built at 3-hour steps. After the benchmark below, the author chose **1-hour steps** for all scenarios (spec D11). Our scenario pipeline starts from the 1-hour file, whose path is in [`config/pipeline.yaml`](../../config/pipeline.yaml).
 
 Command to rebuild it, run from `D:\pypsa-earth`:
 
@@ -123,10 +123,10 @@ Command: `snakemake -j 1 results/TN/networks/elec_s_2_ec_lcopt_{3h,1h}.nc --conf
 | Batteries built | 0 | 0 | |
 | Peak load (MW) | 4,604 | 4,620 | 3-hour averaging smooths the peak |
 
-Sources (verbatim log lines in [`docs/evidence/phase2-run-logs.txt`](evidence/phase2-run-logs.txt)):
+Sources (verbatim log lines in [`docs/project-history/evidence/phase2-run-logs.txt`](evidence/phase2-run-logs.txt)):
 - **HiGHS run time:** the "HiGHS run time" line of the first run.
 - **Step time:** the Snakemake rule timestamps of the first run.
-- **Peak memory:** [`scripts/peak_ram.py`](../scripts/peak_ram.py). Snakemake cannot measure memory on Windows ("unable to collect cpu and memory benchmark statistics"), so a second run of each solve sampled the whole process tree's memory every 0.5 s.
+- **Peak memory:** [`scripts/peak_ram.py`](../../scripts/peak_ram.py). Snakemake cannot measure memory on Windows ("unable to collect cpu and memory benchmark statistics"), so a second run of each solve sampled the whole process tree's memory every 0.5 s.
 
 The second run reproduced both objectives exactly. Its HiGHS run times were 59.5 s (3 h) and 591.8 s (1 h), so times vary by about 10% between runs. The second run overwrote `D:\pypsa-earth\benchmarks\TN\solve_network\`, so those files hold its times, not the first run's.
 
