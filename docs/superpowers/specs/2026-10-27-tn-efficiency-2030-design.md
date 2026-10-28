@@ -38,7 +38,7 @@ system. If a sourced ANME programme cost is found, it is compared against this v
 | D8 | Gas price | **Economic (opportunity) cost**, not STEG's subsidised tariff. Base value from technology-data; **±50% sensitivity** (labelled assumption). |
 | D9 | CO2 | **Reported, not priced** (no carbon price in Tunisia). Emission factor from technology-data. |
 | D10 | Weather | PyPSA-Earth default weather year from its data bundle (no ERA5 account). Ask before any download > 2 GB. |
-| D11 | Resolution | Tunisia only; **2 clusters** (4 if runtime allows); **3-hour** time steps (see risk R1); HiGHS. |
+| D11 | Resolution | Tunisia only; **2 clusters** (4 if runtime allows); **1-hour** time steps (decided 2026-10-28 after the risk R1 benchmark; first planned at 3 h); HiGHS. |
 | D12 | RE constraint | One annual constraint: (solar + wind + hydro generation) ≥ 35% × total **domestic** generation. Storage discharge and imports excluded from both sides. Use a built-in PyPSA-Earth option if one exists (checked in Phase 2), else a custom `extra_functionality`. |
 | D13 | ELMED (Italy link) | **Optional scenario 4**, decided after Phase 4 depending on time. |
 
@@ -141,7 +141,7 @@ Each phase: own git branch, code review, then a 5-line summary + evidence, then 
 
 | ID | Risk | Mitigation |
 |---|---|---|
-| R1 | **Time resolution vs shift window.** At 3-hour steps, a "shift up to 3 h" can only move load by exactly one step, a coarse approximation. | Benchmark in Phase 2. If a 1-hour run for 2 clusters solves in reasonable time, use 1 h for **all** scenarios (needs your approval). Otherwise keep 3 h and state the limitation. |
+| R1 | **Time resolution vs shift window.** At 3-hour steps, a "shift up to 3 h" can only move load by exactly one step, a coarse approximation. | Benchmark in Phase 2. If a 1-hour run for 2 clusters solves in reasonable time, use 1 h for **all** scenarios (needs your approval). Otherwise keep 3 h and state the limitation. **Outcome (2026-10-28):** 1 h solved in about 10 min with 1.3 GiB peak memory (3 h: about 1 min, 0.7 GiB), and 3 h built 2.7% more solar and 3.9% more wind than 1 h. The author chose 1 h for all scenarios. See `docs/phase2-base-network.md`. |
 | R2 | PyPSA-Earth install problems on native Windows | systematic-debugging; WSL fallback only with your approval |
 | R3 | Data bundle larger than 2 GB | Check size first; ask before downloading |
 | R4 | Open plant databases inaccurate for Tunisia | Phase 3 calibration against STEG, documented |
