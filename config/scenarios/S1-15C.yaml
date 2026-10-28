@@ -1,0 +1,6 @@
+# Efficiency: the same 15% of annual energy, taken from the summer cooling load first (spec 5.2).
+name: S1-15C
+reference: S0
+efficiency: {share: 0.15, mode: cooling}
+flexibility: {p_max_mw: 0}
+gas_price_factor: 1.0

@@ -1,0 +1,6 @@
+# Reference: 2030 demand, no extra efficiency or flexibility (spec section 4).
+name: S0
+reference: S0
+efficiency: {share: 0, mode: uniform}
+flexibility: {p_max_mw: 0}
+gas_price_factor: 1.0

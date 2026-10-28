@@ -293,7 +293,7 @@ if rest > 0: out = out * (1 - rest / (out * weights).sum())
 return out, on_cooling / S
 ```
 
-- [ ] **Step 1: Write the failing tests** (full 2030 hourly index; base 1000 MW flat, +500 MW at 12:00–17:00 in July):
+- [x] **Step 1: Write the failing tests** (full 2030 hourly index; base 1000 MW flat, +500 MW at 12:00–17:00 in July):
 ```python
 def test_uniform_cut_scales_every_hour():
     assert np.allclose(uniform_cut(p, 0.15), p * 0.85)
@@ -309,10 +309,10 @@ def test_cooling_weighted_cut_flat_profile_falls_back_to_uniform():
     out, frac = cooling_weighted_cut(flat, w, 0.15)
     assert frac == 0.0 and np.allclose(out, flat * 0.85)
 ```
-- [ ] **Step 2:** Run `pytest tests/test_efficiency.py -v`. Expected: 5 FAIL.
-- [ ] **Step 3:** Implement.
-- [ ] **Step 4:** Run. Expected: 5 passed.
-- [ ] **Step 5:** Commit: `git commit -m "feat: add uniform and cooling-weighted efficiency cuts"`
+- [x] **Step 2:** Run `pytest tests/test_efficiency.py -v`. Expected: 5 FAIL.
+- [x] **Step 3:** Implement.
+- [x] **Step 4:** Run. Expected: 5 passed.
+- [x] **Step 5:** Commit: `git commit -m "feat: add uniform and cooling-weighted efficiency cuts"`
 
 ### Task 12: Flexibility module
 
@@ -321,7 +321,7 @@ def test_cooling_weighted_cut_flat_profile_falls_back_to_uniform():
 **Interfaces:**
 - Produces: `add_shiftable_load(n: pypsa.Network, p_max_mw: float, max_hours: float) -> None`. Adds one `StorageUnit` per load bus named `"demand_shift <bus>"`, carrier `"demand_shift"` (added to `n.carriers` if missing), `p_nom` = `p_max_mw` × (bus annual load share), `max_hours`, `efficiency_store = efficiency_dispatch = 1`, `capital_cost = marginal_cost = 0`, `p_nom_extendable = False`, `cyclic_state_of_charge = False`. `state_of_charge_set` = 0 at the last snapshot of each calendar day, NaN elsewhere (spec §5.3).
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 ```python
 def test_shift_split_by_bus_load_share(two_bus_network):        # loads 3:1
     add_shiftable_load(two_bus_network, 300.0, 3.0)
@@ -337,10 +337,10 @@ def test_shift_soc_reset_on_partial_last_day(toy_network_partial_day):  # 52 h h
 def test_shift_is_energy_neutral(toy_network): ...
     assert (p * w).sum() == pytest.approx(0.0, abs=1e-6)
 ```
-- [ ] **Step 2:** Run. Expected: 4 FAIL.
-- [ ] **Step 3:** Implement. Add fixtures `two_bus_network` and `toy_network_partial_day` to `conftest.py`.
-- [ ] **Step 4:** Run. Expected: 4 passed.
-- [ ] **Step 5:** Commit: `git commit -m "feat: add shiftable load as daily energy-neutral virtual storage"`
+- [x] **Step 2:** Run. Expected: 4 FAIL.
+- [x] **Step 3:** Implement. Add fixtures `two_bus_network` and `toy_network_partial_day` to `conftest.py`.
+- [x] **Step 4:** Run. Expected: 4 passed.
+- [x] **Step 5:** Commit: `git commit -m "feat: add shiftable load as daily energy-neutral virtual storage"`
 
 ### Task 13: RES constraint and solve wrapper
 
@@ -353,7 +353,7 @@ def test_shift_is_energy_neutral(toy_network): ...
   - `solve_network(n: pypsa.Network, res_share: float, solver_name: str = "highs") -> None` (`RuntimeError` if status ≠ `"ok"`)
   - `res_share(n: pypsa.Network, res_carriers: tuple[str, ...] = RES_CARRIERS) -> float` (ex-post, same definition)
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 ```python
 def test_res_share_binding_when_gas_is_cheap(toy_network_cheap_gas):
     toy_network_cheap_gas.optimize(solver_name="highs")
@@ -366,10 +366,10 @@ def test_res_constraint_raises_when_no_carrier_matches(toy_network):
         solve_network_with(toy_network, res_carriers=("wind",))
 ```
 (`solve_network_with` is a test helper calling `n.optimize(extra_functionality=lambda n, s: add_min_res_share(n, 0.35, ("wind",)))`.)
-- [ ] **Step 2:** Run. Expected: FAIL.
-- [ ] **Step 3:** Add fixture `toy_network_cheap_gas` to `conftest.py` (toy network with solar and wind `capital_cost` × 5, so the unconstrained RES share falls below 35%). Implement with linopy: `n.model["Generator-p"]` and `n.model["StorageUnit-p_dispatch"]`, multiplied by `n.snapshot_weightings.generators`. If Task 6 found a built-in option, still keep `res_share` for the check and document why the custom constraint is kept or dropped.
-- [ ] **Step 4:** Run. Expected: 3 passed.
-- [ ] **Step 5:** Commit: `git commit -m "feat: add 35% renewable share constraint and solve wrapper"`
+- [x] **Step 2:** Run. Expected: FAIL.
+- [x] **Step 3:** Add fixture `toy_network_cheap_gas` to `conftest.py` (toy network with solar and wind `capital_cost` × 5, so the unconstrained RES share falls below 35%). Implement with linopy: `n.model["Generator-p"]` and `n.model["StorageUnit-p_dispatch"]`, multiplied by `n.snapshot_weightings.generators`. If Task 6 found a built-in option, still keep `res_share` for the check and document why the custom constraint is kept or dropped.
+- [x] **Step 4:** Run. Expected: 3 passed.
+- [x] **Step 5:** Commit: `git commit -m "feat: add 35% renewable share constraint and solve wrapper"`
 
 ### Task 14: Results and sanity checks
 
@@ -381,7 +381,7 @@ def test_res_constraint_raises_when_no_carrier_matches(toy_network):
   - `avoided_per_mwh(base: pd.Series, scen: pd.Series) -> pd.Series` with keys `cost_eur_per_mwh`, `co2_t_per_mwh`, `gas_mwh_th_per_mwh`, `capacity_mw_per_twh`. `ValueError` "zero saving" if `base.demand_twh == scen.demand_twh`.
   - `sanity_check(n: pypsa.Network, res_share_min: float, committed: pd.DataFrame, peak_ref_mw: float) -> list[str]` raising `AssertionError` on: energy balance gap > 1e-4 relative, RES share < min − 1e-6, any load-shedding dispatch > 0, any committed capacity not met; returns warnings (peak outside ±10%).
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 ```python
 def test_summary_uses_snapshot_weightings(solved_toy):
     s = summarize(solved_toy)
@@ -406,10 +406,10 @@ def test_sanity_check_fails_on_res_shortfall(solved_toy):
 def test_sanity_check_fails_on_missing_committed(solved_toy):
     with pytest.raises(AssertionError, match="committed"): sanity_check(solved_toy, 0.0, committed_10gw_solar, ...)
 ```
-- [ ] **Step 2:** Run. Expected: FAIL.
-- [ ] **Step 3:** Implement both modules. Add fixture `solved_toy` (toy solved with `solve_network(n, 0.35)`).
-- [ ] **Step 4:** Run. Expected: 7 passed.
-- [ ] **Step 5:** Commit: `git commit -m "feat: add result metrics, avoided-per-MWh and sanity checks"`
+- [x] **Step 2:** Run. Expected: FAIL.
+- [x] **Step 3:** Implement both modules. Add fixture `solved_toy` (toy solved with `solve_network(n, 0.35)`).
+- [x] **Step 4:** Run. Expected: 7 passed.
+- [x] **Step 5:** Commit: `git commit -m "feat: add result metrics, avoided-per-MWh and sanity checks"`
 
 ### Task 15: Scenario builder
 
@@ -427,7 +427,7 @@ def test_sanity_check_fails_on_missing_committed(solved_toy):
   - `apply_committed(n: pypsa.Network, committed: pd.DataFrame) -> None`: raises `p_nom_min` (and `p_nom` floor) of the extendable component with the same `carrier` and `bus` by `p_nom_mw`; `ValueError` if none exists
   - `scale_gas_cost(n: pypsa.Network, factor: float, gas_price_eur_per_mwh_th: float) -> None`: for carriers `CCGT`, `OCGT`, `marginal_cost += (factor − 1) × price / efficiency`
   - `build_scenario(n_base: pypsa.Network, scenario: dict, register: dict[str, float], committed: pd.DataFrame, calibrate: bool = True) -> pypsa.Network` (returns a copy). Order fixed by spec §5.1: `calibrate_base` (if `calibrate`) → reshape total load with `demand.reshape_profile` (load factor = `demand_2024_twh` / 8,784 h / `peak_2024_mw`, `min_to_peak_2030`) → scale to `annual_demand_2030` split by base bus shares → efficiency cut → subtract imports split by the same shares → `apply_committed` (all rows of `data/committed_projects.csv`, including `operating_since_*`) → `scale_gas_cost` (existing and new CCGT/OCGT) → `add_shiftable_load` if `p_max_mw > 0`.
-  - Sensitivity to decide with the author in Phase 4: the fitted efficiency factor also absorbs outages, and the marginal gas unit drives the headline metric (see `docs/phase3-validation.md`, gap 2).
+  - Decided 2026-10-28 (author): the efficiency-factor issue (it also absorbs outages; see `docs/phase3-validation.md`, gap 2) is recorded as a limitation, no sensitivity run. Added instead: STEG's 10% reserve margin in all runs (spec D14) and a two-way 3 h shift limit (spec D5).
 
 Scenario files (`reference` is the scenario it is compared against):
 
@@ -442,7 +442,7 @@ Scenario files (`reference` is the scenario it is compared against):
 
 Flex sizes and gas factors in YAML are register ids (`flex_cap_mw`, `gas_price_factor_lo`), resolved by `build_scenario`, so no number lives in two places.
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 ```python
 def test_build_scenario_hits_2030_demand_minus_saving_minus_imports(toy_network, reg): ...
     expected = annual_demand_2030(reg["demand_2024_twh"], reg["demand_growth"]) * 0.85 - reg["imports_2024_twh"]
@@ -459,10 +459,10 @@ def test_load_scenario_rejects_bad_mode(tmp_path):
 def test_all_scenario_files_load():
     assert len([load_scenario(p) for p in Path("config/scenarios").glob("*.yaml")]) == 11
 ```
-- [ ] **Step 2:** Run. Expected: FAIL.
-- [ ] **Step 3:** Implement and write the 11 YAML files.
-- [ ] **Step 4:** Run `pytest -v`. Expected: all pass.
-- [ ] **Step 5:** Commit: `git commit -m "feat: add scenario builder and 11 scenario definitions"`
+- [x] **Step 2:** Run. Expected: FAIL.
+- [x] **Step 3:** Implement and write the 11 YAML files.
+- [x] **Step 4:** Run `pytest -v`. Expected: all pass.
+- [x] **Step 5:** Commit: `git commit -m "feat: add scenario builder and 11 scenario definitions"`
 
 ### Task 16: Snakemake pipeline and full run
 
@@ -475,7 +475,7 @@ def test_all_scenario_files_load():
   - `summarize_step(solved_paths: list[Path], scenario_paths: list[Path], summary_out: Path, avoided_out: Path) -> None` (one row per scenario; `avoided.csv` compares each with its `reference`, skips self-references)
 - Rules: `all` → `build_scenario` (`results/networks/{s}_built.nc`) → `solve` (`results/networks/{s}_solved.nc`) → `summarize`. `.nc` files are gitignored; CSVs are committed.
 
-- [ ] **Step 1: Write the failing integration test** (toy base saved to `tmp_path`, two scenario YAMLs S0 and S1-15, fixture register and empty committed CSV):
+- [x] **Step 1: Write the failing integration test** (toy base saved to `tmp_path`, two scenario YAMLs S0 and S1-15, fixture register and empty committed CSV):
 ```python
 def test_pipeline_end_to_end_on_toy(tmp_path):
     ...build_step → solve_step → summarize_step...
@@ -485,11 +485,11 @@ def test_pipeline_end_to_end_on_toy(tmp_path):
     assert summary.loc["S1-15", "demand_twh"] < summary.loc["S0", "demand_twh"]
     assert avoided.loc["S1-15", "cost_eur_per_mwh"] > 0
 ```
-- [ ] **Step 2:** Run. Expected: FAIL.
-- [ ] **Step 3:** Implement `pipeline.py` and `Snakefile`.
-- [ ] **Step 4:** Run `pytest -v`. Expected: all pass. Then `snakemake -n` lists 11 build + 11 solve + 1 summarize jobs.
-- [ ] **Step 5:** Run `snakemake -j 1` on the real base network. Expected: `results/summary.csv` (11 rows), `results/avoided.csv` (8 rows: every scenario except the three self-referenced ones), no sanity-check failure. Failures → `superpowers:systematic-debugging` + `operations-planning-mitigation`.
-- [ ] **Step 6:** `docs/phase4-scenarios.md`: how efficiency and flexibility are represented (spec §5.2–5.3 in plain words), runtimes, all warnings.
+- [x] **Step 2:** Run. Expected: FAIL.
+- [x] **Step 3:** Implement `pipeline.py` and `Snakefile`.
+- [x] **Step 4:** Run `pytest -v`. Expected: all pass. Then `snakemake -n` lists 11 build + 11 solve + 1 summarize jobs.
+- [x] **Step 5:** Run `snakemake -j 1` on the real base network. Expected: `results/summary.csv` (11 rows), `results/avoided.csv` (8 rows: every scenario except the three self-referenced ones), no sanity-check failure. Failures → `superpowers:systematic-debugging` + `operations-planning-mitigation`.
+- [x] **Step 6:** `docs/phase4-scenarios.md`: how efficiency and flexibility are represented (spec §5.2–5.3 in plain words), runtimes, all warnings.
 - [ ] **Step 7:** Commit, then **Phase gate**. Evidence: Snakemake log, both CSVs, pytest output.
 
 ---

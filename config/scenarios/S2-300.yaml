@@ -1,0 +1,6 @@
+# Efficiency 15% + 300 MW of shiftable load (register flex_cap_mw).
+name: S2-300
+reference: S0
+efficiency: {share: 0.15, mode: uniform}
+flexibility: {p_max_mw: flex_cap_mw}
+gas_price_factor: 1.0
