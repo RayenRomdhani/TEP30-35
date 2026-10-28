@@ -36,3 +36,40 @@ def load_register(path: Path) -> dict[str, float]:
         raise ValueError(f"rows without a value (fill it or mark them pending): {no_value}")
 
     return {row.id: float(row.value) for row in usable.itertuples()}
+
+
+MARKDOWN_HEADER = """# Assumptions register
+
+Every input number of the study, with its unit and where it comes from. This page is generated from
+`assumptions_register.xlsx` by `scripts/export_register.py`: edit the Excel file, then rerun the script
+(a test fails if the two differ).
+
+- **sourced**: taken from the linked source.
+- **assumption**: no published source; the notes say why the value was chosen.
+- **pending**: placeholder, not used by the model.
+
+"""
+
+
+def _cell(value) -> str:
+    """One table cell as text: numbers compact, empty cells blank, pipes escaped so the table holds."""
+    if value is None or (isinstance(value, float) and pd.isna(value)):
+        return ""
+    if isinstance(value, float):
+        return f"{value:,.0f}" if abs(value) >= 1000 else f"{value:.4g}"
+    if isinstance(value, pd.Timestamp):
+        return value.strftime("%Y-%m-%d")
+    return str(value).replace("|", "\\|").replace("\n", " ")
+
+
+def register_markdown(path: Path) -> str:
+    """The whole register as a Markdown table, the source title linked to its URL."""
+    df = pd.read_excel(path, sheet_name="register")
+    lines = ["| id | parameter | value | unit | type | source | accessed | notes |",
+             "|---|---|---|---|---|---|---|---|"]
+    for r in df.itertuples():
+        title, url = _cell(r.source_title), _cell(r.source_url)
+        source = f"[{title or url}]({url})" if url else title
+        lines.append("| " + " | ".join([_cell(r.id), _cell(r.parameter), _cell(r.value), _cell(r.unit),
+                                        _cell(r.type), source, _cell(r.accessed), _cell(r.notes)]) + " |")
+    return MARKDOWN_HEADER + "\n".join(lines) + "\n"
