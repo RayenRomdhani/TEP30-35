@@ -69,6 +69,12 @@ def test_reshape_profile_raises_on_impossible_target():  # load factor must lie 
         reshape_profile(p, w, load_factor=0.30, min_to_peak=0.34)
 
 
+def test_reshape_profile_raises_on_constant_profile():  # nothing to rank: x would be 0/0
+    p, w = _flat_year()
+    with pytest.raises(ValueError, match="constant"):
+        reshape_profile(p * 0 + 3000.0, w, load_factor=0.52, min_to_peak=0.34)
+
+
 def test_peak_check_flags_outside_tolerance():
     assert peak_check(pd.Series([5000.0, 6700.0]), 6000) == (6700.0, False)
     assert peak_check(pd.Series([5000.0, 6300.0]), 6000) == (6300.0, True)

@@ -26,8 +26,13 @@ How the ONEM Memento was read:
   - 2024: demand 23.96 TWh, net imports 2.59 TWh, generation 21.37 TWh, gas 94.52% of generation.
   - Used as a cross-check only. Not verified from Ember's data file: the author declined the 49 MB download.
 - **STEG, "Produire":** https://www.steg.com.tn/fr/page/produire
-  - Peaks: 4,888 MW (14 Aug 2024) and 4,837 MW (25 Jul 2025).
+  - Peaks: 4,888 MW (Wed 14 Aug 2024, 15:41) and 4,837 MW (Fri 25 Jul 2025, 15:41).
   - Demand growth of 4.1% in 2025.
+- **La Presse, 9 Oct 2026** (STEG short-term plan: restoring the full capacity of the Kchabta and Metline plants, about 190 MW): https://www.lapresse.tn/2026/10/09/electricite-la-steg-prevoit-des-capacites-supplementaires-de-250-mw-grace-a-lamelioration-des-centrales/
+- **IRENA, Tunisia renewable energy statistical profile** (wind 245 MW in 2024): https://www.irena.org/-/media/Files/IRENA/Agency/Statistics/Statistical_Profiles/Africa/Tunisia_Africa_RE_SP.pdf
+  - The 245 MW was reported by a research agent and not re-read by the author.
+- **PyPSA-Earth DemandCast data** (`D:\pypsa-earth\data\demand\forecasts_on_historical_period.parquet`, from the approved data bundle).
+  - The Tunisia 2024 load factor of 0.70 was computed from it in Phase 3.
 - **Committed projects:** see `source_url` and `notes` in `data/committed_projects.csv`.
   - Inclusion rule (spec D6): under construction or signed contract, plus plants that came online in 2025–26 and so are missing from the 2024 fleet.
   - Excluded:

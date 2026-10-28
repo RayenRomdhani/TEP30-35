@@ -36,25 +36,34 @@ def row(case, metric, model, reference, source):
 
 
 def capacity_rows(case, n, reg):
-    """Existing capacity by type. For PyPSA-Earth's merged units, existing = p_nom_min."""
+    """2024 capacity by type, as used in the dispatch run.
+
+    Thermal: for PyPSA-Earth's merged existing+new units, existing = p_nom_min.
+    Renewables: p_nom, which includes PyPSA-Earth's top-up to IRENA's 2024 solar total (rooftop included);
+    the dispatch run freezes them at this value.
+    """
     g = n.generators[n.generators.carrier != "load shedding"]
-    existing = g.p_nom_min.where(g.p_nom_extendable, g.p_nom).groupby(g.carrier).sum()
-    renewables = existing.reindex(RENEWABLE, fill_value=0).sum() + n.storage_units.p_nom.sum()
+    thermal = g.p_nom_min.where(g.p_nom_extendable, g.p_nom).groupby(g.carrier).sum()
+    renewables = g.p_nom[g.carrier.isin(RENEWABLE)].sum() + n.storage_units.p_nom.sum()
     thermal_ref = reg["cap_2024_ccgt_mw"] + reg["cap_2024_ocgt_mw"] + reg["cap_2024_steam_mw"]
+    selfgen = reg["cap_2024_selfgen_solar_lv_mw"] + reg["cap_2024_selfgen_solar_mvhv_mw"]
     return [
-        row(case, "cap_ccgt_mw", existing.get("CCGT", 0), reg["cap_2024_ccgt_mw"], ONEM),
-        row(case, "cap_ocgt_and_steam_mw", existing.get("OCGT", 0), reg["cap_2024_ocgt_mw"] + reg["cap_2024_steam_mw"], ONEM),
-        row(case, "cap_oil_mw", existing.get("oil", 0), 0.0, ONEM + " (no oil category)"),
-        row(case, "cap_thermal_mw", existing.reindex(GAS + ["oil"], fill_value=0).sum(), thermal_ref, ONEM),
-        row(case, "cap_renewable_mw", renewables, reg["cap_2024_re_mw"], ONEM + " (centralised only)"),
+        row(case, "cap_ccgt_mw", thermal.get("CCGT", 0), reg["cap_2024_ccgt_mw"], ONEM),
+        row(case, "cap_ocgt_and_steam_mw", thermal.get("OCGT", 0), reg["cap_2024_ocgt_mw"] + reg["cap_2024_steam_mw"], ONEM),
+        row(case, "cap_oil_mw", thermal.get("oil", 0), 0.0, ONEM + " (no oil category)"),
+        row(case, "cap_thermal_mw", thermal.reindex(GAS + ["oil"], fill_value=0).sum(), thermal_ref, ONEM),
+        row(case, "cap_renewable_centralised_mw", renewables, reg["cap_2024_re_mw"], ONEM + " (centralised only)"),
+        row(case, "cap_renewable_incl_selfgen_mw", renewables, reg["cap_2024_re_mw"] + selfgen,
+            ONEM + " (centralised + self-generation solar 315 + 125 MW)"),
     ]
 
 
 def dispatch_network(n, reg, reshape):
     """Freeze every capacity and set the load to 2024 domestic demand (total demand minus flat imports)."""
     m = n.copy()
-    for comp, attr in (("generators", "p_nom"), ("links", "p_nom"), ("stores", "e_nom"), ("lines", "s_nom")):
-        getattr(m, comp)[f"{attr}_extendable"] = False
+    for comp, attr in (("generators", "p_nom"), ("storage_units", "p_nom"), ("links", "p_nom"), ("stores", "e_nom"),
+                       ("lines", "s_nom")):
+        getattr(m, comp)[f"{attr}_extendable"] = False  # extendable units keep p_nom, PyPSA-Earth's 2024 estimate
 
     w = m.snapshot_weightings.generators
     pe_total = m.loads_t.p_set.sum(axis=1)
@@ -92,6 +101,11 @@ def dispatch_rows(case, m, total, reg):
     gas = gen.reindex(GAS, fill_value=0).sum()
     produced = gen.drop("unserved", errors="ignore").sum() + hydro - gen.get("ror", 0)
     steg_eff = 1000 / (reg["steg_specific_consumption_2024"] * MWH_PER_TOE) / reg["gas_ncv_per_gcv"]
+    by_unit = m.generators_t.p.mul(w, axis=0).sum() / 1e6
+    is_gas = m.generators.carrier.isin(GAS)
+    fuel = (by_unit[is_gas] / m.generators.efficiency[is_gas]).sum()
+    load_factor = (total * w).sum() / w.sum() / total.max()  # weighted mean / peak
+    nan = float("nan")
     return [
         row(case, "gen_gas_twh", gas, reg["gen_2024_gas_twh"], ONEM),
         row(case, "gen_oil_twh", gen.get("oil", 0), reg["gen_2024_oil_twh"], ONEM),
@@ -99,11 +113,16 @@ def dispatch_rows(case, m, total, reg):
         row(case, "gen_solar_twh", gen.get("solar", 0), reg["gen_2024_solar_twh"], ONEM),
         row(case, "gen_hydro_twh", hydro, reg["gen_2024_hydro_twh"], ONEM),
         row(case, "gen_total_twh", produced, reg["gen_2024_total_twh"], ONEM + " (excl. 0.187 TWh third-party purchases)"),
-        row(case, "gas_share", gas / produced, reg["gas_share_2024"], ONEM),
+        row(case, "gas_share", gas / produced, reg["gas_share_2024"],
+            ONEM + " (model total includes the 0.187 TWh ONEM books as third-party purchases)"),
         row(case, "unserved_twh", gen.get("unserved", 0), 0.0, "should be zero"),
         row(case, "gas_fleet_efficiency_ncv", gas_efficiency(m), steg_eff, ONEM + " specific consumption x 1/0.9 (gross to net)"),
+        row(case, "gas_fuel_for_power_twh_th", fuel, reg["gas_for_power_2024_ktep_ncv"] * MWH_PER_TOE / 1000,
+            ONEM + " gas burnt for electricity, 3,168 ktep (net CV); independent of the fit"),
+        row(case, "gen_ccgt_twh", by_unit[m.generators.carrier == "CCGT"].sum(), nan, "dispatch split, no reference"),
+        row(case, "gen_ocgt_and_steam_twh", by_unit[m.generators.carrier == "OCGT"].sum(), nan, "dispatch split, no reference"),
         row(case, "peak_mw", total.max(), reg["peak_2024_mw"], ONEM),
-        row(case, "load_factor", total.mean() / total.max(), reg["demand_2024_twh"] * 1e6 / HOURS_2024 / reg["peak_2024_mw"],
+        row(case, "load_factor", load_factor, reg["demand_2024_twh"] * 1e6 / HOURS_2024 / reg["peak_2024_mw"],
             ONEM + " (2024 demand / 8,784 h / peak)"),
         row(case, "min_to_peak", total.min() / total.max(), reg["min_to_peak_2030"], "STEG 2030 forecast in JICA 2022"),
     ]
@@ -114,7 +133,7 @@ def calibrated_fleet(n, reg, factor):
     return rebuild_thermal_fleet(
         n, ccgt_mw=reg["cap_2024_ccgt_mw"], ocgt_mw=reg["cap_2024_ocgt_mw"] + reg["cap_2024_steam_mw"],
         ccgt_eff=reg["ccgt_efficiency"], ocgt_eff=reg["ocgt_efficiency"], fuel_cost=reg["gas_price_eur_per_mwh_th"],
-        ccgt_vom=reg["ccgt_vom"], ocgt_vom=reg["ocgt_vom"], efficiency_factor=factor)
+        ccgt_vom=reg["ccgt_vom"], ocgt_vom=reg["ocgt_vom"], gas_co2=reg["gas_co2_intensity"], efficiency_factor=factor)
 
 
 def main():
@@ -132,6 +151,8 @@ def main():
     m1, _ = dispatch_network(calibrated_fleet(n, reg, 1.0), reg, reshape=True)
     factor = target / gas_efficiency(m1)
     print(f"\nfitted efficiency factor for existing gas units: {factor:.4f}")
+    if abs(factor - reg["existing_gas_efficiency_factor"]) > 0.001:  # Phase 4 reads the register value
+        print(f"WARNING: register existing_gas_efficiency_factor = {reg['existing_gas_efficiency_factor']}; update it")
 
     cal = calibrated_fleet(n, reg, factor)
     rows += capacity_rows("calibrated", cal, reg)

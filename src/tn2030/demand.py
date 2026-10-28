@@ -25,6 +25,8 @@ def reshape_profile(profile: pd.Series, weights: pd.Series, load_factor: float, 
     """
     if not min_to_peak < load_factor < 1:
         raise ValueError(f"load factor {load_factor} must lie between min_to_peak {min_to_peak} and 1")
+    if profile.max() == profile.min():
+        raise ValueError("cannot reshape a constant profile: it has no peaks or troughs to stretch")
     x = (profile - profile.min()) / (profile.max() - profile.min())
 
     def shape(k):
@@ -37,7 +39,10 @@ def reshape_profile(profile: pd.Series, weights: pd.Series, load_factor: float, 
     for _ in range(100):  # bisection on a log scale
         mid = (lo * hi) ** 0.5
         lo, hi = (mid, hi) if mean_over_peak(mid) > load_factor else (lo, mid)
-    return scale_profile(shape((lo * hi) ** 0.5), weights, (profile * weights).sum())
+    k = (lo * hi) ** 0.5
+    if abs(mean_over_peak(k) - load_factor) > 1e-6:  # target outside what k in [0.001, 1000] can reach
+        raise ValueError(f"could not reach load factor {load_factor} (got {mean_over_peak(k):.4f})")
+    return scale_profile(shape(k), weights, (profile * weights).sum())
 
 
 def subtract_imports(profile: pd.Series, weights: pd.Series, annual_imports_mwh: float) -> pd.Series:
