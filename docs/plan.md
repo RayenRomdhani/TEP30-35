@@ -202,7 +202,7 @@ Verify: TN-only buses; ≥ 1 gas generator; annual load > 0.
 
 - [x] **Step 1:** Solve the base network as-is at 3 H and at 1 H (same config otherwise). Record solve time and peak RAM.
 - [x] **Step 2:** Present both numbers to the author with a recommendation. **Their decision** sets the resolution for all scenarios; record it in the spec's D11 and in `docs/config-changes.md`.
-- [ ] **Step 3:** Commit, then **Phase gate**. Evidence: run logs, network summary, config-change log, benchmark table.
+- [x] **Step 3:** Commit, then **Phase gate**. Evidence: run logs, network summary, config-change log, benchmark table.
 
 ---
 
@@ -230,7 +230,7 @@ Use the `anthropic-skills:pdf` skill for STEG / ANME / IRENA reports, and `super
   - `subtract_imports(profile: pd.Series, weights: pd.Series, annual_imports_mwh: float) -> pd.Series` (flat MW = imports / weights.sum(); `ValueError` "negative" if any value < 0)
   - `peak_check(profile: pd.Series, reference_mw: float, tolerance: float = 0.10) -> tuple[float, bool]`
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 ```python
 def test_annual_demand_2030_compounds_growth():
     assert annual_demand_2030(20.0, 0.037) == pytest.approx(20.0 * 1.037**6)
@@ -248,10 +248,10 @@ def test_peak_check_flags_outside_tolerance():
     assert peak_check(pd.Series([5000.0, 6700.0]), 6000) == (6700.0, False)
     assert peak_check(pd.Series([5000.0, 6300.0]), 6000) == (6300.0, True)
 ```
-- [ ] **Step 2:** Run `pytest tests/test_demand.py -v`. Expected: 5 FAIL.
-- [ ] **Step 3:** Implement the four functions.
-- [ ] **Step 4:** Run. Expected: 5 passed.
-- [ ] **Step 5:** Commit: `git commit -m "feat: add 2030 demand calibration functions"`
+- [x] **Step 2:** Run `pytest tests/test_demand.py -v`. Expected: 5 FAIL.
+- [x] **Step 3:** Implement the four functions.
+- [x] **Step 4:** Run. Expected: 5 passed.
+- [x] **Step 5:** Commit: `git commit -m "feat: add 2030 demand calibration functions"`
 
 ### Task 10: Baseline validation
 
