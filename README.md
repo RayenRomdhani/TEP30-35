@@ -135,12 +135,18 @@ The study ran on Windows 11 (i3-1215U, 24 GB RAM). `environment.yml` pins Window
    ```bash
    pytest
    ```
-6. Run the 11 scenarios (about 1 hour), then draw the figures:
+6. Run the 11 scenarios (about 1 hour), then draw the figures and write the report and slides (`report/`):
    ```bash
    snakemake -j 1
    ```
    ```bash
    python scripts/make_figures.py
+   ```
+   ```bash
+   python scripts/make_report.py
+   ```
+   ```bash
+   python scripts/make_deck.py
    ```
 
 ## Tests

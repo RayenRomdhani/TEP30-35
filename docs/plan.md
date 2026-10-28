@@ -522,12 +522,12 @@ Verify: 9 PNGs exist; inspect each visually.
 
 **Files:** Create `README.md`, `environment.yml`, `report/report.docx`, `report/deck.pptx`
 
-- [ ] **Step 1:** `conda env export -n pypsa-earth --from-history > environment.yml`; add the PyPSA-Earth tag and `pip install -e .` line to README.
+- [x] **Step 1:** `conda env export -n pypsa-earth --from-history > environment.yml`; add the PyPSA-Earth tag and `pip install -e .` line to README.
 Verify: README "How to reproduce" steps run from a clean clone up to `pytest` passing.
-- [ ] **Step 2:** `README.md` (`technical-writing-guide`, then `humanizer`): question, method, assumptions (link to register), results (headline table + figure), limitations (programme costs not modelled, R1 resolution, secondary sources R6/R7, flat imports), how to reproduce.
-- [ ] **Step 3:** `report/report.docx` via `anthropic-skills:docx`; `report/deck.pptx` (6–8 slides) via `presentation-builder` + `anthropic-skills:pptx`. Numbers are pulled only from `results/*.csv`.
-- [ ] **Step 4:** `test-coverage-analyzer` on `src/tn2030`; record the coverage figure in the README.
-- [ ] **Step 5:** Commit: `git commit -m "docs: add README, environment, report and deck"`
+- [x] **Step 2:** `README.md` (`technical-writing-guide`, then `humanizer`): question, method, assumptions (link to register), results (headline table + figure), limitations (programme costs not modelled, R1 resolution, secondary sources R6/R7, flat imports), how to reproduce.
+- [x] **Step 3:** `report/report.docx` via `anthropic-skills:docx`; `report/deck.pptx` (6–8 slides) via `presentation-builder` + `anthropic-skills:pptx`. Numbers are pulled only from `results/*.csv`.
+- [x] **Step 4:** `test-coverage-analyzer` on `src/tn2030`; record the coverage figure in the README.
+- [x] **Step 5:** Commit: `git commit -m "docs: add README, environment, report and deck"`
 
 ### Task 19: Reusable skill
 

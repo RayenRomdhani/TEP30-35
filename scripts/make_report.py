@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))  # this che
 import pandas as pd
 from docx import Document
 from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.oxml.ns import qn
 from docx.shared import Cm, Pt, RGBColor
 
 from tn2030.register import load_register
@@ -88,6 +89,9 @@ def main() -> None:
     doc.styles["Normal"].font.size = Pt(11)
     for section in doc.sections:
         section.left_margin = section.right_margin = Cm(2.2)
+    zoom = doc.settings.element.find(qn("w:zoom"))
+    if zoom is not None:  # python-docx's template omits this attribute, which the Word schema requires
+        zoom.set(qn("w:percent"), "100")
 
     doc.add_heading("The value of energy efficiency in Tunisia's power system (2030)", level=0)
     para(doc, "Rayen Romdhani, Energy Engineering, ENIM (Monastir, Tunisia). October 2026.")
