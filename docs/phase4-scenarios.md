@@ -100,7 +100,7 @@ All figures are from `results/summary.csv` and `results/avoided.csv`. They descr
 | New batteries (MW) | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 | Gas burnt (TWh_th) | 21.55 | 19.09 | 17.83 | 16.60 | 17.09 | 16.63 | 15.89 |
 | CO2 (Mt) | 4.27 | 3.78 | 3.53 | 3.29 | 3.38 | 3.29 | 3.15 |
-| Renewable share | 56% | 56% | 56% | 56% | 58% | 59% | 60% |
+| Renewable share | 56% | 56% | 56% | 56% | 57% | 58% | 60% |
 | System cost (M EUR/yr) | 1,327 | 1,157 | 1,084 | 1,012 | 1,073 | 1,062 | 1,045 |
 | Average price (EUR/MWh) | 54.7 | 54.2 | 53.5 | 52.8 | 53.1 | 52.5 | 51.9 |
 
