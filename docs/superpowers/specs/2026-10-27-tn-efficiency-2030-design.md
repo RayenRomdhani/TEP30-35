@@ -29,11 +29,11 @@ system. If a sourced ANME programme cost is found, it is compared against this v
 | # | Decision | Choice |
 |---|---|---|
 | D1 | Capacity | **Brownfield capacity expansion.** Existing plants + committed projects are fixed; the optimizer builds new gas (CCGT, OCGT), solar PV, onshore wind and Li-ion batteries at least cost. Avoided capacity = difference in what gets built. |
-| D2 | 2030 demand | **2024 actual demand × (1 + g)^6.** 2024 demand from Ember / ONEM (generation + net imports). Growth rate g from a cited source (currently 3.7%/yr, REGlobal; replaced by STEG master plan figure if obtained). Hourly shape from PyPSA-Earth, scaled to the annual total. Resulting peak checked against the ~6,000 MW 2030 estimate (warning, not a hard fail). |
+| D2 | 2030 demand | **2024 actual demand × (1 + g)^6.** 2024 demand from ONEM (22.51 TWh; Ember kept as a cross-check). Growth rate g = 3.2%/yr, STEG's base-case forecast (JICA 2022), chosen 2026-10-28 over REGlobal's unsourced 3.7%. Hourly shape from PyPSA-Earth, **reshaped** to the official load factor and minimum/peak ratio (Phase 3, `docs/phase3-validation.md`), then scaled to the annual total. Resulting peak checked against STEG's 6,000 MW 2030 forecast (warning, not a hard fail). |
 | D3 | Imports | **Fixed at the cited 2024 import volume**, flat hourly profile, subtracted from demand. Identical in all scenarios, so efficiency only reduces domestic generation. |
 | D4 | Efficiency | **Main runs: uniform cut** of every hour by 10 / 15 / 20%. **Sensitivity at -15%: cooling-weighted** (same annual MWh saved, concentrated on the cooling component, see §5.2). |
 | D5 | Flexibility | **Shiftable load** capped at 300 MW, shift up to 3 h, energy-neutral each day. Sensitivity at 600 MW. Batteries are extendable in **all** scenarios, so scenario 3 isolates the extra value of demand shifting. |
-| D6 | Existing fleet | PyPSA-Earth existing plants (validated against STEG in Phase 3) **+ committed projects** (under construction or signed contract, each with a cited source). Announced-only projects are excluded. |
+| D6 | Existing fleet | **ONEM 2024 thermal fleet by type** (2,527 MW combined cycle; 2,457 MW gas turbines + 660 MW steam), replacing PyPSA-Earth's labels after the Phase 3 validation, with one fitted efficiency factor for existing gas units; PyPSA-Earth's renewables and hydro **+ committed projects** (under construction or signed contract, each with a cited source). Announced-only projects are excluded. Steam units are kept in 2030 (author, 2026-10-28). |
 | D7 | Technology costs | PyPSA `technology-data`, 2030 values, version shipped with the pinned PyPSA-Earth. Every value copied into the register. |
 | D8 | Gas price | **Economic (opportunity) cost**, not STEG's subsidised tariff. Base value from technology-data; **±50% sensitivity** (labelled assumption). |
 | D9 | CO2 | **Reported, not priced** (no carbon price in Tunisia). Emission factor from technology-data. |
@@ -61,7 +61,7 @@ Core: 11 solves. Each scenario is one small YAML file in `config/scenarios/`.
 ### 5.1 Demand calibration
 1. `D2024` = annual demand 2024 (TWh), source in register.
 2. `D2030 = D2024 × (1 + g)^6`.
-3. Scale PyPSA-Earth's hourly profile so its annual sum equals `D2030`.
+3. Reshape PyPSA-Earth's hourly profile to the 2024 load factor (ONEM) and STEG's minimum/peak ratio, keeping each hour's rank (Phase 3 calibration), then scale it so its annual sum equals `D2030`.
 4. Apply the scenario's efficiency cut (§5.2 or uniform) to this **total** demand profile.
 5. Subtract the flat import profile `I2024 / 8760` from every hour. The result is the domestic load the model must
    serve. Because imports are the same in every scenario, all savings fall on domestic generation.

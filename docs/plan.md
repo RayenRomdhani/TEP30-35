@@ -202,7 +202,7 @@ Verify: TN-only buses; ≥ 1 gas generator; annual load > 0.
 
 - [x] **Step 1:** Solve the base network as-is at 3 H and at 1 H (same config otherwise). Record solve time and peak RAM.
 - [x] **Step 2:** Present both numbers to the author with a recommendation. **Their decision** sets the resolution for all scenarios; record it in the spec's D11 and in `docs/config-changes.md`.
-- [ ] **Step 3:** Commit, then **Phase gate**. Evidence: run logs, network summary, config-change log, benchmark table.
+- [x] **Step 3:** Commit, then **Phase gate**. Evidence: run logs, network summary, config-change log, benchmark table.
 
 ---
 
@@ -214,10 +214,10 @@ Verify: TN-only buses; ≥ 1 gas generator; annual load > 0.
 
 Use the `anthropic-skills:pdf` skill for STEG / ANME / IRENA reports, and `superpowers:dispatching-parallel-agents` to search independent sources in parallel. Read Ember's own Tunisia data directly (risk R7).
 
-- [ ] **Step 1:** Fill the pending register rows: `demand_2024_twh`, `imports_2024_twh`, `gas_price_eur_per_mwh_th` (from the technology-data version used by PyPSA-Earth). Add validation rows: `cap_2024_<carrier>_mw` (STEG), `gen_2024_<carrier>_twh` and `gas_share_2024` (Ember). Each has a URL and access date; disagreements get a `notes` line. If a sourced ANME efficiency programme cost exists, add `ee_programme_cost_eur_per_mwh` (compared with the headline value in the report, spec §1); if none is found, say so in the README limitations.
-- [ ] **Step 2:** `data/committed_projects.csv` with columns `name, carrier, p_nom_mw, e_nom_mwh, bus, status, source_url`. `status` ∈ {`under_construction`, `signed_contract`}; announced-only projects are not included (spec D6). `bus` = nearest base-network bus to the site.
-- [ ] **Step 3:** `python -c "from tn2030.register import load_register; r = load_register('data/assumptions_register.xlsx'); print(r['demand_2024_twh'], r['imports_2024_twh'])"` prints two numbers.
-- [ ] **Step 4:** Commit: `git commit -m "data: add sourced 2024 inputs and committed projects"`
+- [x] **Step 1:** Fill the pending register rows: `demand_2024_twh`, `imports_2024_twh`, `gas_price_eur_per_mwh_th` (from the technology-data version used by PyPSA-Earth). Add validation rows: `cap_2024_<carrier>_mw` (STEG), `gen_2024_<carrier>_twh` and `gas_share_2024` (Ember). Each has a URL and access date; disagreements get a `notes` line. If a sourced ANME efficiency programme cost exists, add `ee_programme_cost_eur_per_mwh` (compared with the headline value in the report, spec §1); if none is found, say so in the README limitations.
+- [x] **Step 2:** `data/committed_projects.csv` with columns `name, carrier, p_nom_mw, e_nom_mwh, bus, status, source_url`. `status` ∈ {`under_construction`, `signed_contract`}; announced-only projects are not included (spec D6). `bus` = nearest base-network bus to the site. *As built:* extra columns `governorate, cod_expected, notes`; a third status `operating_since_2025/2026` for plants that came online after the 2024 fleet; `bus` = the bus region holding most of the governorate's area (method in `data/raw/SOURCES.md`), since no source gives site coordinates.
+- [x] **Step 3:** `python -c "from tn2030.register import load_register; r = load_register('data/assumptions_register.xlsx'); print(r['demand_2024_twh'], r['imports_2024_twh'])"` prints two numbers.
+- [x] **Step 4:** Commit: `git commit -m "data: add sourced 2024 inputs and committed projects"`
 
 ### Task 9: Demand module
 
@@ -230,7 +230,7 @@ Use the `anthropic-skills:pdf` skill for STEG / ANME / IRENA reports, and `super
   - `subtract_imports(profile: pd.Series, weights: pd.Series, annual_imports_mwh: float) -> pd.Series` (flat MW = imports / weights.sum(); `ValueError` "negative" if any value < 0)
   - `peak_check(profile: pd.Series, reference_mw: float, tolerance: float = 0.10) -> tuple[float, bool]`
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 ```python
 def test_annual_demand_2030_compounds_growth():
     assert annual_demand_2030(20.0, 0.037) == pytest.approx(20.0 * 1.037**6)
@@ -248,10 +248,10 @@ def test_peak_check_flags_outside_tolerance():
     assert peak_check(pd.Series([5000.0, 6700.0]), 6000) == (6700.0, False)
     assert peak_check(pd.Series([5000.0, 6300.0]), 6000) == (6300.0, True)
 ```
-- [ ] **Step 2:** Run `pytest tests/test_demand.py -v`. Expected: 5 FAIL.
-- [ ] **Step 3:** Implement the four functions.
-- [ ] **Step 4:** Run. Expected: 5 passed.
-- [ ] **Step 5:** Commit: `git commit -m "feat: add 2030 demand calibration functions"`
+- [x] **Step 2:** Run `pytest tests/test_demand.py -v`. Expected: 5 FAIL.
+- [x] **Step 3:** Implement the four functions.
+- [x] **Step 4:** Run. Expected: 5 passed.
+- [x] **Step 5:** Commit: `git commit -m "feat: add 2030 demand calibration functions"`
 
 ### Task 10: Baseline validation
 
@@ -260,9 +260,9 @@ def test_peak_check_flags_outside_tolerance():
 **Interfaces:**
 - Consumes: the base network, `load_register`, `scale_profile`, `subtract_imports`.
 
-- [ ] **Step 1:** Script: (a) compare existing `p_nom` by carrier in the base network with `cap_2024_*` rows; (b) copy the network, freeze all capacities (`p_nom_extendable = False`), scale load to 2024 demand minus 2024 imports, solve a dispatch-only run, compare generation by carrier and gas share with `gen_2024_*` and `gas_share_2024`. Write `results/validation.csv` with columns `metric, model, reference, diff_pct, source`.
+- [x] **Step 1:** Script: (a) compare existing `p_nom` by carrier in the base network with `cap_2024_*` rows; (b) copy the network, freeze all capacities (`p_nom_extendable = False`), scale load to 2024 demand minus 2024 imports, solve a dispatch-only run, compare generation by carrier and gas share with `gen_2024_*` and `gas_share_2024`. Write `results/validation.csv` with columns `metric, model, reference, diff_pct, source`.
 Verify: `python scripts/validate_baseline.py` writes the CSV with one row per compared metric.
-- [ ] **Step 2:** `docs/phase3-validation.md`: comparison table, explanation of each gap > 10%, and each calibration (what changed, why, source). Calibrations go into `config/tn_base.yaml` or the register, never as unexplained edits to the network.
+- [x] **Step 2:** `docs/phase3-validation.md`: comparison table, explanation of each gap > 10%, and each calibration (what changed, why, source). Calibrations go into `config/tn_base.yaml` or the register, never as unexplained edits to the network.
 - [ ] **Step 3:** Commit, then **Phase gate**. Evidence: validation table, explained gaps, calibration log.
 
 ---
@@ -416,12 +416,18 @@ def test_sanity_check_fails_on_missing_committed(solved_toy):
 **Files:** Create `src/tn2030/scenario.py`, `tests/test_scenario.py`, `config/scenarios/*.yaml` (11 files)
 
 **Interfaces:**
-- Consumes: Tasks 9, 11, 12.
+- Consumes: Tasks 9, 10 (calibrations), 11, 12.
 - Produces:
+  - `calibrate_base(n_base: pypsa.Network, register: dict[str, float]) -> pypsa.Network` (copy). Applies the Phase 3 calibrations (see `docs/phase3-validation.md`):
+    - `fleet.rebuild_thermal_fleet` with the ONEM capacities (steam counted with OCGT) and `existing_gas_efficiency_factor`;
+    - `fleet.add_ocgt_candidates`, with capital cost = annuity(`discount_rate`, `ocgt_lifetime`) × `ocgt_investment` + FOM;
+    - existing solar and onwind floor `p_nom_min = p_nom` (PyPSA-Earth's 2024 estimate, incl. the IRENA top-up the validation run used).
+    The toy fixture has no existing gas, so scenario unit tests call `build_scenario(..., calibrate=False)`; the calibration functions have their own tests.
   - `load_scenario(path: Path) -> dict` validating keys `name, reference, efficiency.share, efficiency.mode ∈ {uniform, cooling}, flexibility.p_max_mw, gas_price_factor` (`ValueError` naming the bad key)
   - `apply_committed(n: pypsa.Network, committed: pd.DataFrame) -> None`: raises `p_nom_min` (and `p_nom` floor) of the extendable component with the same `carrier` and `bus` by `p_nom_mw`; `ValueError` if none exists
   - `scale_gas_cost(n: pypsa.Network, factor: float, gas_price_eur_per_mwh_th: float) -> None`: for carriers `CCGT`, `OCGT`, `marginal_cost += (factor − 1) × price / efficiency`
-  - `build_scenario(n_base: pypsa.Network, scenario: dict, register: dict[str, float], committed: pd.DataFrame) -> pypsa.Network` (returns a copy). Order fixed by spec §5.1: scale total load to `annual_demand_2030` split by base bus shares → efficiency cut → subtract imports split by the same shares → `apply_committed` → `scale_gas_cost` → `add_shiftable_load` if `p_max_mw > 0`.
+  - `build_scenario(n_base: pypsa.Network, scenario: dict, register: dict[str, float], committed: pd.DataFrame, calibrate: bool = True) -> pypsa.Network` (returns a copy). Order fixed by spec §5.1: `calibrate_base` (if `calibrate`) → reshape total load with `demand.reshape_profile` (load factor = `demand_2024_twh` / 8,784 h / `peak_2024_mw`, `min_to_peak_2030`) → scale to `annual_demand_2030` split by base bus shares → efficiency cut → subtract imports split by the same shares → `apply_committed` (all rows of `data/committed_projects.csv`, including `operating_since_*`) → `scale_gas_cost` (existing and new CCGT/OCGT) → `add_shiftable_load` if `p_max_mw > 0`.
+  - Sensitivity to decide with the author in Phase 4: the fitted efficiency factor also absorbs outages, and the marginal gas unit drives the headline metric (see `docs/phase3-validation.md`, gap 2).
 
 Scenario files (`reference` is the scenario it is compared against):
 
