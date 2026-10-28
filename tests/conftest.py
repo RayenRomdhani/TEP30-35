@@ -45,6 +45,28 @@ def toy_network_cheap_gas(toy_network):
 
 
 @pytest.fixture
+def pe_battery_network(toy_network):
+    """Toy network with the battery built the PyPSA-Earth way: a Store charged and discharged through Links.
+
+    As in PyPSA-Earth, the whole inverter cost sits on the charger; the discharger is free.
+    """
+    n = toy_network
+    cost = n.storage_units.at["battery", "capital_cost"]
+    eff = n.storage_units.at["battery", "efficiency_store"]
+    n.remove("StorageUnit", "battery")
+    n.add("Bus", "TN battery", carrier="battery")
+    n.add("Store", "TN battery", bus="TN battery", carrier="battery", e_nom_extendable=True, e_cyclic=True,
+          capital_cost=cost / 4)  # rough: storage part per MWh, enough for the test
+    n.add("Carrier", "battery charger")
+    n.add("Carrier", "battery discharger")
+    n.add("Link", "TN battery charger", bus0="TN", bus1="TN battery", carrier="battery charger", efficiency=eff,
+          p_nom_extendable=True, capital_cost=cost / 2)
+    n.add("Link", "TN battery discharger", bus0="TN battery", bus1="TN", carrier="battery discharger",
+          efficiency=eff, p_nom_extendable=True, capital_cost=0.0)
+    return n
+
+
+@pytest.fixture
 def two_bus_network():
     """Two buses whose loads are in the ratio 3:1 over the day."""
     n = pypsa.Network()

@@ -7,8 +7,7 @@ import pandas as pd
 import pypsa
 
 from tn2030.constraints import NOT_GENERATION
-
-GAS = ("CCGT", "OCGT")
+from tn2030.fleet import GAS
 
 
 def summarize(n: pypsa.Network) -> pd.Series:
@@ -44,7 +43,8 @@ def summarize(n: pypsa.Network) -> pd.Series:
     load = n.get_switchable_as_dense("Load", "p_set")
     out["demand_twh"] = load.mul(w, axis=0).sum().sum() / 1e6  # domestic load only; imports cancel in differences
 
-    # Cost (M EUR) and the load-weighted average of the bus price (the energy-balance dual, EUR/MWh).
+    # Cost (M EUR) and the average bus price (the energy-balance dual, EUR/MWh), weighted by the planned
+    # load p_set (before any demand shifting).
     out["system_cost_meur"] = (n.statistics.capex().sum() + n.statistics.opex().sum()) / 1e6
     price = n.buses_t.marginal_price[n.loads.bus].set_axis(load.columns, axis=1)
     out["avg_price_eur_mwh"] = (price * load).mul(w, axis=0).sum().sum() / load.mul(w, axis=0).sum().sum()

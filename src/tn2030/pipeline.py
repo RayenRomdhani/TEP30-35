@@ -23,17 +23,18 @@ def build_step(base_path: Path, scenario_path: Path, register_path: Path, commit
 
 
 def solve_step(in_path: Path, out_path: Path, register_path: Path, committed_path: Path) -> None:
-    """Solve with the 35% renewable target, then run the sanity checks (an error stops the pipeline)."""
+    """Solve with the 35% renewable target and STEG's reserve margin, then run the sanity checks."""
     r = load_register(register_path)
     n = pypsa.Network(str(in_path))
     start = time.time()
-    solve_network(n, r["re_target_2030"])
+    solve_network(n, r["re_target_2030"], reserve_margin=r["reserve_margin"])
     minutes = (time.time() - start) / 60
 
     # The model's load is domestic (imports removed as a flat flow), so compare its peak on the same basis.
     hours = n.snapshot_weightings.generators.sum()
     peak_ref = r["peak_ref_2030_mw"] - r["imports_2024_twh"] * 1e6 / hours
-    warnings = sanity_check(n, r["re_target_2030"], pd.read_csv(committed_path), peak_ref)
+    warnings = sanity_check(n, r["re_target_2030"], pd.read_csv(committed_path), peak_ref,
+                            reserve_margin=r["reserve_margin"])
     for w in warnings:
         print("WARNING:", w)
     Path(f"{out_path}.warnings.txt").write_text(
@@ -47,7 +48,8 @@ def summarize_step(solved_paths: list[Path], scenario_paths: list[Path], summary
     for solved, scen_path in zip(solved_paths, scenario_paths):
         scen = load_scenario(scen_path)
         n = pypsa.Network(str(solved))
-        rows[scen["name"]] = pd.concat([summarize(n), pd.Series({"res_share": res_share(n)})])
+        extra = {"res_share": res_share(n), "cooling_share": n.meta.get("cooling_share", 0.0)}
+        rows[scen["name"]] = pd.concat([summarize(n), pd.Series(extra)])
         refs[scen["name"]] = scen["reference"]
     summary = pd.DataFrame(rows).T.fillna(0.0)  # a technology not built in one scenario shows as 0
     summary.index.name = "scenario"

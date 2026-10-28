@@ -84,3 +84,10 @@ def test_calibrate_base_on_real_network(reg):  # integration: the Phase 3 calibr
     assert (g.carrier[g.index.str.endswith("OCGT new")] == "OCGT").sum() == 2  # one new-build OCGT per bus
     solar = g[(g.carrier == "solar") & g.p_nom_extendable]
     assert (solar.p_nom_min == solar.p_nom).all()  # existing 2024 solar is kept
+
+
+@pytest.mark.skipif(not BASE.exists(), reason="needs the PyPSA-Earth base network on D:")
+def test_cooling_scenario_records_its_cooling_share(reg):  # spec §5.2 step 4: the share is reported
+    scen = load_scenario(ROOT / "config" / "scenarios" / "S1-15C.yaml")
+    n = build_scenario(pypsa.Network(str(BASE)), scen, reg, NO_COMMITTED)
+    assert 0 < n.meta["cooling_share"] < 1

@@ -33,4 +33,5 @@ def test_pipeline_end_to_end_on_toy(tmp_path, toy_network):
     assert summary.loc["S1-15", "demand_twh"] < summary.loc["S0", "demand_twh"]
     assert avoided.loc["S1-15", "cost_eur_per_mwh"] > 0
     assert list(avoided.index) == ["S1-15"]  # S0 is its own reference: skipped
+    assert (summary["cooling_share"] == 0).all()  # uniform cuts put nothing specifically on cooling
     assert (tmp_path / "S0_solved.nc.warnings.txt").exists()

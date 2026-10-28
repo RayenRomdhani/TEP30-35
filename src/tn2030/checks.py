@@ -3,11 +3,11 @@
 import pandas as pd
 import pypsa
 
-from tn2030.constraints import NOT_GENERATION, res_share
+from tn2030.constraints import FIRM_CARRIERS, NOT_GENERATION, res_share
 
 
 def sanity_check(n: pypsa.Network, res_share_min: float, committed: pd.DataFrame, peak_ref_mw: float,
-                 tolerance: float = 0.10) -> list[str]:
+                 reserve_margin: float | None = None, tolerance: float = 0.10) -> list[str]:
     """Raise AssertionError if the solution is broken; return warnings that need a look but are not errors.
 
     peak_ref_mw is compared with the model's load, so pass the reference on the same basis (domestic load).
@@ -15,18 +15,29 @@ def sanity_check(n: pypsa.Network, res_share_min: float, committed: pd.DataFrame
     w = n.snapshot_weightings.generators
     load = n.get_switchable_as_dense("Load", "p_set")
     demand = load.mul(w, axis=0).sum().sum()
+    g = n.generators
 
-    slack = n.generators.index[n.generators.carrier.isin(NOT_GENERATION)]
+    slack = g.index[g.carrier.isin(NOT_GENERATION)]
     shed = n.generators_t.p.reindex(columns=slack, fill_value=0.0).mul(w, axis=0).sum().sum()
     assert shed <= 1e-6, f"load shedding used: {shed:,.0f} MWh of demand not met"
 
     share = res_share(n)
     assert share >= res_share_min - 1e-6, f"renewable share {share:.3f} below the target {res_share_min:.3f}"
 
+    # Committed projects: each extendable generator keeps its floor (existing + committed), and every committed
+    # carrier/bus has at least the committed MW built.
+    below = g.index[g.p_nom_extendable & (g.p_nom_opt < g.p_nom_min - 1e-3)]
+    assert len(below) == 0, f"committed or existing capacity not kept: {list(below)}"
     for (carrier, bus), mw in committed.groupby(["carrier", "bus"]).p_nom_mw.sum().items():
         installed = sum(df.p_nom_opt[(df.carrier == carrier) & (df.bus == bus)].sum()
-                        for df in (n.generators, n.storage_units))
+                        for df in (g, n.storage_units))
         assert installed >= mw - 1e-3, f"committed {carrier} at {bus}: {mw:,.0f} MW required, {installed:,.0f} MW built"
+
+    if reserve_margin is not None:
+        firm = (g.p_nom_opt[g.carrier.isin(FIRM_CARRIERS)].sum()
+                + n.storage_units.p_nom_opt[n.storage_units.carrier.isin(FIRM_CARRIERS)].sum())
+        need = (1 + reserve_margin) * load.sum(axis=1).max()
+        assert firm >= need - 1e-3, f"reserve margin: {firm:,.0f} MW firm, {need:,.0f} MW needed"
 
     # Whole-system energy balance: production + storage output - link losses = demand.
     supply = (n.generators_t.p.mul(w, axis=0).sum().sum()

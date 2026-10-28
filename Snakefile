@@ -12,6 +12,7 @@ configfile: "config/pipeline.yaml"
 SCENARIOS = sorted(p.stem for p in Path("config/scenarios").glob("*.yaml"))
 REGISTER = "data/assumptions_register.xlsx"
 COMMITTED = "data/committed_projects.csv"
+CODE = sorted(str(p) for p in Path("src/tn2030").glob("*.py"))  # a code change re-runs builds and solves
 
 
 rule all:
@@ -26,6 +27,7 @@ rule build_scenario:
         scenario="config/scenarios/{s}.yaml",
         register=REGISTER,
         committed=COMMITTED,
+        code=CODE,
     output:
         "results/networks/{s}_built.nc",
     run:
@@ -38,6 +40,7 @@ rule solve:
         network="results/networks/{s}_built.nc",
         register=REGISTER,
         committed=COMMITTED,
+        code=CODE,
     output:
         "results/networks/{s}_solved.nc",
     run:

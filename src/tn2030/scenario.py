@@ -8,13 +8,12 @@ import yaml
 
 from tn2030.demand import annual_demand_2030, reshape_profile, scale_profile, subtract_imports
 from tn2030.efficiency import cooling_weighted_cut, uniform_cut
-from tn2030.fleet import add_ocgt_candidates, rebuild_thermal_fleet
+from tn2030.fleet import GAS, add_ocgt_candidates, rebuild_thermal_fleet
 from tn2030.flexibility import add_shiftable_load
 from tn2030.toy import HOURS_PER_YEAR, annualised_capex
 
 MODES = ("uniform", "cooling")
 HOURS_2024 = 8784  # 2024 was a leap year
-GAS = ("CCGT", "OCGT")
 
 
 def load_scenario(path: Path) -> dict:
@@ -61,8 +60,9 @@ def apply_committed(n: pypsa.Network, committed: pd.DataFrame) -> None:
     g = n.generators
     for _, row in committed.iterrows():
         match = g.index[(g.carrier == row.carrier) & (g.bus == row.bus) & g.p_nom_extendable]
-        if len(match) == 0:
-            raise ValueError(f"no extendable {row.carrier} generator at bus {row.bus} for a committed project")
+        if len(match) != 1:
+            raise ValueError(f"no extendable {row.carrier} generator at bus {row.bus} for a committed project"
+                             if len(match) == 0 else f"several extendable {row.carrier} generators at bus {row.bus}")
         name = match[0]
         g.at[name, "p_nom_min"] += row.p_nom_mw
         g.at[name, "p_nom"] = max(g.at[name, "p_nom"], g.at[name, "p_nom_min"])
@@ -91,8 +91,10 @@ def build_scenario(n_base: pypsa.Network, scenario: dict, register: dict[str, fl
     share = scenario["efficiency"]["share"]
     if scenario["efficiency"]["mode"] == "uniform":
         total = uniform_cut(total, share)
+        n.meta["cooling_share"] = 0.0
     else:
-        total, _ = cooling_weighted_cut(total, w, share)
+        total, on_cooling = cooling_weighted_cut(total, w, share)
+        n.meta["cooling_share"] = on_cooling  # share of the saving that fits on the cooling load (spec §5.2)
     domestic = subtract_imports(total, w, r["imports_2024_twh"] * 1e6)
     n.loads_t.p_set = base_load.div(base_load.sum(axis=1), axis=0).mul(domestic, axis=0)
 
