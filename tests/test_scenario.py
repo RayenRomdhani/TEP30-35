@@ -67,6 +67,18 @@ def test_load_scenario_rejects_bad_mode(tmp_path):
         load_scenario(path)
 
 
+@pytest.mark.parametrize("drop, message", [("reference", "'reference'"), ("efficiency.share", "efficiency.share"),
+                                           ("flexibility.p_max_mw", "flexibility.p_max_mw")])
+def test_load_scenario_names_the_missing_key(tmp_path, drop, message):
+    scen = {**S1_15, "efficiency": dict(S1_15["efficiency"]), "flexibility": dict(S1_15["flexibility"])}
+    *parents, key = drop.split(".")
+    (scen[parents[0]] if parents else scen).pop(key)
+    path = tmp_path / "bad.yaml"
+    path.write_text(yaml.safe_dump(scen))
+    with pytest.raises(ValueError, match=message):
+        load_scenario(path)
+
+
 def test_all_scenario_files_load():
     assert len([load_scenario(p) for p in (ROOT / "config" / "scenarios").glob("*.yaml")]) == 11
 

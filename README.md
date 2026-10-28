@@ -145,4 +145,12 @@ The study ran on Windows 11 (i3-1215U, 24 GB RAM). `environment.yml` pins Window
 
 ## Tests
 
-89 tests check the study code. Most run on a 2-day network at 3-hour steps, which also catches energy sums that forget the snapshot weighting. Two integration tests run on the real Tunisia network.
+93 tests check the study code. Most run on a 2-day network at 3-hour steps, which also catches energy sums that forget the snapshot weighting. Two integration tests run on the real Tunisia network.
+
+Test coverage of `src/tn2030` is 98% (lines and branches together, measured with pytest-cov on 2026-10-28):
+
+```bash
+pytest --cov=tn2030 --cov-branch --cov-report=term-missing
+```
+
+The 5 lines not covered are error branches that need a failing solver or an unreachable target, and the figure-size helper used only by `scripts/make_figures.py`.

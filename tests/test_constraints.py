@@ -20,6 +20,17 @@ def test_solve_network_enforces_35pct(toy_network_cheap_gas):
     assert res_share(toy_network_cheap_gas) >= 0.35 - 1e-6
 
 
+def test_res_constraint_counts_hydro_dam_output(toy_network_cheap_gas):  # Tunisia has a hydro StorageUnit
+    n = toy_network_cheap_gas
+    n.add("Carrier", "hydro")
+    n.add("StorageUnit", "hydro", bus="TN", carrier="hydro", p_nom=400, max_hours=6, inflow=300,
+          cyclic_state_of_charge=True)
+    solve_network(n, 0.35)
+    assert n.storage_units_t.p_dispatch["hydro"].sum() > 0
+    # Binding at exactly 35% only if hydro is on both sides; without it, the share with hydro would be higher.
+    assert res_share(n) == pytest.approx(0.35, abs=1e-4)
+
+
 def test_res_constraint_raises_when_no_carrier_matches(toy_network):  # e.g. "wind" instead of "onwind"
     with pytest.raises(ValueError, match="carrier"):
         solve_network_with(toy_network, res_carriers=("wind",))

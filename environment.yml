@@ -462,6 +462,9 @@ dependencies:
   - zstandard=0.23.0=py311he736701_2
   - zstd=1.5.7=hbeecb71_2
   - openjdk
+  - python-pptx
+  - python-docx
+  - pytest-cov
   - pip
   - pip:  # installed by PyPSA-Earth's own setup with pip (versions from this environment)
     - atlite==0.4.1

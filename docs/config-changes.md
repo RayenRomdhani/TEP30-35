@@ -13,6 +13,7 @@ Every install step and every change to PyPSA-Earth's configuration, with the rea
 | 2026-10-27 | `pytest`, `openpyxl` | already in the lock file; conda updated pytest 8.4.1 → 9.1.1 and rebuilt openpyxl 3.1.5 | same env | Tests; reading the assumptions register |
 | 2026-10-27 | Side effects of the extras install | openssl 3.5.2 → 3.6.5, certifi/ca-certificates → 2026.10.23, docutils 0.22.4 → 0.22 | same env | Pulled in by conda's solver; no modelling package (pypsa, linopy, highspy, snakemake, pandas, numpy) changed |
 | 2026-10-27 | Installer tool | extras installed with `conda`, not `mamba` | base | Bitdefender quarantined `mamba.exe` and blocks the reinstalled copy; PyPSA-Earth docs give conda as the fallback |
+| 2026-10-28 | `python-docx` 1.2.0, `python-pptx` 1.0.2, `pytest-cov` 7.1.0 (+ `coverage` 7.17.0, `xlsxwriter` 3.2.9) | conda-forge, 1.2 MB, approved by the author | same env | Phase 5 report, deck and coverage figure; dry run showed new packages only, nothing updated |
 | 2026-10-27 | Environment repair | reinstalled `currencyconverter==0.18.9`, `googledrivedownloader==1.1.0` (pip, `--force-reinstall --no-deps`) and `snakemake-minimal=7.32.4` (bioconda) | same env | Bitdefender had removed 5 `.py` files and kept their paths blocked until a reboot; an audit of conda/pip install records against the disk now shows no missing files that matter (only gurobipy licence/DLL, unused, and two debugpy `.gitignore` files) |
 
 Key pinned versions: Python 3.11.13, PyPSA 0.30.3, linopy 0.5.5, HiGHS (highspy) 1.11.0, Snakemake 7.32.4.
