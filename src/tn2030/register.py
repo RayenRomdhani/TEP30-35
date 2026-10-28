@@ -70,6 +70,7 @@ def register_markdown(path: Path) -> str:
     for r in df.itertuples():
         title, url = _cell(r.source_title), _cell(r.source_url)
         source = f"[{title or url}]({url})" if url else title
-        lines.append("| " + " | ".join([_cell(r.id), _cell(r.parameter), _cell(r.value), _cell(r.unit),
+        value = str(int(r.value)) if r.unit == "year" else _cell(r.value)  # 1962, not 1,962
+        lines.append("| " + " | ".join([_cell(r.id), _cell(r.parameter), value, _cell(r.unit),
                                         _cell(r.type), source, _cell(r.accessed), _cell(r.notes)]) + " |")
     return MARKDOWN_HEADER + "\n".join(lines) + "\n"

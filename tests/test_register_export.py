@@ -14,6 +14,7 @@ def test_markdown_register_matches_excel():  # the readable copy must never drif
 def test_register_markdown_links_sources():
     md = register_markdown(REGISTER)
     assert "| demand_2024_twh |" in md and "](http" in md
+    assert "| 1962 | year |" in md  # a year is not a quantity: no thousands separator
 
 
 def test_register_markdown_escapes_pipes(tmp_path):  # a | inside a cell would split the table column
