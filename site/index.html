@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>One Saved MWh · Tunisia 2030</title>
+  <meta name="description" content="What one MWh of electricity saved is worth to Tunisia's 2030 power system: an open, hour-by-hour PyPSA-Earth study of energy efficiency and demand flexibility.">
+  <meta name="author" content="Rayen Romdhani">
+  <meta property="og:title" content="What is one saved MWh worth to Tunisia?">
+  <meta property="og:description" content="An open PyPSA-Earth study of Tunisia's 2030 power system: 11 scenarios, 8,760 hours, every number sourced.">
+  <meta property="og:image" content="assets/headline.png">
+  <meta name="theme-color" content="#060a12">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%233fc1ff'/%3E%3Cpath d='M18 4 8 18h7l-2 10 11-15h-7z' fill='%23041019'/%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0&display=block">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    { "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js" defer></script>
+  <script type="module" src="js/main.js"></script>
+</head>
+<body>
+<a class="sr-only" href="#problem">Skip to the study</a>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="brand-mark icon" aria-hidden="true">bolt</span>One Saved MWh</a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#problem">Problem</a><a href="#ideas">Key ideas</a><a href="#model">Model</a>
+      <a href="#landscape">8,760 hours</a><a href="#experiment">Scenarios</a><a href="#results">Results</a><a href="#trust">Trust</a>
+    </nav>
+    <a class="btn" href="https://github.com/RayenRomdhani/TEP30-35"><span class="icon" aria-hidden="true">code</span>Code</a>
+  </div>
+</header>
+
+<main>
+<!-- HERO -->
+<section class="hero" id="top">
+  <canvas id="hero-scene" aria-hidden="true"></canvas>
+  <div class="wrap hero-inner">
+    <div class="eyebrow">Tunisia · 2030 · energy-system model</div>
+    <h1>What is one <em>saved MWh</em> worth?</h1>
+    <p class="lede">Tunisia makes <span data-f="gasShare2024"></span> of its electricity from gas and has promised <span data-f="reTarget"></span> renewables by 2030. I modelled its whole power system, hour by hour, to price the electricity it doesn't use.</p>
+    <div class="hero-cta">
+      <a class="btn primary" href="#problem"><span class="icon" aria-hidden="true">south</span>Explore the study</a>
+      <a class="btn" href="#landscape"><span class="icon" aria-hidden="true">view_in_ar</span>Jump to the 3D model</a>
+    </div>
+    <div class="kpis" aria-label="What one MWh saved avoids">
+      <div class="kpi"><div class="v"><span data-count="headCost">0</span><small>EUR</small></div><div class="l">of power-system cost</div></div>
+      <div class="kpi"><div class="v"><span data-count="headGas" data-dec="2">0</span><small>MWh</small></div><div class="l">of gas not burnt</div></div>
+      <div class="kpi"><div class="v"><span data-count="headCo2" data-dec="2">0</span><small>t</small></div><div class="l">of CO2 not emitted</div></div>
+      <div class="kpi"><div class="v"><span data-count="headCap">0</span><small>MW</small></div><div class="l">less new capacity per TWh saved / yr</div></div>
+    </div>
+    <div class="kpi-note">Per MWh saved, saving 15% of demand in every hour (scenario S1-15) against the 2030 base case.</div>
+  </div>
+  <div class="scene-caption"><b>Live 3D:</b> Tunisia's high-voltage grid from OpenStreetMap. The two glowing nodes are the model's north and south buses.</div>
+</section>
+
+<!-- 1 PROBLEM -->
+<section class="block" id="problem">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="idx">01</span> The problem</div>
+    <h2 class="reveal">A country that runs on gas</h2>
+    <p class="intro reveal">Of every 20 MWh generated in Tunisia in 2024, about 19 came from burning natural gas. Most of that gas comes from a neighbour, and demand keeps growing.</p>
+    <div class="grid g3">
+      <div class="card stat reveal"><div class="v" data-f="gasShare2024"></div><div class="l">of domestic generation came from gas in 2024</div><div class="src" data-src="gas_share_2024"></div></div>
+      <div class="card stat reveal"><div class="v" data-f="algeriaShare"></div><div class="l">of Tunisia's gas supply came from Algeria (royalty + purchases)</div><div class="src" data-src="gas_supply_purchases_2024_ktep"></div></div>
+      <div class="card stat reveal"><div class="v" data-f="energyIndependence"></div><div class="l">of the energy Tunisia used was covered by its own resources</div><div class="src" data-src="energy_independence_2024"></div></div>
+    </div>
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card chart-card reveal">
+        <div class="chart-head"><h3>Where Tunisia's gas came from, 2024</h3><span class="small">thousand tonnes of oil equivalent</span></div>
+        <div class="chart-box short"><canvas id="ch-gas" role="img" aria-label="Doughnut chart of Tunisia's 2024 gas supply by source"></canvas></div>
+        <p class="small" style="margin-top:10px">Power plants burnt <span data-f="gasForPowerShare"></span> of it. Domestic production fell <span data-f="domesticDrop"></span> in one year.</p>
+      </div>
+      <div class="card reveal">
+        <h3>The 2030 promise</h3>
+        <p class="muted">Going from about 5% renewable electricity to the target in a few years, while demand grows <span data-f="growth"></span> a year (STEG forecast).</p>
+        <div class="timeline">
+          <div class="tl"><div class="y">2012</div><div class="t">Tunisian Solar Plan: <span data-f="tspTarget"></span> renewables by 2030</div></div>
+          <div class="tl"><div class="y">2015</div><div class="t">Climate pledge: <span data-f="indc"></span> lower CO2 emission intensity than in 2010</div></div>
+          <div class="tl"><div class="y">2022</div><div class="t">Target raised to <span data-f="reTarget"></span></div></div>
+          <div class="tl now"><div class="y">2030</div><div class="t">Demand <span data-f="demand2030"></span> TWh; peak forecast <span data-f="peak2030"></span> MW</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="question reveal">
+      <div class="kicker" style="color:var(--accent-2)"><span class="icon" aria-hidden="true">help</span> The question</div>
+      <p>If Tunisia uses one MWh less in 2030, what does its power system no longer have to buy, burn or build?</p>
+    </div>
+  </div>
+</section>
+
+<!-- 2 KEY IDEAS -->
+<section class="block" id="ideas">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="idx">02</span> Key ideas</div>
+    <h2 class="reveal">Five ideas carry the whole study</h2>
+    <p class="intro reveal">If you work in power systems, skim these. If not, they are all you need to follow the rest.</p>
+    <div class="grid g3">
+      <div class="card reveal"><span class="icon big" aria-hidden="true">bolt</span><h3>Energy is not power</h3><p class="muted">Power (MW) is a rate; energy (MWh) is power × time. A country needs enough power for its worst hour and enough energy over the year: plants for the peak, fuel for the hours.</p></div>
+      <div class="card reveal"><span class="icon big" aria-hidden="true">swap_vert</span><h3>Efficiency vs flexibility</h3><p class="muted">Efficiency removes MWh (same comfort, less electricity). Flexibility moves MWh in time, out of expensive hours into cheap, sunny ones.</p></div>
+      <div class="card reveal"><span class="icon big" aria-hidden="true">shield</span><h3>The reserve margin</h3><p class="muted">Planners keep firm capacity above the peak. Here: <span data-f="reserve"></span> above, from gas and hydro. Lower the peak and fewer plants are needed.</p></div>
+      <div class="card reveal" style="grid-column: span 2"><div class="chart-head"><h3>The merit order: who runs, and what it costs</h3><span class="small">running cost per MWh of electricity, gas at <span data-f="gasPrice"></span> EUR/MWh</span></div>
+        <div class="chart-box short"><canvas id="ch-merit" role="img" aria-label="Bar chart of running cost per MWh for four gas plant types"></canvas></div>
+        <p class="small" style="margin-top:8px">The last plant needed in an hour sets the price. Existing plants use the technology-data efficiency times a factor fitted to Tunisia's 2024 fuel use.</p></div>
+      <div class="card reveal"><span class="icon big" aria-hidden="true">calculate</span><h3>Avoided per MWh</h3><p class="muted">The headline metric: (cost in the base case − cost with savings) ÷ MWh saved. The same for gas, CO2 and new capacity.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 3 MODEL -->
+<section class="block" id="model">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="idx">03</span> The model</div>
+    <h2 class="reveal">A planner's game, played 8,760 times a year</h2>
+    <p class="intro reveal">For each scenario the model decides what to build (solar, wind, batteries, gas turbines) and how to run every plant in every hour of 2030, at the lowest total cost. Nobody tells it to build solar: it does because that is the cheapest way through the year.</p>
+    <div class="pipeline">
+      <div class="step reveal"><span class="icon" aria-hidden="true">public</span><b>Open data</b><span class="d">Grid, plants, ERA5 weather</span></div>
+      <div class="step reveal"><span class="icon" aria-hidden="true">hub</span><b>PyPSA-Earth</b><span class="d">Builds the Tunisia network</span></div>
+      <div class="step reveal"><span class="icon" aria-hidden="true">tune</span><b>Calibration</b><span class="d">Official 2024 fleet, peak, fuel</span></div>
+      <div class="step reveal"><span class="icon" aria-hidden="true">science</span><b>11 scenarios</b><span class="d">Savings, shifting, gas price</span></div>
+      <div class="step reveal"><span class="icon" aria-hidden="true">memory</span><b>Least-cost solve</b><span class="d">HiGHS, one linear program</span></div>
+      <div class="step reveal"><span class="icon" aria-hidden="true">verified</span><b>Checks</b><span class="d">Balance, targets, reserve</span></div>
+    </div>
+    <div class="grid g2">
+      <div class="reveal">
+        <h3 style="margin-bottom:14px">The rules it cannot break</h3>
+        <ul class="rules">
+          <li><span class="icon" aria-hidden="true">check_circle</span><span>Supply equals demand in every hour, at both nodes.</span></li>
+          <li><span class="icon" aria-hidden="true">check_circle</span><span>No plant above its size; solar and wind no more than the weather allows.</span></li>
+          <li><span class="icon" aria-hidden="true">check_circle</span><span>At least <span data-f="reTarget"></span> of the year's domestic generation is renewable.</span></li>
+          <li><span class="icon" aria-hidden="true">check_circle</span><span>Firm capacity at least <span data-f="reserve"></span> above the peak.</span></li>
+          <li><span class="icon" aria-hidden="true">check_circle</span><span>Existing plants and committed projects are kept.</span></li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <h3 style="margin-bottom:14px">Under the hood</h3>
+        <div class="spec">
+          <div><div class="k">Time steps</div><div class="v">8,760 h</div></div>
+          <div><div class="k">Network</div><div class="v">2 nodes</div></div>
+          <div><div class="k">Weather year</div><div class="v">2013</div></div>
+          <div><div class="k">Solver</div><div class="v">HiGHS</div></div>
+          <div><div class="k">Constraints</div><div class="v">≈ 0.5 M</div></div>
+          <div><div class="k">Solve time</div><div class="v">4–8 min</div></div>
+        </div>
+        <p class="small" style="margin-top:12px">Built with <a href="https://pypsa.org">PyPSA</a> and <a href="https://github.com/pypsa-meets-earth/pypsa-earth">PyPSA-Earth</a> v0.10.0 (unmodified). Calibrated to official 2024 statistics: the gas burnt matches within <span data-f="calGas"></span>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 LANDSCAPE -->
+<section class="block" id="landscape">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="idx">04</span> Inside the model</div>
+    <h2 class="reveal">The 8,760-hour landscape</h2>
+    <p class="intro reveal">Every hour of 2030 is a column: <b>day of the year</b> along one side, <b>hour of the day</b> along the other, <b>megawatts</b> as height. Gas forms a ridge every evening, highest in July and August, while the midday sun pushes it down. Switch scenarios and watch the ridge erode.</p>
+    <div class="landscape reveal" id="ls">
+      <canvas id="ls-canvas" aria-label="3D surface of hourly power output over the year; drag to rotate"></canvas>
+      <div class="ls-ui">
+        <div class="seg" role="group" aria-label="Scenario">
+          <button data-scen="S0" aria-pressed="true">S0 · Base</button>
+          <button data-scen="S1-15" aria-pressed="false">S1-15 · Save 15%</button>
+          <button data-scen="S2-300" aria-pressed="false">S2-300 · + shifting</button>
+        </div>
+        <div class="seg" role="group" aria-label="Layer">
+          <button data-layer="gas" aria-pressed="true">Gas</button>
+          <button data-layer="solar" aria-pressed="false">Solar</button>
+          <button data-layer="wind" aria-pressed="false">Wind</button>
+          <button data-layer="load" aria-pressed="false">Demand</button>
+        </div>
+      </div>
+      <div class="ls-readout" aria-live="polite"><div id="ls-title">Gas output · S0</div><div class="v" id="ls-total">–</div><div id="ls-sub">TWh over the year</div></div>
+      <div class="ls-axes">x: day of year (Jan → Dec)<br>z: hour of day (UTC)<br>height &amp; colour: MW<div class="ramp"></div><span id="ls-max"></span></div>
+    </div>
+    <div class="hint"><span class="icon" aria-hidden="true">pan_tool</span>Drag to rotate · scroll or pinch to zoom</div>
+  </div>
+</section>
+
+<!-- 5 EXPERIMENT -->
+<section class="block" id="experiment">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="idx">05</span> The experiment</div>
+    <h2 class="reveal">Eleven versions of 2030</h2>
+    <p class="intro reveal">Run the model, change exactly one thing, compare. Pick a scenario to see how it differs from the base case (S0). Gas-price scenarios are compared at their own gas price.</p>
+    <div class="scen-grid" id="scen-grid" role="group" aria-label="Scenarios"></div>
+    <div class="card chart-card reveal">
+      <div class="chart-head"><h3 id="cap-title">Installed capacity in 2030</h3>
+        <div class="legend" id="cap-legend"></div></div>
+      <div class="chart-box"><canvas id="ch-cap" role="img" aria-label="Stacked bar chart of installed capacity, selected scenario against the base case"></canvas></div>
+      <div class="delta-row" id="delta-row"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 RESULTS -->
+<section class="block" id="results">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="idx">06</span> Results</div>
+    <h2 class="reveal">What the model found</h2>
+    <p class="intro reveal">Every number here is read from the study's result files.</p>
+
+    <div class="grid g2">
+      <div class="card finding reveal"><div class="n">1</div><div><h3>A 10% saving cancels a gas plant</h3>
+        <p class="muted">To keep the reserve margin, the base case builds <b class="num" data-f="s0Ocgt"></b> MW of new gas turbines. Save 10% in every hour: the model builds none. That's why the first 10% is worth the most (<span class="num" data-f="s110Cost"></span> EUR/MWh, then ≈ <span class="num" data-f="marg1015"></span> for the next 5%).</p></div></div>
+      <div class="card finding reveal"><div class="n">2</div><div><h3>A saved MWh cuts gas <i>and</i> renewables</h3>
+        <p class="muted">Of the generation no longer needed in S1-15, <b class="num" data-f="splitGas"></b> would have been gas and <b class="num" data-f="splitRes"></b> renewables the model now doesn't build.</p></div></div>
+      <div class="card finding reveal"><div class="n">3</div><div><h3>Timing changes what a MWh is worth</h3>
+        <p class="muted">Take the same 15% from summer air conditioning first (only <span class="num" data-f="coolingShare"></span> of it fits there) and each saved MWh avoids <b class="num" data-f="coolGain"></b> more gas and CO2.</p></div></div>
+      <div class="card finding reveal"><div class="n">4</div><div><h3>Shifting demand three hours has real value</h3>
+        <p class="muted">300 MW of shiftable load on top of S1-15 saves <b class="num" data-f="flexCost"></b> M EUR and <b class="num" data-f="flexCo2"></b> Mt CO2 a year (gross: shifting is free in the model), about <span class="num" data-f="flexPerMw"></span> EUR per MW.</p></div></div>
+    </div>
+
+    <div class="card chart-card reveal" style="margin-top:16px">
+      <div class="chart-head"><h3>What one MWh saved avoids</h3>
+        <div class="seg" role="group" aria-label="Metric" id="avoid-seg">
+          <button data-m="cost_eur_per_mwh" aria-pressed="true">Cost (EUR)</button>
+          <button data-m="co2_t_per_mwh" aria-pressed="false">CO2 (t)</button>
+          <button data-m="gas_mwh_th_per_mwh" aria-pressed="false">Gas (MWh)</button>
+          <button data-m="capacity_mw_per_twh" aria-pressed="false">Capacity (MW/TWh)</button>
+        </div></div>
+      <div class="chart-box tall"><canvas id="ch-avoid" role="img" aria-label="Bar chart: what one MWh saved avoids, by scenario"></canvas></div>
+    </div>
+
+    <div class="grid g2" style="margin-top:16px">
+      <div class="card chart-card reveal">
+        <div class="chart-head"><h3>The peak week, hour by hour</h3>
+          <div class="seg" role="group" aria-label="Scenario" id="week-seg">
+            <button data-w="S0" aria-pressed="true">S0</button><button data-w="S2-300" aria-pressed="false">S2-300</button>
+          </div></div>
+        <div class="chart-box"><canvas id="ch-week" role="img" aria-label="Stacked area chart of hourly generation in the peak week"></canvas></div>
+        <div class="legend" id="week-legend" style="margin-top:10px"></div>
+      </div>
+      <div class="card chart-card reveal">
+        <div class="chart-head"><h3>Price duration curves</h3><span class="small">hourly price, sorted, EUR/MWh</span></div>
+        <div class="chart-box"><canvas id="ch-price" role="img" aria-label="Line chart of sorted hourly electricity prices for three scenarios"></canvas></div>
+        <p class="small" style="margin-top:10px">Two plateaus: existing gas turbines (≈ <span data-f="meritOcgt"></span> EUR) and combined cycles (≈ <span data-f="meritCcgt"></span> EUR). Free hours are solar surplus.</p>
+      </div>
+    </div>
+
+    <div class="card reveal" style="margin-top:16px">
+      <h3>The gas price flips the story</h3>
+      <div class="table-scroll"><table class="tbl" id="gas-table"></table></div>
+      <p class="small" style="margin-top:10px">With cheap gas, a saved MWh mostly displaces gas. With expensive gas, the system is already largely renewable, so it mostly displaces solar, wind and batteries.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 7 TRUST -->
+<section class="block" id="trust">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="idx">07</span> How far to trust it</div>
+    <h2 class="reveal">Calibrated, checked, and honest about its blind spots</h2>
+    <p class="intro reveal">Before 2030, the model had to reproduce 2024. Several lines below match <i>because they were made to match</i>: that's calibration, not proof.</p>
+    <div class="card reveal"><div class="table-scroll"><table class="tbl" id="val-table"></table></div></div>
+    <h3 class="reveal" style="margin:40px 0 14px">What the model cannot see</h3>
+    <div class="grid g2">
+      <div>
+        <details class="limit reveal"><summary><span class="icon" aria-hidden="true">speed</span>No speed limit on building<span class="icon dir" title="Likely pushes gas savings up" aria-label="likely pushes gas savings up">trending_up</span></summary><div>The base case adds about 6 GW of solar and wind by 2030, far above Tunisia's recent pace. Read the renewable share as "what least cost would do", not a forecast.</div></details>
+        <details class="limit reveal"><summary><span class="icon" aria-hidden="true">payments</span>Saving and shifting are free<span class="icon dir" aria-label="values are gross">info</span></summary><div>The value per MWh is the most a programme could cost and still pay off. Shifting gets no capacity credit, which is conservative.</div></details>
+        <details class="limit reveal"><summary><span class="icon" aria-hidden="true">schedule</span>The model's peak comes ~2 h late<span class="icon dir" aria-label="could push either way">swap_vert</span></summary><div>Model summer peaks fall around 17:00 UTC; STEG's real peaks were at 14:41 UTC. This affects the cooling and shifting results.</div></details>
+        <details class="limit reveal"><summary><span class="icon" aria-hidden="true">settings_power</span>No unit commitment or outages<span class="icon dir" aria-label="likely pushes gas savings up">trending_up</span></summary><div>Plants run at any level, with no start-up costs or breakdowns. Real plants are less flexible, so more gas would run.</div></details>
+      </div>
+      <div>
+        <details class="limit reveal"><summary><span class="icon" aria-hidden="true">sync_alt</span>Imports are fixed<span class="icon dir" aria-label="structural">info</span></summary><div>Imports stay at 2024 levels every hour, so every MWh saved falls on Tunisian plants. The ELMED link to Italy is not modelled.</div></details>
+        <details class="limit reveal"><summary><span class="icon" aria-hidden="true">wb_sunny</span>One weather year<span class="icon dir" aria-label="small effect">remove</span></summary><div>2013 weather at 1-hour steps. A 3-hour test built 2.7% more solar and 3.9% more wind.</div></details>
+        <details class="limit reveal"><summary><span class="icon" aria-hidden="true">factory</span>Steam units kept in 2030<span class="icon dir" aria-label="likely pushes value up">trending_up</span></summary><div>STEG planned to retire 660 MW but has not committed. Retiring them would raise the value of saving.</div></details>
+        <details class="limit reveal"><summary><span class="icon" aria-hidden="true">cable</span>Grid losses not modelled<span class="icon dir" aria-label="likely pushes value up">trending_up</span></summary><div>A MWh saved at the meter saves slightly more than one MWh at the plant.</div></details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8 RUN -->
+<section class="block" id="run">
+  <div class="wrap">
+    <div class="kicker reveal"><span class="idx">08</span> Open science</div>
+    <h2 class="reveal">Every number sourced. Every step reproducible.</h2>
+    <div class="grid g2" style="align-items:start">
+      <div class="reveal">
+        <p class="muted">The code, the 11 scenario files, the assumptions register with a source link for every input, about a hundred automated tests, and a seven-chapter learning path are all on GitHub.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-top:20px">
+          <a class="btn primary" href="https://github.com/RayenRomdhani/TEP30-35"><span class="icon" aria-hidden="true">code</span>Repository</a>
+          <a class="btn" href="https://github.com/RayenRomdhani/TEP30-35/blob/main/docs/learn/01-the-problem.md"><span class="icon" aria-hidden="true">school</span>Learning path</a>
+          <a class="btn" href="https://github.com/RayenRomdhani/TEP30-35/blob/main/data/assumptions_register.md"><span class="icon" aria-hidden="true">fact_check</span>Sources</a>
+        </div>
+      </div>
+      <div class="terminal reveal"><div class="bar"><i></i><i></i><i></i></div>
+<pre><span class="c"># build, solve and check all 11 scenarios</span>
+<span class="p">$</span> snakemake -j 1
+<span class="c"># draw the figures and this site's data</span>
+<span class="p">$</span> python scripts/make_figures.py
+<span class="p">$</span> python scripts/export_site_data.py
+<span class="c"># add your own scenario: copy a YAML in config/scenarios/</span></pre></div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap cols">
+    <div><b style="color:var(--text)">Rayen Romdhani</b> · Energy engineering student, ENIM (Monastir, Tunisia)<br>Text and figures CC BY 4.0 · code MIT.</div>
+    <div>Data: ONEM, STEG (via JICA 2022), PyPSA technology-data.<br>Grid: © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors.</div>
+    <div>Outline: <a href="https://www.naturalearthdata.com/">Natural Earth</a>.<br>3D: three.js · charts: Chart.js.</div>
+  </div>
+</footer>
+</body>
+</html>

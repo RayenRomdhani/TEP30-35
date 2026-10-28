@@ -69,7 +69,7 @@ New to power systems? The learning path explains everything from scratch, one sh
 | 7 | [Try it yourself](docs/learn/07-try-it-yourself.md) | Run the model, add your own scenario |
 | | [Glossary](docs/learn/glossary.md) | Every term in one or two lines |
 
-Prefer a document? There is a [written report](report/report.docx) and an [8-slide deck](report/deck.pptx).
+Prefer a document? There is a [written report](report/report.docx) and an [8-slide deck](report/deck.pptx). Prefer to explore? The [interactive site](site/) has a 3D map of Tunisia's grid, a 3D landscape of all 8,760 hours, and a scenario explorer (see [`site/README.md`](site/README.md) to run it locally).
 
 ## Where the numbers come from
 
@@ -87,6 +87,7 @@ No number in this study is made up. Every input is a row in the [assumptions reg
 | [`scripts/`](scripts/) | Figures, report, slides, register export, 2024 validation (`scripts/dev/` holds one-off helpers) |
 | [`tests/`](tests/) | Automated tests |
 | [`report/`](report/) | Report and slides |
+| [`site/`](site/) | The interactive web page (3D views, scenario explorer), fed by `scripts/export_site_data.py` |
 | [`skill/`](skill/) | `pypsa-country-study`: the method and its pitfalls, packaged for a study of another country |
 | [`docs/project-history/`](docs/project-history/) | The lab notebook: how the study was built, phase by phase |
 
