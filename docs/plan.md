@@ -214,10 +214,10 @@ Verify: TN-only buses; ≥ 1 gas generator; annual load > 0.
 
 Use the `anthropic-skills:pdf` skill for STEG / ANME / IRENA reports, and `superpowers:dispatching-parallel-agents` to search independent sources in parallel. Read Ember's own Tunisia data directly (risk R7).
 
-- [ ] **Step 1:** Fill the pending register rows: `demand_2024_twh`, `imports_2024_twh`, `gas_price_eur_per_mwh_th` (from the technology-data version used by PyPSA-Earth). Add validation rows: `cap_2024_<carrier>_mw` (STEG), `gen_2024_<carrier>_twh` and `gas_share_2024` (Ember). Each has a URL and access date; disagreements get a `notes` line. If a sourced ANME efficiency programme cost exists, add `ee_programme_cost_eur_per_mwh` (compared with the headline value in the report, spec §1); if none is found, say so in the README limitations.
-- [ ] **Step 2:** `data/committed_projects.csv` with columns `name, carrier, p_nom_mw, e_nom_mwh, bus, status, source_url`. `status` ∈ {`under_construction`, `signed_contract`}; announced-only projects are not included (spec D6). `bus` = nearest base-network bus to the site.
-- [ ] **Step 3:** `python -c "from tn2030.register import load_register; r = load_register('data/assumptions_register.xlsx'); print(r['demand_2024_twh'], r['imports_2024_twh'])"` prints two numbers.
-- [ ] **Step 4:** Commit: `git commit -m "data: add sourced 2024 inputs and committed projects"`
+- [x] **Step 1:** Fill the pending register rows: `demand_2024_twh`, `imports_2024_twh`, `gas_price_eur_per_mwh_th` (from the technology-data version used by PyPSA-Earth). Add validation rows: `cap_2024_<carrier>_mw` (STEG), `gen_2024_<carrier>_twh` and `gas_share_2024` (Ember). Each has a URL and access date; disagreements get a `notes` line. If a sourced ANME efficiency programme cost exists, add `ee_programme_cost_eur_per_mwh` (compared with the headline value in the report, spec §1); if none is found, say so in the README limitations.
+- [x] **Step 2:** `data/committed_projects.csv` with columns `name, carrier, p_nom_mw, e_nom_mwh, bus, status, source_url`. `status` ∈ {`under_construction`, `signed_contract`}; announced-only projects are not included (spec D6). `bus` = nearest base-network bus to the site.
+- [x] **Step 3:** `python -c "from tn2030.register import load_register; r = load_register('data/assumptions_register.xlsx'); print(r['demand_2024_twh'], r['imports_2024_twh'])"` prints two numbers.
+- [x] **Step 4:** Commit: `git commit -m "data: add sourced 2024 inputs and committed projects"`
 
 ### Task 9: Demand module
 

@@ -5,7 +5,8 @@ __pycache__/
 .ipynb_checkpoints/
 
 # Large or downloaded data (sources listed in data/assumptions_register.xlsx)
-data/raw/
+data/raw/*
+!data/raw/SOURCES.md
 *.nc
 !tests/fixtures/*.nc
 
