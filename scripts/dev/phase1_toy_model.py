@@ -1,6 +1,6 @@
 """Phase 1: solve the single-node toy model for one summer week and plot its dispatch.
 
-Run:  python scripts/phase1_toy_model.py
+Run:  python scripts/dev/phase1_toy_model.py
 Output: results/figures/phase1_toy_dispatch.png and a short printed summary.
 """
 
@@ -12,10 +12,10 @@ import pandas as pd
 from tn2030.register import load_register
 from tn2030.toy import build_toy_network
 
-ROOT = Path(__file__).parents[1]
+ROOT = Path(__file__).parents[2]  # repo root (this file is in scripts/dev)
 FIG = ROOT / "results" / "figures" / "phase1_toy_dispatch.png"
 
-# Fixed carrier colours (validated for colour-blind separation with the dataviz validator).
+# Fixed carrier colours (checked for colour-blind separation).
 COLORS = {"CCGT": "#eb6834", "onwind": "#2a78d6", "solar": "#eda100", "battery": "#6250d6"}
 LABELS = {"CCGT": "Gas (CCGT)", "onwind": "Onshore wind", "solar": "Solar PV", "battery": "Battery"}
 INK, MUTED, GRID, SURFACE = "#0b0b0b", "#52514e", "#e1e0d9", "#fcfcfb"

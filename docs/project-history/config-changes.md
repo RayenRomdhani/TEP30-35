@@ -28,7 +28,7 @@ Command (from `D:\pypsa-earth`, PyPSA-Earth unmodified):
 | Date | 2026-10-27, 16:10 → 17:08 |
 | Result | 27 of 27 steps done, exit 0 |
 | Runtime | 58.1 min, one Snakemake job at a time (i3-1215U, 24 GB RAM) |
-| Peak RAM | Not measured. Snakemake cannot collect memory on Windows (its benchmark files show `NA`); a sampler (`scripts/peak_ram.py`) was only written later, for Task 7 |
+| Peak RAM | Not measured. Snakemake cannot collect memory on Windows (its benchmark files show `NA`); a sampler (`scripts/dev/peak_ram.py`) was only written later, for Task 7 |
 | Downloads | tutorial bundles ≈ 0.75 GB zipped (data 144 MB, cutouts 10 MB, common data 259 MB, hydrobasins 337 MB) + OpenStreetMap data |
 | Disk after unzip | `data/` 4.5 GB, other folders < 0.1 GB |
 | Solved network | `results/networks/elec_s_6_ec_lcopt_Co2L-4H.nc` (Nigeria + Benin, 18 buses, 36 snapshots × 243 h) |

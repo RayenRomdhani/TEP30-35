@@ -14,7 +14,7 @@ The long build (see "Build run" below) produced the 3-hour file. The 1-hour file
 
 ## Network summary
 
-Output of `python scripts/inspect_base.py D:\pypsa-earth\networks\TN\elec_s_2_ec_lcopt_1h.nc`:
+Output of `python scripts/dev/inspect_base.py D:\pypsa-earth\networks\TN\elec_s_2_ec_lcopt_1h.nc`:
 
 ```
 network:   D:\pypsa-earth\networks\TN\elec_s_2_ec_lcopt_1h.nc
@@ -126,7 +126,7 @@ Command: `snakemake -j 1 results/TN/networks/elec_s_2_ec_lcopt_{3h,1h}.nc --conf
 Sources (verbatim log lines in [`docs/project-history/evidence/phase2-run-logs.txt`](evidence/phase2-run-logs.txt)):
 - **HiGHS run time:** the "HiGHS run time" line of the first run.
 - **Step time:** the Snakemake rule timestamps of the first run.
-- **Peak memory:** [`scripts/peak_ram.py`](../../scripts/peak_ram.py). Snakemake cannot measure memory on Windows ("unable to collect cpu and memory benchmark statistics"), so a second run of each solve sampled the whole process tree's memory every 0.5 s.
+- **Peak memory:** [`scripts/dev/peak_ram.py`](../../scripts/dev/peak_ram.py). Snakemake cannot measure memory on Windows ("unable to collect cpu and memory benchmark statistics"), so a second run of each solve sampled the whole process tree's memory every 0.5 s.
 
 The second run reproduced both objectives exactly. Its HiGHS run times were 59.5 s (3 h) and 591.8 s (1 h), so times vary by about 10% between runs. The second run overwrote `D:\pypsa-earth\benchmarks\TN\solve_network\`, so those files hold its times, not the first run's.
 

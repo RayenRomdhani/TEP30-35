@@ -137,7 +137,7 @@ def test_annualised_capex_adds_fom():
 
 ### Task 4: Toy network, solve, explanation
 
-**Files:** Modify `src/tn2030/toy.py`; create `tests/conftest.py`, `scripts/phase1_toy_model.py`, `docs/project-history/phase1-toy-model.md`; test in `tests/test_toy.py`
+**Files:** Modify `src/tn2030/toy.py`; create `tests/conftest.py`, `scripts/dev/phase1_toy_model.py`, `docs/project-history/phase1-toy-model.md`; test in `tests/test_toy.py`
 
 **Interfaces:**
 - Consumes: `load_register`, `annualised_capex`.
@@ -160,8 +160,8 @@ def test_toy_battery_soc_within_bounds(toy_network): ...
 - [x] **Step 2:** Run. Expected: FAIL (`build_toy_network` not defined).
 - [x] **Step 3:** Implement `build_toy_network`.
 - [x] **Step 4:** Run `pytest -v`. Expected: all pass.
-- [x] **Step 5:** `scripts/phase1_toy_model.py`: build a 168 h network, solve, print capacities and cost, and save `results/figures/phase1_toy_dispatch.png` (stacked dispatch + load line, footer "Illustrative inputs; costs: PyPSA technology-data 2030"). Use the `dataviz` skill for the style.
-Verify: `python scripts/phase1_toy_model.py` prints `status ok` and the PNG exists.
+- [x] **Step 5:** `scripts/dev/phase1_toy_model.py`: build a 168 h network, solve, print capacities and cost, and save `results/figures/phase1_toy_dispatch.png` (stacked dispatch + load line, footer "Illustrative inputs; costs: PyPSA technology-data 2030").
+Verify: `python scripts/dev/phase1_toy_model.py` prints `status ok` and the PNG exists.
 - [x] **Step 6:** `docs/project-history/phase1-toy-model.md`: objective (min Σ annualised capex × capacity + Σ marginal cost × dispatch × weighting), constraints (nodal energy balance, capacity limits with availability profiles, storage state-of-charge continuity, energy ≤ p_nom × max_hours), each mapped to the PyPSA component that creates it, plus what the results show.
 - [x] **Step 7:** Commit: `git commit -m "feat: add Phase 1 single-node toy model and explanation"`
 - [x] **Step 8: Phase gate** (see Global Constraints). Evidence: pytest output, solve log, dispatch PNG.
@@ -184,7 +184,7 @@ Failures here are debugged to their root cause, never patched around; log every 
 
 ### Task 6: Tunisia base network
 
-**Files:** Create `config/tn_base.yaml`, `scripts/inspect_base.py`, `docs/project-history/phase2-base-network.md`
+**Files:** Create `config/tn_base.yaml`, `scripts/dev/inspect_base.py`, `docs/project-history/phase2-base-network.md`
 
 **Interfaces:**
 - Produces: a prepared (not solved) base network `.nc` path, written into `config/pipeline.yaml` as `base_network:`; the list of carrier names actually used (feeds the constants in Task 13).
@@ -192,7 +192,7 @@ Failures here are debugged to their root cause, never patched around; log every 
 - [x] **Step 1:** Write `config/tn_base.yaml` with only the keys we change, checked against the pinned `config.default.yaml`: `countries: ["TN"]`, clusters `[2]`, time resolution `3H` (changed to 1 h after Task 7), cost year 2030, extendable carriers CCGT, OCGT, solar, onwind, battery, solver `highs`. Each key gets a one-line comment saying why.
 - [x] **Step 2:** Check whether the pinned release has a built-in minimum-renewable-share option. Record the answer (key name, or "none, custom constraint in Task 13") in `docs/project-history/config-changes.md`.
 - [x] **Step 3:** Dry run with `--configfile <repo>/config/tn_base.yaml` up to the prepared network. Check bundle sizes (> 2 GB → ask). Then run.
-- [x] **Step 4:** `scripts/inspect_base.py <network.nc>` prints buses, carriers, `p_nom` by carrier, annual load (TWh, using weightings), peak load. Save the output in `docs/project-history/phase2-base-network.md`.
+- [x] **Step 4:** `scripts/dev/inspect_base.py <network.nc>` prints buses, carriers, `p_nom` by carrier, annual load (TWh, using weightings), peak load. Save the output in `docs/project-history/phase2-base-network.md`.
 Verify: TN-only buses; ≥ 1 gas generator; annual load > 0.
 - [x] **Step 5:** Commit: `git commit -m "feat: add Tunisia PyPSA-Earth base configuration"`
 

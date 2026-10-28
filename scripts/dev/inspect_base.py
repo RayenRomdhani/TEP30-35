@@ -1,6 +1,6 @@
 """Print a short summary of a PyPSA network: buses, carriers, capacities and load.
 
-Run:  python scripts/inspect_base.py <network.nc>
+Run:  python scripts/dev/inspect_base.py <network.nc>
 """
 
 import sys
@@ -41,5 +41,5 @@ def summarize(path: str) -> None:
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        sys.exit("usage: python scripts/inspect_base.py <network.nc>")
+        sys.exit("usage: python scripts/dev/inspect_base.py <network.nc>")
     summarize(sys.argv[1])

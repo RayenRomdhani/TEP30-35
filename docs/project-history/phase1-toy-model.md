@@ -1,6 +1,6 @@
 # Phase 1: the toy model, its objective and its constraints
 
-Code: [`src/tn2030/toy.py`](../../src/tn2030/toy.py) · run: `python scripts/phase1_toy_model.py`
+Code: [`src/tn2030/toy.py`](../../src/tn2030/toy.py) · run: `python scripts/dev/phase1_toy_model.py`
 Figure: [`results/figures/phase1_toy_dispatch.png`](../../results/figures/phase1_toy_dispatch.png)
 
 ## In one sentence
