@@ -1,0 +1,6 @@
+# Gas price +50% (register gas_price_factor_hi); reference for G-hi-S1-15.
+name: G-hi-S0
+reference: G-hi-S0
+efficiency: {share: 0, mode: uniform}
+flexibility: {p_max_mw: 0}
+gas_price_factor: gas_price_factor_hi

@@ -1,0 +1,6 @@
+# Efficiency: every hour 15% lower.
+name: S1-15
+reference: S0
+efficiency: {share: 0.15, mode: uniform}
+flexibility: {p_max_mw: 0}
+gas_price_factor: 1.0

@@ -1,0 +1,6 @@
+# Efficiency 15% with the gas price +50%.
+name: G-hi-S1-15
+reference: G-hi-S0
+efficiency: {share: 0.15, mode: uniform}
+flexibility: {p_max_mw: 0}
+gas_price_factor: gas_price_factor_hi

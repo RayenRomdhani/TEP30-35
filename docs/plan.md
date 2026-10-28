@@ -442,7 +442,7 @@ Scenario files (`reference` is the scenario it is compared against):
 
 Flex sizes and gas factors in YAML are register ids (`flex_cap_mw`, `gas_price_factor_lo`), resolved by `build_scenario`, so no number lives in two places.
 
-- [ ] **Step 1: Write the failing tests:**
+- [x] **Step 1: Write the failing tests:**
 ```python
 def test_build_scenario_hits_2030_demand_minus_saving_minus_imports(toy_network, reg): ...
     expected = annual_demand_2030(reg["demand_2024_twh"], reg["demand_growth"]) * 0.85 - reg["imports_2024_twh"]
@@ -459,10 +459,10 @@ def test_load_scenario_rejects_bad_mode(tmp_path):
 def test_all_scenario_files_load():
     assert len([load_scenario(p) for p in Path("config/scenarios").glob("*.yaml")]) == 11
 ```
-- [ ] **Step 2:** Run. Expected: FAIL.
-- [ ] **Step 3:** Implement and write the 11 YAML files.
-- [ ] **Step 4:** Run `pytest -v`. Expected: all pass.
-- [ ] **Step 5:** Commit: `git commit -m "feat: add scenario builder and 11 scenario definitions"`
+- [x] **Step 2:** Run. Expected: FAIL.
+- [x] **Step 3:** Implement and write the 11 YAML files.
+- [x] **Step 4:** Run `pytest -v`. Expected: all pass.
+- [x] **Step 5:** Commit: `git commit -m "feat: add scenario builder and 11 scenario definitions"`
 
 ### Task 16: Snakemake pipeline and full run
 
