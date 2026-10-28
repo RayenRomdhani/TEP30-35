@@ -475,7 +475,7 @@ def test_all_scenario_files_load():
   - `summarize_step(solved_paths: list[Path], scenario_paths: list[Path], summary_out: Path, avoided_out: Path) -> None` (one row per scenario; `avoided.csv` compares each with its `reference`, skips self-references)
 - Rules: `all` → `build_scenario` (`results/networks/{s}_built.nc`) → `solve` (`results/networks/{s}_solved.nc`) → `summarize`. `.nc` files are gitignored; CSVs are committed.
 
-- [ ] **Step 1: Write the failing integration test** (toy base saved to `tmp_path`, two scenario YAMLs S0 and S1-15, fixture register and empty committed CSV):
+- [x] **Step 1: Write the failing integration test** (toy base saved to `tmp_path`, two scenario YAMLs S0 and S1-15, fixture register and empty committed CSV):
 ```python
 def test_pipeline_end_to_end_on_toy(tmp_path):
     ...build_step → solve_step → summarize_step...
@@ -485,11 +485,11 @@ def test_pipeline_end_to_end_on_toy(tmp_path):
     assert summary.loc["S1-15", "demand_twh"] < summary.loc["S0", "demand_twh"]
     assert avoided.loc["S1-15", "cost_eur_per_mwh"] > 0
 ```
-- [ ] **Step 2:** Run. Expected: FAIL.
-- [ ] **Step 3:** Implement `pipeline.py` and `Snakefile`.
-- [ ] **Step 4:** Run `pytest -v`. Expected: all pass. Then `snakemake -n` lists 11 build + 11 solve + 1 summarize jobs.
-- [ ] **Step 5:** Run `snakemake -j 1` on the real base network. Expected: `results/summary.csv` (11 rows), `results/avoided.csv` (8 rows: every scenario except the three self-referenced ones), no sanity-check failure. Failures → `superpowers:systematic-debugging` + `operations-planning-mitigation`.
-- [ ] **Step 6:** `docs/phase4-scenarios.md`: how efficiency and flexibility are represented (spec §5.2–5.3 in plain words), runtimes, all warnings.
+- [x] **Step 2:** Run. Expected: FAIL.
+- [x] **Step 3:** Implement `pipeline.py` and `Snakefile`.
+- [x] **Step 4:** Run `pytest -v`. Expected: all pass. Then `snakemake -n` lists 11 build + 11 solve + 1 summarize jobs.
+- [x] **Step 5:** Run `snakemake -j 1` on the real base network. Expected: `results/summary.csv` (11 rows), `results/avoided.csv` (8 rows: every scenario except the three self-referenced ones), no sanity-check failure. Failures → `superpowers:systematic-debugging` + `operations-planning-mitigation`.
+- [x] **Step 6:** `docs/phase4-scenarios.md`: how efficiency and flexibility are represented (spec §5.2–5.3 in plain words), runtimes, all warnings.
 - [ ] **Step 7:** Commit, then **Phase gate**. Evidence: Snakemake log, both CSVs, pytest output.
 
 ---
