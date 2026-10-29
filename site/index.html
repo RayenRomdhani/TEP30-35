@@ -26,7 +26,7 @@
 
 <header class="bar">
   <a class="mark" href="#top">One saved MWh</a>
-  <nav aria-label="Chapters"><a href="#day">The day</a><a href="#problem">The problem</a><a href="#model">The model</a><a href="#answer">The answer</a><a href="#evening">The evening</a><a href="#trust">Trust</a></nav>
+  <nav aria-label="Chapters"><a href="#day">The day</a><a href="#problem">The problem</a><a href="#model">The model</a><a href="#answer">The answer</a><a href="#evening">The evening</a><a href="#road">To 2030</a><a href="#trust">Trust</a></nav>
   <a class="act" href="https://github.com/RayenRomdhani/TEP30-35">Read the code</a>
 </header>
 
@@ -208,6 +208,37 @@
   </div>
 </section>
 
+<!-- ============ twilight: the road from 2027 to 2030 ============ -->
+<section class="chapter ch-twilight" id="road" data-chapter>
+  <h2 class="big ch-head rise">Four years, built at Tunisia's pace</h2>
+  <p class="lede rise">The 2030 above is one year on its own, with the model free to build whatever is cheapest. Here it plays 2027 to 2030 one year at a time. Each year starts with the plants of the year before, the committed projects switch on in the year they are due, and nothing is built faster than Tunisia has managed so far.</p>
+  <ul class="timeline">
+    <li class="rise"><div class="y num">+<span data-p="solar"></span> MW</div><p class="t">of solar a year at most, beyond the committed projects: the <span data-p="solarYear"></span> pace, Tunisia's fastest so far.</p></li>
+    <li class="rise"><div class="y num"><span data-p="windYear"></span></div><p class="t">first new wind beyond Sidi Daoud, then <span data-p="wind"></span> MW a year: the size of one tender lot.</p></li>
+    <li class="rise"><div class="y num"><span data-p="battery"></span> MW</div><p class="t">of batteries from <span data-p="batteryYear"></span>, the size of the Bazma tender (<span data-p="batteryMwh"></span> MWh).</p></li>
+    <li class="rise"><div class="y num"><span data-p="committed"></span> GW</div><p class="t">of committed solar and wind switching on between 2025 and 2028, each in its own year.</p></li>
+  </ul>
+  <div class="road rise">
+    <div class="week-head">
+      <h3 class="block-title">Renewable share of generation, year by year</h3>
+      <div class="chips" role="group" aria-label="Scenario" data-group="road"></div>
+    </div>
+    <svg id="road-chart" role="img" aria-label="Line chart of the renewable share from 2025 to 2030 against the 35% target"></svg>
+  </div>
+  <div class="finding">
+    <div class="giant num rise"><span data-p="s0Share"></span><small>renewable share in 2030 at this pace</small></div>
+    <div class="rise">
+      <h3 class="block-title">The target moves out of reach</h3>
+      <p class="lede" style="margin-top: 20px"><span data-p="gapText"></span></p>
+    </div>
+  </div>
+  <div style="margin-top: 140px">
+    <h3 class="block-title rise">What one saved MWh avoids, year by year</h3>
+    <p class="lede rise" style="margin-top: 20px">Saving 15% by 2030, reached a quarter at a time from 2027, against the same years without it.</p>
+    <div style="overflow-x: auto"><table class="flip rise" id="road-table"></table></div>
+  </div>
+</section>
+
 <!-- ============ close: trust and code ============ -->
 <section class="chapter ch-close" id="trust" data-chapter>
   <h2 class="big ch-head rise">How far to trust it</h2>
@@ -219,7 +250,7 @@
     <div style="overflow-x: auto" class="rise"><table class="val" id="val"></table></div>
   </div>
   <ul class="limits">
-    <li class="rise"><h3>No speed limit on building</h3><p>The plan adds about 6 GW of solar and wind by 2030, far faster than Tunisia's recent pace. It shows what least cost would do, not a forecast.</p><span class="dir">More gas would run: savings likely worth more</span></li>
+    <li class="rise"><h3>The 2030 answer has no speed limit</h3><p>On its own, 2030 adds about 6 GW of solar and wind in one step. The four-year pathway caps building at Tunisia's pace, and a saved MWh then avoids about twice the gas and CO2. Its caps are judgements, and it assumes committed projects arrive on time.</p><span class="dir">Tested: savings worth more</span></li>
     <li class="rise"><h3>Saving and shifting are free here</h3><p>The study prices the MWh, not the programme that saves it. Read the figures as the most a programme could cost and still pay off.</p><span class="dir">Gross values</span></li>
     <li class="rise"><h3>The model's peak comes two hours late</h3><p>Its summer peak lands around 19:00 in Tunis; the real 2024 peak came at 15:41. That moves when cooling savings and shifting land.</p><span class="dir">Could push either way</span></li>
     <li class="rise"><h3>Plants are more flexible than in reality</h3><p>No start-up costs, minimum output or breakdowns. Real plants would burn more gas around the evening ramp.</p><span class="dir">Savings likely worth more</span></li>
@@ -229,14 +260,14 @@
   <div class="code">
     <div class="rise">
       <h3 class="block-title">Every number sourced, every step on GitHub</h3>
-      <p class="lede" style="margin-top: 20px">The code, the eleven scenario files, a register with a source link for every input, about a hundred automated tests, and a seven-chapter guide that explains the topic from scratch.</p>
+      <p class="lede" style="margin-top: 20px">The code, the eleven scenario files, a register with a source link for every input, over a hundred automated tests, and a seven-chapter guide that explains the topic from scratch.</p>
       <div class="links">
         <a class="btn light" href="https://github.com/RayenRomdhani/TEP30-35">Open the repository</a>
         <a class="btn ghost" href="https://github.com/RayenRomdhani/TEP30-35/blob/main/docs/learn/01-the-problem.md">Read the guide</a>
         <a class="btn ghost" href="https://github.com/RayenRomdhani/TEP30-35/blob/main/data/assumptions_register.md">See the sources</a>
       </div>
     </div>
-    <pre class="run rise"><code># build, solve and check all 11 scenarios
+    <pre class="run rise"><code># build, solve and check all 11 scenarios, 2030 and 2027-2030
 snakemake -j 1
 
 # draw the figures and refresh this page's data

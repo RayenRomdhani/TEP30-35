@@ -8,6 +8,7 @@
   --noon: #f2c230;   --noon-ink: #1b1306;
   --peak: #d9481c;   --peak-ink: #fff3e8;
   --dusk: #5a1414;   --dusk-ink: #fbe9dc;
+  --twilight: #2a2248; --twilight-ink: #ece6ff;
   --close: #0e0d0c;  --close-ink: #efe9e1;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   --margin: clamp(20px, 3.4vw, 48px);
@@ -46,6 +47,7 @@ p { margin: 0; text-wrap: pretty; }
 .ch-noon { background: var(--noon); color: var(--noon-ink); }
 .ch-peak { background: var(--peak); color: var(--peak-ink); }
 .ch-dusk { background: var(--dusk); color: var(--dusk-ink); }
+.ch-twilight { background: var(--twilight); color: var(--twilight-ink); }
 .ch-close { background: var(--close); color: var(--close-ink); }
 .big { font-size: clamp(56px, 10.5vw, 176px); }
 .mid { font-size: clamp(32px, 4.2vw, 64px); }
@@ -197,6 +199,12 @@ table.flip { width: 100%; border-collapse: collapse; margin-top: 36px; font-size
 .flip td.num, .flip th.num { text-align: right; }
 .flip tbody tr:nth-child(odd) td { background: rgba(255, 255, 255, 0.05); }
 .flip td:first-child { padding-left: 12px; }
+
+/* twilight: the road to 2030 */
+.ch-twilight .chips { --chip-on: var(--twilight); }
+.road { margin-top: 120px; }
+.road svg { width: 100%; height: auto; display: block; overflow: visible; margin-top: 28px; }
+.road .line { transition: stroke-dashoffset 1.6s var(--ease); }
 
 /* close: limits, code, footer */
 .limits { list-style: none; padding: 0; margin: 80px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px 64px; }

@@ -8,6 +8,8 @@
 
 **Battery (in PyPSA-Earth).** A store of energy (MWh) with a charger and a discharger (MW). In this model the charger's size is tied to the discharger's (charger = efficiency × discharger), as PyPSA-Earth itself does.
 
+**Build limit.** The most new capacity of one technology the pathway may add in a year (for example 268 MW of solar, Tunisia's best year so far). Each limit is a row of the assumptions register.
+
 **Capacity.** The maximum power a plant can produce, in MW.
 
 **Capacity expansion model.** A model that decides what to build as well as how to run it. The opposite is a dispatch model, where the plants are given.
@@ -50,11 +52,15 @@
 
 **Merit order.** Running plants from cheapest to most expensive marginal cost until demand is met.
 
+**Myopic (model).** A pathway model that plans each year without knowing the years after it, like a country buying plants one tender at a time. The opposite is perfect foresight.
+
 **Node (bus).** A point in the network where plants, demand and lines connect. The model has two: north and south.
 
 **OCGT (open-cycle gas turbine).** A simple gas turbine. Cheap to build, less efficient (41% for a new one), so it runs mainly at peaks. In this study "OCGT" also covers the existing steam units.
 
 **ONEM.** Tunisia's national energy observatory, which publishes the yearly energy statistics (*Memento*) used to calibrate the model.
+
+**Pathway.** The study's year-by-year runs, 2027 to 2030: each year starts from the fleet of the year before, committed projects arrive in their year, and building is capped by build limits.
 
 **Peak.** The highest demand of the year, in MW. The official 2024 figure (4,888 MW) is a record at one moment; the model's peak is the highest hourly average.
 

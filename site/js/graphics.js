@@ -34,6 +34,34 @@ export async function drawMap(svg, grid) {
   el("text", { x: (E - W) * kx * scale - 150, y: 30, "font-size": 24, fill: "currentColor", "fill-opacity": 0.75 }, svg).textContent = "Mediterranean";
 }
 
+// ---------- the road: renewable share year by year, one line per scenario, against the target ----------
+// series: [{ key, points: [{year, v}], strong }] ; shared history points sit at the start of every line
+export function drawRoad(svg, series, target, years) {
+  svg.textContent = "";
+  const W = 1200, H = 460, pad = { l: 64, r: 120, t: 24, b: 48 };
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  const max = Math.max(target * 1.15, ...series.flatMap((s) => s.points.map((p) => p.v))) * 1.05;
+  const x = (y) => pad.l + ((y - years[0]) / (years[years.length - 1] - years[0])) * (W - pad.l - pad.r);
+  const y = (v) => H - pad.b - (v / max) * (H - pad.t - pad.b);
+  for (let k = 0; k <= max + 1e-9; k += 0.1) {
+    el("text", { x: pad.l - 14, y: y(k) + 6, "text-anchor": "end", "font-size": 18, fill: "currentColor", "fill-opacity": 0.7 }, svg).textContent = `${Math.round(k * 100)}%`;
+  }
+  years.forEach((yr) => { el("text", { x: x(yr), y: H - 12, "text-anchor": "middle", "font-size": 18, fill: "currentColor", "fill-opacity": 0.7 }, svg).textContent = yr; });
+  el("line", { x1: pad.l, x2: W - pad.r, y1: y(target), y2: y(target), stroke: "currentColor", "stroke-width": 2, "stroke-dasharray": "10 8" }, svg);
+  el("text", { x: W - pad.r + 12, y: y(target) + 6, "font-size": 18, fill: "currentColor" }, svg).textContent = `Target ${Math.round(target * 100)}%`;
+  const drawn = [];
+  series.forEach((s) => {
+    const d = s.points.map((p, i) => `${i ? "L" : "M"}${x(p.year).toFixed(1)},${y(p.v).toFixed(1)}`).join("");
+    const path = el("path", { d, fill: "none", stroke: "currentColor", "stroke-width": s.strong ? 4 : 2, "stroke-opacity": s.strong ? 1 : 0.45,
+      "stroke-linejoin": "round", class: "line" }, svg);
+    s.points.forEach((p) => el("circle", { cx: x(p.year), cy: y(p.v), r: s.strong ? 7 : 4, fill: "currentColor", "fill-opacity": s.strong ? 1 : 0.45 }, svg));
+    const last = s.points[s.points.length - 1];
+    if (s.strong) el("text", { x: x(last.year) + 16, y: y(last.v) + 7, "font-size": 22, "font-weight": 600, fill: "currentColor" }, svg).textContent = `${Math.round(last.v * 100)}%`;
+    drawn.push(path);
+  });
+  return drawn;
+}
+
 // ---------- a week of hourly output, stacked, with the load line ----------
 export function drawWeek(svg, week, scen, colors, labels, order) {
   svg.textContent = "";

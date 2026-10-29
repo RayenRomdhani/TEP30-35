@@ -88,6 +88,11 @@ def main() -> None:
     s0_ocgt = s.loc["S0", "new_cap_OCGT_mw"]
     lo, hi = reg["gas_price_factor_lo"], reg["gas_price_factor_hi"]
     binding = sorted(s.index[s.res_share < reg["re_target_2030"] + 1e-4])  # runs where the target binds
+    # The 2027-2030 pathway: the same scenarios year by year, building at Tunisia's demonstrated pace.
+    ps = pd.read_csv(RESULTS / "pathway_summary.csv").set_index(["scenario", "year"])
+    pa = pd.read_csv(RESULTS / "pathway_avoided.csv").set_index(["scenario", "year"])
+    whole = pa.xs("2027-2030", level="year")
+    share = lambda sc: ps.loc[(sc, 2030), "res_share"]
     # The findings text says a 10% saving avoids all new gas turbines; stop if a re-run changes that.
     assert s.loc["S1-10", "new_cap_OCGT_mw"] < 0.5, "S1-10 builds new OCGT: rewrite the findings text"
 
@@ -107,7 +112,7 @@ def main() -> None:
     doc.add_heading(TITLE, level=0)
     para(doc, f"{AUTHOR}, Energy Engineering, ENIM (Monastir, Tunisia). October 2026.")
     para(doc, "Model: PyPSA-Earth v0.10.0 with the study code in this repository. All result numbers come from "
-              "results/summary.csv, results/avoided.csv and results/validation.csv; all inputs come from "
+              "results/summary.csv, results/avoided.csv, results/pathway_*.csv and results/validation.csv; all inputs come from "
               "data/assumptions_register.xlsx.", size=9)
 
     doc.add_heading("Summary", level=1)
@@ -129,6 +134,9 @@ def main() -> None:
         f"15% saving, cuts another {flex:.0f} M EUR per year and {flex_co2:.2f} Mt of CO2.",
         f"At the base gas price the least-cost system reaches {s.loc['S0', 'res_share']:.0%} renewables, so the "
         f"{reg['re_target_2030']:.0%} target does not bind. It binds only in {', '.join(binding)}.",
+        f"Built year by year at Tunisia's demonstrated pace (2027-2030 pathway), renewables reach only "
+        f"{share('S0'):.0%} in 2030 ({share('S1-15'):.0%} with the 15% saving), and each MWh saved avoids "
+        f"{whole.at['S1-15', 'co2_t_per_mwh']:.2f} t of CO2 and {whole.at['S1-15', 'cost_eur_per_mwh']:.0f} EUR.",
     ])
 
     doc.add_heading("1. Question and scope", level=1)
@@ -247,11 +255,46 @@ def main() -> None:
          bold_lead="The gas price changes the result most.")
     figure(doc, "6_price_duration", "Figure 6. Hourly electricity price, sorted, for S0, S1-15 and S2-300.")
 
+    s0_ccgt = ps.loc[("S0", 2030), "cap_CCGT_mw"] - ps.loc[("S0", 2027), "cap_CCGT_mw"]
+    doc.add_heading("3.4 The 2027-2030 pathway", level=2)
+    para(doc, "The runs above solve 2030 in one step and may build any amount. The pathway instead solves 2025 and "
+              "2026 once (base case), then each scenario for 2027, 2028, 2029 and 2030 in turn. Each year keeps what "
+              "was built before, committed projects switch on in their expected year, and new building is capped at "
+              f"Tunisia's demonstrated pace: {reg['pathway_solar_extra_mw_per_year']:.0f} MW of solar a year beyond the "
+              f"committed projects, no new wind before {reg['pathway_wind_first_year']:.0f} and then "
+              f"{reg['pathway_wind_extra_mw_per_year']:.0f} MW a year, and batteries only from "
+              f"{reg['pathway_battery_first_year']:.0f} (at most {reg['pathway_battery_mw']:.0f} MW / "
+              f"{reg['pathway_battery_mwh']:.0f} MWh). Savings and shifting reach their full size in 2030, a quarter at "
+              f"a time from 2027. The {reg['re_target_2030']:.0%} target is measured, not enforced.")
+    table(doc, ["Over 2027-2030, per MWh saved", "Cost (EUR)", "CO2 (t)", "Gas (MWh)"],
+          [[f"{sc} vs {whole.at[sc, 'reference']}", f"{whole.at[sc, 'cost_eur_per_mwh']:.1f}",
+            f"{whole.at[sc, 'co2_t_per_mwh']:.2f}", f"{whole.at[sc, 'gas_mwh_th_per_mwh']:.2f}"]
+           for sc in ["S1-10", "S1-15", "S1-20", "S2-300", "G-lo-S1-15", "G-hi-S1-15"]],
+          widths_cm=[6, 3, 3, 3])
+    bullets(doc, [
+        f"Renewables reach {share('S0'):.0%} of generation in 2030 without extra saving, {share('S1-15'):.0%} when "
+        f"saving 15% and {share('S1-20'):.0%} when saving 20%: the {reg['re_target_2030']:.0%} target is out of reach "
+        "at this pace, and efficiency closes part of the gap.",
+        f"Each MWh saved (S1-15) avoids {whole.at['S1-15', 'co2_t_per_mwh']:.2f} t of CO2 and "
+        f"{whole.at['S1-15', 'gas_mwh_th_per_mwh']:.2f} MWh of gas, against {head['co2_t_per_mwh']:.2f} t and "
+        f"{head['gas_mwh_th_per_mwh']:.2f} MWh in the unconstrained 2030 run: with little room to build solar, a "
+        "saved MWh comes off a gas plant.",
+        f"Without extra saving the model adds {s0_ccgt:.0f} MW of combined cycles by 2030 for the reserve margin; "
+        "every saving scenario adds none.",
+        f"Shifting {reg['flex_cap_mw']:.0f} MW is worth "
+        f"{ps.loc[('S1-15', 2030), 'system_cost_meur'] - ps.loc[('S2-300', 2030), 'system_cost_meur']:.1f} M EUR "
+        "in 2030, much less than in the unconstrained run, because there is little midday solar to shift into.",
+    ])
+    figure(doc, "10_pathway_res_share", "Figure 7. Renewable share year by year on the pathway, against the target.")
+    figure(doc, "12_pathway_avoided", "Figure 8. What each MWh saved avoids, year by year (S1-15 vs S0), against "
+                                      "the unconstrained 2030 run (dashed).")
+
     doc.add_heading("4. Limitations", level=1)
     bullets(doc, [
-        "Nothing limits how fast renewables are built. The base case adds "
-        f"{(s.loc['S0', 'new_cap_solar_mw'] + s.loc['S0', 'new_cap_onwind_mw']) / 1e3:.1f} GW of solar and wind by "
-        "2030, far above Tunisia's recent pace. The results show what least cost would do, not a forecast.",
+        "In the 2030 runs nothing limits how fast renewables are built: the base case adds "
+        f"{(s.loc['S0', 'new_cap_solar_mw'] + s.loc['S0', 'new_cap_onwind_mw']) / 1e3:.1f} GW of solar and wind, "
+        "far above Tunisia's recent pace. The pathway (section 3.4) caps building; its caps are judgements based on "
+        "past pace, and it assumes committed projects arrive on time.",
         "The cost of efficiency programmes is not modelled. The avoided cost per MWh is the most a programme could "
         "cost and still pay off for the power system.",
         "One weather year (2013) at 1-hour steps. A 3-hour test run built 2.7% more solar and 3.9% more wind "
@@ -274,7 +317,8 @@ def main() -> None:
 
     doc.add_heading("6. Reproducing the study", level=1)
     para(doc, "The code, tests, scenario files and step-by-step instructions are in the repository README. One "
-              "command (snakemake -j 1) rebuilds, solves and checks all 11 scenarios in about an hour on a laptop, "
+              "command (snakemake -j 1) rebuilds, solves and checks all 11 scenarios, for 2030 and for the 2027-2030 "
+              "pathway, in about two hours on a laptop, "
               "and scripts/make_figures.py and scripts/make_report.py redraw the figures and this report.")
 
     Path("report").mkdir(exist_ok=True)

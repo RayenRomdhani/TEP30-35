@@ -2,7 +2,7 @@
 
 This folder is the lab notebook. If you want to *learn* the topic, start with the [learning path](../learn/01-the-problem.md) instead; come here when you want to check how a result was produced or why a decision was taken.
 
-The study was built in five phases, each ending with evidence before the next one started.
+The study was built in six phases, each ending with evidence before the next one started.
 
 | Phase | What happened | Write-up |
 |---|---|---|
@@ -11,6 +11,7 @@ The study was built in five phases, each ending with evidence before the next on
 | 3 | The network checked against official 2024 statistics and calibrated | [phase3-validation.md](phase3-validation.md) |
 | 4 | The 11 scenarios built, solved and checked | [phase4-scenarios.md](phase4-scenarios.md) |
 | 5 | Figures, report, slides and the reusable skill | (this repository's README and `report/`) |
+| 6 | The 2027-2030 pathway: the same scenarios year by year, built at Tunisia's demonstrated pace | [phase6-pathway.md](phase6-pathway.md) |
 
 Other records:
 

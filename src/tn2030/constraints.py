@@ -68,15 +68,16 @@ def add_reserve_margin(n: pypsa.Network, margin: float, firm_carriers: tuple[str
     n.model.add_constraints(new >= (1 + margin) * peak - fixed, name="reserve_margin")
 
 
-def solve_network(n: pypsa.Network, res_share: float, reserve_margin: float | None = None,
+def solve_network(n: pypsa.Network, res_share: float | None, reserve_margin: float | None = None,
                   solver_name: str = "highs") -> None:
     """Least-cost investment and dispatch with the study's extra constraints. Fails loudly if not optimal.
 
-    Renewable share (always), battery charger/discharger link, reserve margin (if given), 3 h shift limit (if
-    the network has shiftable load).
+    Renewable share (if given; the pathway reports it instead), battery charger/discharger link, reserve margin
+    (if given), 3 h shift limit (if the network has shiftable load).
     """
     def extra(n, snapshots):
-        add_min_res_share(n, res_share)
+        if res_share is not None:
+            add_min_res_share(n, res_share)
         add_battery_link_constraint(n)
         if reserve_margin is not None:
             add_reserve_margin(n, reserve_margin)

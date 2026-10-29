@@ -56,6 +56,21 @@ For each pair, the model reports:
 | Avoided CO2 (t per MWh saved) | CO2 not emitted |
 | Avoided capacity (MW per TWh saved per year) | New plants the model no longer builds (all types added together, mostly solar and wind) |
 
+## Then the realistic version: 2027 to 2030, one year at a time
+
+Everything above treats 2030 as a single year: the model starts from the 2024 fleet and may build whatever is cheapest, in one go. That answers "what would least cost do?", but no country adds 6 GW of solar and wind in one step. Tunisia connected its first 100 MW-class solar plant only in December 2025.
+
+So the same eleven scenarios are also run as a **pathway**:
+
+1. **2025 and 2026 are solved once**, in the base case, to bring the fleet from 2024 to the start of the plan.
+2. **Each scenario then runs 2027, 2028, 2029 and 2030 in order.** Each year starts with everything built the year before; nothing is taken down.
+3. **Committed projects switch on in the year they are due** (about 0.8 GW of solar in 2027, Voltalia's 132 MW at Gabès in 2028).
+4. **New building is capped at the pace Tunisia has shown**: at most 268 MW of extra solar a year (what it added in 2024, its best year), no new wind before 2029 and then 75 MW a year (one tender lot), batteries only from 2029 and at most 150 MW / 540 MWh (the Bazma tender). New gas turbines are not capped: one can be added within a year.
+5. **Savings and shifting ramp up**: a quarter of the scenario's saving in 2027, half in 2028, three quarters in 2029, all of it in 2030.
+6. **The 35% target is measured, not forced.** At this pace it cannot be met, and forcing it would make the model build faster than Tunisia can.
+
+Each year is planned without knowing the next one (a "myopic" model), which is close to how Tunisia buys power plants: one tender at a time. The design and every source are in the [Phase 6 write-up](../project-history/phase6-pathway.md).
+
 ---
 
 **Next:** [5. Results](05-results.md): what the model found.
