@@ -79,15 +79,17 @@ def apply_committed_year(n: pypsa.Network, committed: pd.DataFrame, year: int) -
 
 
 def build_year(n_base: pypsa.Network, scenario: dict, register: dict, committed: pd.DataFrame, year: int,
-               prev: pypsa.Network | None, limits: dict) -> pypsa.Network:
+               prev: pypsa.Network | None, limits: dict, calibrate: bool = True) -> pypsa.Network:
     """The network for one year: calibrated base, that year's demand and saving, last year's fleet, the year's
-    committed plants, and the building limits."""
+    committed plants, and the building limits. calibrate=False is for the toy network, which has no fleet."""
     r = register
-    n = calibrate_base(n_base, r)
+    n = calibrate_base(n_base, r) if calibrate else n_base.copy()
     w = n.snapshot_weightings.generators
     base_load = n.loads_t.p_set
-    load_factor = r["demand_2024_twh"] * 1e6 / HOURS_2024 / r["peak_2024_mw"]
-    total = reshape_profile(base_load.sum(axis=1), w, load_factor, r["min_to_peak_2030"])
+    total = base_load.sum(axis=1)
+    if calibrate:  # Phase 3 calibration of the hourly shape
+        load_factor = r["demand_2024_twh"] * 1e6 / HOURS_2024 / r["peak_2024_mw"]
+        total = reshape_profile(total, w, load_factor, r["min_to_peak_2030"])
     total = scale_profile(total, w, demand_twh(r["demand_2024_twh"], r["demand_growth"], year) * 1e6)
     share = ramp(scenario["efficiency"]["share"], year)
     if scenario["efficiency"]["mode"] == "uniform" or share == 0:

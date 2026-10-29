@@ -229,20 +229,39 @@ def main() -> None:
         f"{target} target binds only in "
         f"{', '.join(sorted(s.index[s.res_share < reg['re_target_2030'] + 1e-4]))}.")
 
-    # 8. Limits and next steps
+    # 8. The 2027-2030 pathway at Tunisia's demonstrated building pace
+    ps = pd.read_csv("results/pathway_summary.csv").set_index(["scenario", "year"])
+    whole = pd.read_csv("results/pathway_avoided.csv").set_index(["scenario", "year"]).xs("2027-2030", level="year")
+    share = lambda sc: ps.loc[(sc, 2030), "res_share"]
+    sl = deck.slides.add_slide(blank)
+    title(sl, f"At Tunisia's real pace, {target} is out of reach")
+    picture(sl, "10_pathway_res_share", 0.4, 1.5, 8.6)
+    card(sl, 9.3, 1.6, 3.5, 4.6)
+    stat(sl, 9.5, 1.8, 3.1, f"{share('S0'):.0%}", f"renewables in 2030 without extra saving; {share('S1-15'):.0%} "
+                                                 "when saving 15%")
+    text(sl, 9.5, 3.9, 3.1, 2.2, f"Each MWh saved over 2027-2030 avoids {whole.at['S1-15', 'co2_t_per_mwh']:.2f} t "
+                                 f"of CO2 and {whole.at['S1-15', 'cost_eur_per_mwh']:.0f} EUR: it comes off a gas plant.",
+         size=15)
+    footer(sl)
+    sl.notes_slide.notes_text_frame.text = (
+        "Each year from 2027 starts from the year before; committed projects arrive in their year; new solar is "
+        f"capped at {reg['pathway_solar_extra_mw_per_year']:.0f} MW a year (Tunisia's best year, 2024), new wind "
+        f"starts in {reg['pathway_wind_first_year']:.0f} and batteries in {reg['pathway_battery_first_year']:.0f}.")
+
+    # 9. Limits and next steps
     sl = deck.slides.add_slide(blank)
     background(sl, DARK)
     title(sl, "What the numbers mean, and what comes next", colour=WHITE)
     text(sl, 0.6, 1.6, 5.8, 0.5, "Read with care", size=20, colour=SUN, bold=True, font=HEAD)
     text(sl, 0.6, 2.2, 5.8, 4.4, [
-        "Least cost, not a forecast: no limit on how fast renewables are built",
+        "Not a forecast: 2030 alone has no build limit; the pathway's limits are judgements",
         "Programme costs not modelled: the avoided cost is a ceiling on what a programme may cost",
         "One weather year; imports flat at their 2024 level",
         "Demand growth from STEG's forecast as quoted by JICA (2022)"], size=15, colour=WHITE)
     text(sl, 7.0, 1.6, 5.7, 0.5, "Next steps", size=20, colour=SUN, bold=True, font=HEAD)
     text(sl, 7.0, 2.2, 5.7, 4.4, [
         "Add the ELMED link to Italy as a scenario",
-        "Cap the yearly renewable build rate with a sourced limit",
+        "Test faster build rates as the 2 GW wind tenders progress",
         "Compare the avoided cost with the cost of real efficiency programmes"], size=15, colour=WHITE)
     footer(sl, colour="B8C4C7")
     sl.notes_slide.notes_text_frame.text = "Code, data sources and full results are in the GitHub repository."

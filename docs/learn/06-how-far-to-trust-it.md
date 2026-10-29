@@ -36,13 +36,13 @@ After each of the 11 solves, the pipeline checks, and stops if anything fails:
 - every existing plant and committed project is kept;
 - firm capacity is at least 10% above the peak.
 
-All 11 runs pass. On top of that, the code has 100 automated tests, most of them on a small two-day test network where the right answer is known.
+All 11 runs pass, and so do the 46 pathway solves (their only warnings: in saving scenarios the peak falls below STEG's forecast, which does not know about the saving). On top of that, the code has 112 automated tests, most of them on a small two-day test network where the right answer is known.
 
 ## What the model cannot see
 
-Each limit comes with the way I expect it would push the results. None of these were tested with extra runs.
+Each limit comes with the way I expect it would push the results. Only the first was tested with extra runs.
 
-1. **No speed limit on building.** The base case adds about 6 GW of solar and wind by 2030, far above Tunisia's recent pace (about 1 GW of projects under way). Read the 56% renewable share as "what least cost would do", not a forecast. *Likely effect:* with a build limit, more gas runs, so a saved MWh avoids more gas and CO2.
+1. **No speed limit on building, in the 2030 runs.** The base case adds about 6 GW of solar and wind by 2030, far above Tunisia's recent pace. Read the 56% renewable share as "what least cost would do", not a forecast. *Tested:* the 2027-2030 pathway caps building at Tunisia's demonstrated pace ([chapter 5](05-results.md#at-tunisias-real-pace-the-2027-2030-pathway)). As expected, more gas runs, and a saved MWh avoids about twice the gas and CO2. The caps themselves are judgements (268 MW of solar a year is Tunisia's best year so far), and the pathway assumes committed projects arrive on time, which is not guaranteed.
 2. **Saving and shifting are free in the model.** The study values a saved or shifted MWh; it does not price the appliances, insulation, smart controls or programmes needed. Read 60 EUR/MWh as the most a saving programme could cost and still pay off for the power system, and 22 M EUR a year as the gross value of 300 MW of shifting. *Pushes the other way for shifting:* it gets no credit for lowering the peak, which is conservative.
 3. **The model's daily peak comes about two hours late.** The model's summer peaks fall around 17:00 UTC; STEG's real peaks were at 14:41 UTC. That changes how much load can move into solar hours and when cooling savings land. *Likely effect:* could push the cooling and shifting results either way.
 4. **One weather year, one hour at a time.** 2013 weather, 8,760 steps. A test at 3-hour steps built 2.7% more solar and 3.9% more wind; another weather year would shift numbers a little too.

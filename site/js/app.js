@@ -2,7 +2,7 @@
 // scripts/export_site_data.py from the study's results); the HTML holds none of them.
 
 import { createDay } from "./day.js";
-import { drawMap, drawWeek } from "./graphics.js";
+import { drawMap, drawRoad, drawWeek } from "./graphics.js";
 
 const getJSON = (n) => fetch(`data/${n}.json`, { cache: "no-cache" }).then((r) => r.json());
 const fmt = (x, d = 0) => x.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -201,6 +201,43 @@ function bar3(f, study) {
   $("#bar3").innerHTML = parts.map(([l, v, bg, ink]) => `<div style="flex:${v};background:${bg};color:${ink}"><span class="p">${pct(v / f.supply)}</span><span class="n">${l} · ${fmt(v)} ktep</span></div>`).join("");
 }
 
+// ---------- the road to 2030: the year-by-year pathway ----------
+function road(pw) {
+  const L = (id) => pw.limits[id].value, years = [...pw.history.map((h) => h.year), ...pw.scenarios.S0.map((r) => r.year)];
+  const committed = Object.entries(pw.committed).filter(([y]) => y >= 2025 && y <= 2028).reduce((a, [, mw]) => a + mw, 0);
+  const last = (c) => pw.scenarios[c][pw.scenarios[c].length - 1];
+  const s0 = last("S0").res_share, s1 = last("S1-15").res_share;
+  const text = {
+    solar: fmt(L("pathway_solar_extra_mw_per_year")), solarYear: "2024", windYear: L("pathway_wind_first_year"),
+    wind: fmt(L("pathway_wind_extra_mw_per_year")), battery: fmt(L("pathway_battery_mw")), batteryYear: L("pathway_battery_first_year"),
+    batteryMwh: fmt(L("pathway_battery_mwh")), committed: fmt(committed / 1000, 1), s0Share: pct(s0),
+    gapText: `At the pace Tunisia has shown, renewables reach ${pct(s0)} of generation in 2030, ${fmt((pw.target - s0) * 100)} points short of the ${pct(pw.target)} target. `
+      + `Saving 15% by 2030 lifts that to ${pct(s1)}: the same panels and turbines cover a larger part of a smaller demand.`,
+  };
+  $$("[data-p]").forEach((e) => { e.textContent = text[e.dataset.p] ?? ""; });
+
+  const options = [["S0", "As planned"], ["S1-15", "Save 15%"], ["S2-300", "15% + 300 MW shift"], ["G-hi-S0", "Gas 50% dearer"]];
+  const group = $('[data-group="road"]'), svg = $("#road-chart");
+  group.innerHTML = options.map(([c, l]) => `<button data-v="${c}" aria-pressed="${c === "S1-15"}"><span>${l}</span></button>`).join("");
+  const points = (c) => [...pw.history, ...pw.scenarios[c]].map((r) => ({ year: r.year, v: r.res_share }));
+  let seen = false;
+  const draw = (c) => {
+    const series = [...(c === "S0" ? [] : [{ key: "S0", points: points("S0") }]), { key: c, points: points(c), strong: true }];
+    const paths = drawRoad(svg, series, pw.target, years);
+    if (!reduce && !seen) paths.forEach((p) => { const len = p.getTotalLength(); p.style.strokeDasharray = len; p.style.strokeDashoffset = len; });
+    $$("button", group).forEach((b) => b.setAttribute("aria-pressed", b.dataset.v === c ? "true" : "false"));
+  };
+  group.addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) draw(b.dataset.v); });
+  draw("S1-15");
+  new IntersectionObserver(([e], obs) => { if (!e.isIntersecting) return; obs.disconnect(); seen = true;
+    $$(".line", svg).forEach((p) => { p.style.strokeDashoffset = 0; }); }, { rootMargin: "0px 0px -25% 0px" }).observe(svg);
+
+  const rows = pw.avoided["S1-15"];
+  $("#road-table").innerHTML = "<thead><tr><th>Year</th><th class='num'>Cost avoided per MWh saved</th><th class='num'>Gas avoided per MWh saved</th><th class='num'>CO2 avoided per MWh saved</th></tr></thead><tbody>"
+    + rows.map((r) => `<tr><td>${r.year === "2027-2030" ? "All four years" : r.year}</td><td class="num">${fmt(r.cost_eur_per_mwh)} EUR</td>`
+      + `<td class="num">${fmt(r.gas_mwh_th_per_mwh, 2)} MWh</td><td class="num">${fmt(r.co2_t_per_mwh, 2)} t</td></tr>`).join("") + "</tbody>";
+}
+
 // ---------- start ----------
 async function main() {
   const [study, weekData, grid] = await Promise.all([getJSON("study"), getJSON("peakweek"), getJSON("grid")]);
@@ -208,6 +245,7 @@ async function main() {
   fill(f, study); chrome(f);
   runDay(weekData); runSteps(); splitBar(f); chooser(f); week(weekData); flip(f); validation(study); bar3(f, study);
   drawMap($("#map"), grid);
+  getJSON("pathway").then(road).catch(() => { $("#road").hidden = true; });   // no pathway results yet: hide the chapter
   // the year surface is heavy (437 kB): load it when the reader gets close
   const yc = $("#year");
   new IntersectionObserver(async ([e], obs) => {

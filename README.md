@@ -14,7 +14,7 @@ Everyone talks about building more solar. I wanted to know what happens on the o
 
 > **If Tunisia uses one MWh less in 2030, what does its power system no longer have to buy, burn or build?**
 
-So I built a model of the whole Tunisian power system, ran 2030 eleven different ways, and measured the difference.
+So I built a model of the whole Tunisian power system, ran 2030 eleven different ways, and measured the difference. Then, because no country builds its 2030 power system in one go, I ran the four years from 2027 to 2030 one after the other, building no faster than Tunisia has managed so far.
 
 ![Every MWh Tunisia does not use in 2030 saves 60 EUR, 0.91 MWh of gas, 0.18 t of CO2 and 449 MW of new capacity per TWh saved](results/figures/0_headline.png)
 
@@ -30,9 +30,22 @@ So I built a model of the whole Tunisian power system, ran 2030 eleven different
 
 And a plot twist: with 2030 cost projections, the cheapest 2030 system reaches **56% renewables** without being forced to. The 35% target binds only in the half-price gas case.
 
+## At the pace Tunisia actually builds
+
+The findings above come from 2030 on its own, where the model may build whatever is cheapest: about 6 GW of new solar and wind in one step. The pathway runs 2027, 2028, 2029 and 2030 in sequence instead. Each year keeps what was built before, the committed projects switch on in the year they are due, and new building is capped at Tunisia's demonstrated pace: **268 MW of solar a year** (its best year so far, 2024), **no new wind before 2029**, then 75 MW a year, and **batteries only from 2029** (the 150 MW Bazma tender). Every limit is a [register](data/assumptions_register.md) row with the facts behind it.
+
+![Renewable share year by year: 22% in 2030 without extra saving, 27% when saving 15%, 29% when saving 20%, against a 35% target](results/figures/10_pathway_res_share.png)
+
+- **The 35% target is out of reach.** Renewables reach **22%** of generation in 2030. Saving 15% lifts that to **27%**, saving 20% to **29%**: the same panels cover a larger part of a smaller demand.
+- **A saved MWh is mostly a gas MWh.** Over 2027-2030, each MWh saved avoids **70 EUR**, **1.95 MWh of gas** and **0.39 t of CO2**. With little room to build solar, almost every saved MWh comes off a gas plant.
+- **Any saving still cancels the new gas plant.** Without extra saving the model adds 423 MW of combined-cycle capacity by 2030 to keep its reserve margin; every saving scenario adds none.
+- **Shifting and the gas price matter less.** With little midday solar to move demand into, 300 MW of shifting is worth 6.9 M EUR in 2030. And at every gas price a saved MWh displaces gas: the price changes how much money it saves, not what it replaces.
+
+The full pathway write-up, with every year's numbers, is in [Phase 6](docs/project-history/phase6-pathway.md).
+
 ## What this study is not
 
-- **Not a forecast.** It shows the least-cost 2030 system, and the model has no limit on how fast Tunisia can build solar and wind.
+- **Not a forecast.** The 2030 runs show the least-cost system with no limit on how fast Tunisia can build; the pathway adds limits, but they are judgements based on its past pace, and they assume committed projects arrive on time.
 - **Not a cost-benefit analysis of programmes.** Saving and shifting are free in the model: the results are what they are worth to the power system, before the cost of achieving them.
 - **Not the whole grid.** Imports are fixed at 2024 levels, there are 2 nodes, and the model's daily peak comes about two hours later than the real one.
 
@@ -63,13 +76,13 @@ New to power systems? The learning path explains everything from scratch, one sh
 | 1 | [The problem](docs/learn/01-the-problem.md) | How Tunisia makes its electricity, where its gas comes from, the 2030 promise |
 | 2 | [Key ideas](docs/learn/02-key-ideas.md) | Energy vs power, the merit order, reserve margins, efficiency vs flexibility |
 | 3 | [How the model works](docs/learn/03-how-the-model-works.md) | Least-cost planning as a game with rules; PyPSA-Earth; where each piece of code fits |
-| 4 | [The experiment](docs/learn/04-the-experiment.md) | The 11 scenarios in plain words |
+| 4 | [The experiment](docs/learn/04-the-experiment.md) | The 11 scenarios in plain words, and the 2027-2030 pathway |
 | 5 | [Results](docs/learn/05-results.md) | Every figure, what to look at, what it means |
 | 6 | [How far to trust it](docs/learn/06-how-far-to-trust-it.md) | The 2024 check and what the model cannot see |
 | 7 | [Try it yourself](docs/learn/07-try-it-yourself.md) | Run the model, add your own scenario |
 | | [Glossary](docs/learn/glossary.md) | Every term in one or two lines |
 
-Prefer a document? There is a [written report](report/report.docx) and an [8-slide deck](report/deck.pptx). Prefer to explore? The [interactive site](site/) tells the study through one summer day: scroll moves the clock across a 3D landscape whose sun, solar field, turbines and gas plant follow the model's real hourly output, then on to the answer, a "choose how Tunisia saves" panel and the limits (see [`site/README.md`](site/README.md) to run it locally).
+Prefer a document? There is a [written report](report/report.docx) and a [9-slide deck](report/deck.pptx). Prefer to explore? The [interactive site](site/) tells the study through one summer day: scroll moves the clock across a 3D landscape whose sun, solar field, turbines and gas plant follow the model's real hourly output, then on to the answer, a "choose how Tunisia saves" panel, the four years to 2030 and the limits (see [`site/README.md`](site/README.md) to run it locally).
 
 ## Where the numbers come from
 
@@ -125,7 +138,7 @@ snakemake -j 1
 python scripts/make_figures.py
 ```
 
-The 100 tests cover 98% of the study's code (`pytest --cov=tn2030 --cov-branch`); those that need the real Tunisia network skip themselves if it is missing.
+The 112 tests cover 98% of the study's code (`pytest --cov=tn2030 --cov-branch`); those that need the real Tunisia network skip themselves if it is missing.
 
 ## Licence and citation
 

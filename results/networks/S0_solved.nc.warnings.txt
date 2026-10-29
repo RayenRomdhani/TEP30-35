@@ -1,1 +1,1 @@
-solve time: 5.1 min
+solve time: 8.2 min

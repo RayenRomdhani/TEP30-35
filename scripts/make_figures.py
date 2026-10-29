@@ -1,7 +1,7 @@
 """Draw the result figures from results/*.csv and the solved networks (plan Task 17).
 
 Run from the repo root after `snakemake -j 1`:  python scripts/make_figures.py
-Writes 10 PNGs to results/figures/ (0_headline.png is the README's opening picture).
+Writes 13 PNGs to results/figures/ (0_headline.png is the README's opening picture; 10-12 need the pathway results).
 """
 
 import sys
@@ -19,6 +19,7 @@ import pypsa
 from tn2030.plotting import (INK, INK_2, LABELS, PALETTE, SINGLE, SOURCE, STACK_ORDER, add_source,
                              annual_generation_twh, dispatch_by_carrier, finish_figure, load_weighted_price,
                              new_figure, style_axis)
+from tn2030.constraints import res_share
 from tn2030.register import load_register
 
 RESULTS = Path("results")
@@ -204,6 +205,65 @@ def uniform_vs_cooling(avoided_df: pd.DataFrame) -> None:
     save(fig, "9_uniform_vs_cooling")
 
 
+PATHWAY_LINES = [("S0", "No extra saving"), ("S1-15", "Save 15% by 2030"), ("S1-20", "Save 20% by 2030")]
+
+
+def pathway_share(ps: pd.DataFrame, history: pd.DataFrame, target: float) -> None:
+    """Renewable share year by year on the realistic pathway (2025-2026 shared history), against the 35% target."""
+    fig, ax = new_figure(10, 4.8)
+    for colour, (s, label) in zip(LINE_COLOURS, PATHWAY_LINES):
+        d = pd.concat([history, ps[ps.scenario == s]]).sort_values("year")
+        ax.plot(d.year, d.res_share * 100, color=colour, linewidth=2.5, marker="o", label=label)
+        ax.text(d.year.iloc[-1] + 0.08, d.res_share.iloc[-1] * 100, f"{d.res_share.iloc[-1]:.0%}", va="center", fontsize=9, color=INK)
+    ax.axhline(target * 100, color=INK, linewidth=1.5, linestyle=(0, (5, 4)))
+    ax.text(history.year.min(), target * 100 + 0.8, f"Target: {target:.0%} by 2030", fontsize=9, color=INK)
+    ax.axvspan(history.year.min() - 0.3, history.year.max() + 0.3, color="#eef3f4", zorder=0)
+    ax.text(history.year.mean(), 1.5, "history (base case)", ha="center", fontsize=8, color=INK_2)
+    ax.set_xticks(range(int(history.year.min()), int(ps.year.max()) + 1)); ax.set_ylim(0, target * 100 + 6)
+    ax.legend(frameon=False, loc="lower right")
+    finish_figure(fig, ax, "Renewable share of generation, built at Tunisia's demonstrated pace", "% of domestic generation",
+                  SOURCE + "; build limits in the register (pathway_*)")
+    save(fig, "10_pathway_res_share")
+
+
+def pathway_capacity(ps: pd.DataFrame, scen: str = "S0") -> None:
+    """How the fleet grows year by year on the pathway (installed capacity, GW)."""
+    d = ps[ps.scenario == scen].sort_values("year").set_index("year")
+    cap = pd.DataFrame({c: d.get(f"cap_{c}_mw", 0.0) for c in STACK_ORDER}).fillna(0)
+    cap["hydro"] += d.get("cap_ror_mw", 0.0)
+    fig, ax = new_figure(10, 4.8)
+    bottom = pd.Series(0.0, index=cap.index)
+    for c in [c for c in STACK_ORDER if cap[c].sum() > 0]:
+        ax.bar(cap.index, cap[c] / 1e3, 0.55, bottom=bottom, color=PALETTE[c], edgecolor="white", linewidth=1, label=LABELS[c])
+        bottom += cap[c] / 1e3
+    for y, t in bottom.items():
+        ax.text(y, t, f"{t:.1f}", ha="center", va="bottom", fontsize=9, color=INK)
+    ax.set_xticks(cap.index)
+    ax.legend(ncol=6, frameon=False, loc="upper left", bbox_to_anchor=(0, -0.1), fontsize=8)
+    fig.subplots_adjust(bottom=0.24)
+    finish_figure(fig, ax, f"Installed capacity year by year on the pathway ({scen}, no extra saving)", "GW", SOURCE)
+    save(fig, "11_pathway_capacity")
+
+
+def pathway_avoided(pa: pd.DataFrame, avoided_df: pd.DataFrame, scen: str = "S1-15") -> None:
+    """What one MWh saved avoids each year on the pathway, against the unconstrained 2030 run (dashed)."""
+    d = pa[(pa.scenario == scen) & (pa.year != "2027-2030")].astype({"year": int}).sort_values("year")
+    fig, axes = plt.subplots(1, 3, figsize=(12, 4.2), facecolor="white")
+    fig.subplots_adjust(bottom=0.16, wspace=0.3, top=0.8)
+    for ax, (col, title, unit, fmt) in zip(axes, METRICS[:3]):
+        ax.plot(d.year, d[col], color=LINE_COLOURS[0], linewidth=2.5, marker="o", label="Built at Tunisia's pace")
+        for x, v in zip(d.year, d[col]):
+            ax.text(x, v, fmt.format(v) + "\n", ha="center", va="bottom", fontsize=8, color=INK)
+        ax.axhline(avoided_df.at[scen, col], color=INK_2, linewidth=1.5, linestyle=(0, (5, 4)), label="2030 with no build limit")
+        ax.set_ylim(0, max(d[col].max(), avoided_df.at[scen, col]) * 1.35)
+        ax.set_xticks(d.year)
+        style_axis(ax, title, unit)
+    axes[0].legend(frameon=False, loc="lower left", fontsize=8)
+    fig.suptitle(f"What each MWh saved avoids, year by year ({scen} against S0)", x=0.01, ha="left", fontsize=13, color=INK)
+    add_source(fig, SOURCE + "; dashed: the 2030 run with no build limit (results/avoided.csv)")
+    save(fig, "12_pathway_avoided")
+
+
 def main() -> None:
     FIGURES.mkdir(parents=True, exist_ok=True)
     reg = load_register(Path("data/assumptions_register.xlsx"))
@@ -225,6 +285,13 @@ def main() -> None:
     dispatch_week(networks)
     avoided(avoided_df, labels)
     uniform_vs_cooling(avoided_df)
+    if (RESULTS / "pathway_summary.csv").exists():
+        ps, pa = pd.read_csv(RESULTS / "pathway_summary.csv"), pd.read_csv(RESULTS / "pathway_avoided.csv")
+        history = pd.DataFrame([{"year": y, "res_share": res_share(pypsa.Network(str(RESULTS / "pathway" / f"history_{y}_solved.nc")))}
+                                for y in (2025, 2026)])
+        pathway_share(ps, history, reg["re_target_2030"])
+        pathway_capacity(ps)
+        pathway_avoided(pa, avoided_df)
 
 
 if __name__ == "__main__":

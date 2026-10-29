@@ -44,12 +44,13 @@ def solve_step(in_path: Path, out_path: Path, register_path: Path, committed_pat
 
 
 def pathway_step(base_path: Path, scenario_path: Path, register_path: Path, committed_path: Path, year: int,
-                 prev_path: Path | None, out_path: Path) -> None:
+                 prev_path: Path | None, out_path: Path, calibrate: bool = True) -> None:
     """One year of the 2027-2030 pathway: build from last year's solved network, solve without forcing the 35%
     target (it is reported instead), check, save."""
     r, committed = load_register(register_path), pd.read_csv(committed_path)
     prev = pypsa.Network(str(prev_path)) if prev_path else None
-    n = build_year(pypsa.Network(str(base_path)), load_scenario(scenario_path), r, committed, year, prev, limits_from_register(r))
+    n = build_year(pypsa.Network(str(base_path)), load_scenario(scenario_path), r, committed, year, prev,
+                   limits_from_register(r), calibrate=calibrate)
     start = time.time()
     solve_network(n, None, reserve_margin=r["reserve_margin"])
     minutes = (time.time() - start) / 60

@@ -14,8 +14,10 @@ sys.path.insert(0, str(ROOT / "src"))  # this checkout's tn2030
 import pandas as pd
 import pypsa
 
+from tn2030.constraints import res_share
 from tn2030.plotting import STACK_ORDER, dispatch_by_carrier
 from tn2030.register import load_register
+from tn2030.results import summarize
 from tn2030.site_data import grid_lines, hour_grid
 
 OUT = ROOT / "site" / "data"
@@ -121,10 +123,44 @@ def grid(s0: pypsa.Network) -> dict:
             "attribution": "Grid: © OpenStreetMap contributors (ODbL), via PyPSA-Earth"}
 
 
+PATHWAY_KEYS = ["res_share", "demand_twh", "gas_use_twh_th", "co2_mt", "system_cost_meur", "new_cap_total_mw"] + \
+    [f"cap_{c}_mw" for c in STACK_ORDER] + ["cap_ror_mw"]
+LIMIT_IDS = ["pathway_solar_extra_mw_per_year", "pathway_wind_first_year", "pathway_wind_extra_mw_per_year",
+             "pathway_battery_first_year", "pathway_battery_mw", "pathway_battery_mwh", "solar_capacity_2024_mw"]
+
+
+def pathway(reg: dict) -> dict:
+    """The 2027-2030 pathway: 2025-2026 history, each scenario year by year, what a saved MWh avoids each year,
+    and the build limits with their sources."""
+    summary = pd.read_csv(RESULTS / "pathway_summary.csv")
+    avoided = pd.read_csv(RESULTS / "pathway_avoided.csv")
+    history = []
+    for year in (2025, 2026):
+        n = pypsa.Network(str(RESULTS / "pathway" / f"history_{year}_solved.nc"))
+        history.append({"year": year, "res_share": res_share(n), **summarize(n).to_dict()})
+    keep = lambda row: {k: round(float(row.get(k, 0.0) or 0.0), 4) for k in PATHWAY_KEYS} | {"year": int(row["year"])}
+    register = pd.read_excel(ROOT / "data" / "assumptions_register.xlsx", sheet_name="register").set_index("id")
+    committed = pd.read_csv(ROOT / "data" / "committed_projects.csv")
+    committed["cod_expected"] = pd.to_numeric(committed.cod_expected, errors="coerce")
+    by_year = committed[committed.carrier.isin(["solar", "onwind"])].groupby("cod_expected").p_nom_mw.sum()
+    return {"target": reg["re_target_2030"],
+            "committed": {int(y): float(mw) for y, mw in by_year.items()},
+            "history": [keep(h) for h in history],
+            "scenarios": {s: [keep(r) for _, r in summary[summary.scenario == s].sort_values("year").iterrows()]
+                          for s in ORDER},
+            "avoided": {s: d.drop(columns=["scenario", "reference"]).to_dict(orient="records")
+                        for s, d in avoided.groupby("scenario")},
+            "limits": {i: {"value": reg[i], "note": register.at[i, "notes"],
+                           "url": register.at[i, "source_url"] if pd.notna(register.at[i, "source_url"]) else None}
+                       for i in LIMIT_IDS}}
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     reg = load_register(ROOT / "data" / "assumptions_register.xlsx")
     write("study.json", study(reg))
+    if (RESULTS / "pathway_summary.csv").exists():
+        write("pathway.json", pathway(reg))
     networks = {s: pypsa.Network(str(RESULTS / "networks" / f"{s}_solved.nc")) for s in ("S0", "S1-15", "S2-300")}
     write("hourly.json", hourly(networks))
     write("peakweek.json", peak_week(networks))
