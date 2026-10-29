@@ -14,7 +14,7 @@ sys.path.insert(0, str(ROOT / "src"))  # this checkout's tn2030
 import pandas as pd
 import pypsa
 
-from tn2030.plotting import STACK_ORDER, dispatch_by_carrier, load_weighted_price
+from tn2030.plotting import STACK_ORDER, dispatch_by_carrier
 from tn2030.register import load_register
 from tn2030.site_data import grid_lines, hour_grid
 
@@ -113,12 +113,6 @@ def peak_week(networks: dict) -> dict:
     return out
 
 
-def prices(networks: dict) -> dict:
-    """Price duration curves (every 10th hour of the sorted year, EUR/MWh)."""
-    return {s: load_weighted_price(networks[s]).sort_values(ascending=False).iloc[::10].round(1).tolist()
-            for s in ("S0", "S1-15", "S2-300")}
-
-
 def grid(s0: pypsa.Network) -> dict:
     """OpenStreetMap transmission lines of Tunisia and the model's two nodes."""
     ac = s0.buses[s0.buses.carrier == "AC"]
@@ -134,7 +128,6 @@ def main() -> None:
     networks = {s: pypsa.Network(str(RESULTS / "networks" / f"{s}_solved.nc")) for s in ("S0", "S1-15", "S2-300")}
     write("hourly.json", hourly(networks))
     write("peakweek.json", peak_week(networks))
-    write("prices.json", prices(networks))
     write("grid.json", grid(networks["S0"]))
     (ROOT / "site" / "assets").mkdir(exist_ok=True)  # social-preview image
     shutil.copyfile(RESULTS / "figures" / "0_headline.png", ROOT / "site" / "assets" / "headline.png")
