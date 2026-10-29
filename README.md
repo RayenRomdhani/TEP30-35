@@ -69,7 +69,7 @@ New to power systems? The learning path explains everything from scratch, one sh
 | 7 | [Try it yourself](docs/learn/07-try-it-yourself.md) | Run the model, add your own scenario |
 | | [Glossary](docs/learn/glossary.md) | Every term in one or two lines |
 
-Prefer a document? There is a [written report](report/report.docx) and an [8-slide deck](report/deck.pptx).
+Prefer a document? There is a [written report](report/report.docx) and an [8-slide deck](report/deck.pptx). Prefer to explore? The [interactive site](site/) tells the study through one summer day: scroll moves the clock across a 3D landscape whose sun, solar field, turbines and gas plant follow the model's real hourly output, then on to the answer, a "choose how Tunisia saves" panel and the limits (see [`site/README.md`](site/README.md) to run it locally).
 
 ## Where the numbers come from
 
@@ -87,6 +87,7 @@ No number in this study is made up. Every input is a row in the [assumptions reg
 | [`scripts/`](scripts/) | Figures, report, slides, register export, 2024 validation (`scripts/dev/` holds one-off helpers) |
 | [`tests/`](tests/) | Automated tests |
 | [`report/`](report/) | Report and slides |
+| [`site/`](site/) | The interactive web page (a scroll story with 3D scenes), fed by `scripts/export_site_data.py` |
 | [`skill/`](skill/) | `pypsa-country-study`: the method and its pitfalls, packaged for a study of another country |
 | [`docs/project-history/`](docs/project-history/) | The lab notebook: how the study was built, phase by phase |
 
